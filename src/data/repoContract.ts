@@ -433,6 +433,53 @@ export function describeRepoContract(name: string, createRepo: RepoFactory): voi
       })
     })
 
+    describe("приборы пачкой", () => {
+      it("отдаёт запрошенные указателем по коду", async () => {
+        const first = await addInstrument({ inventoryNumber: "PR-001" })
+        const second = await addInstrument({ inventoryNumber: "PR-002" })
+        await addInstrument({ inventoryNumber: "PR-003" })
+
+        const found = await repo.instruments.byIds([first.id, second.id])
+
+        expect([...found.keys()].sort()).toEqual([first.id, second.id].sort())
+        expect(found.get(first.id)?.inventoryNumber).toBe("PR-001")
+      })
+
+      it("неизвестный код просто отсутствует, а не приходит пустым местом", async () => {
+        const instrument = await addInstrument({ inventoryNumber: "PR-001" })
+
+        const found = await repo.instruments.byIds([instrument.id, "нет-такого"])
+
+        expect(found.size).toBe(1)
+        expect(found.has("нет-такого")).toBe(false)
+      })
+
+      it("повторы в запросе не дают повторов в ответе", async () => {
+        const instrument = await addInstrument({ inventoryNumber: "PR-001" })
+
+        const found = await repo.instruments.byIds([instrument.id, instrument.id, instrument.id])
+
+        expect(found.size).toBe(1)
+      })
+
+      it("пустой запрос — пустой ответ", async () => {
+        expect((await repo.instruments.byIds([])).size).toBe(0)
+      })
+
+      /* Длинный список разбивается на части: SQLite не принимает сколько угодно
+         подставляемых значений в одном запросе, и на выгрузке журнала за год
+         этот предел достигается. */
+      it("переживает список длиннее предела подстановок", async () => {
+        const instrument = await addInstrument({ inventoryNumber: "PR-001" })
+        const many = Array.from({ length: 1200 }, (_, index) => `нет-${ index }`)
+
+        const found = await repo.instruments.byIds([...many, instrument.id])
+
+        expect(found.size).toBe(1)
+        expect(found.get(instrument.id)?.inventoryNumber).toBe("PR-001")
+      })
+    })
+
     describe("настройки", () => {
       it("запоминает ФИО оператора", async () => {
         expect(await repo.settings.operatorName()).toBeNull()

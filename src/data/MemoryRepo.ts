@@ -120,6 +120,10 @@ export class MemoryRepo implements AppRepo {
   readonly instruments: InstrumentRepo = {
     list: async (query = {}) => this.listInstruments(query),
     getById: async (id) => this.instrumentRows.find((row) => row.id === id) ?? null,
+    byIds: async (ids) => {
+      const wanted = new Set(ids)
+      return new Map(this.instrumentRows.filter((row) => wanted.has(row.id)).map((row) => [row.id, row]))
+    },
     getByInventoryNumber: async (inventoryNumber) =>
       this.instrumentRows.find((row) => row.inventoryNumber === inventoryNumber) ?? null,
     create: async (draft, operatorName) => this.createInstrument(draft, operatorName),

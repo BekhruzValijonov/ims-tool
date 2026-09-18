@@ -4,7 +4,6 @@ import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
-import type { Instrument } from "../features/instruments/domain/types"
 import { TourButton } from "../tour/TourButton"
 import { formatDate } from "../shared/dates"
 import { useStateColors } from "../app/theme/useStateColors"
@@ -41,10 +40,8 @@ export function EmployeePage() {
       repo.directories.instrumentsOf(id),
       repo.operations.journal({ employeeId: id, pageSize: 50 }),
     ])
-    const ids = [...new Set(journal.rows.map((event) => event.instrumentId))]
-    const loaded = await Promise.all(ids.map((rowId) => repo.instruments.getById(rowId)))
-    const instruments = new Map<string, Instrument>()
-    for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
+    const instruments = await repo.instruments.byIds(
+      journal.rows.map((event) => event.instrumentId))
 
     return { employee, onHands, journal, instruments }
   }, [repo, id])

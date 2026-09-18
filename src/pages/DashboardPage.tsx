@@ -11,7 +11,6 @@ import { StatusDonut } from "../features/dashboard/ui/StatusDonut"
 import { PlacementList } from "../features/dashboard/ui/PlacementList"
 import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
-import type { Instrument } from "../features/instruments/domain/types"
 import { DAY_MS } from "../shared/dates"
 import { COLORS } from "../app/theme/tokens"
 import { useStateColors } from "../app/theme/useStateColors"
@@ -47,10 +46,8 @@ export function DashboardPage() {
 
     /* Приборы подтягиваются точечно по тем событиям, что попали в таблицу:
        грузить весь реестр ради восьми строк незачем. */
-    const ids = [...new Set(recent.map((event) => event.instrumentId))]
-    const loaded = await Promise.all(ids.map((id) => repo.instruments.getById(id)))
-    const instruments = new Map<string, Instrument>()
-    for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
+    const instruments = await repo.instruments.byIds(
+      recent.map((event) => event.instrumentId))
 
     return { counters, history, flow, recent, breakdown, departments, locations, instruments }
   }, [repo])

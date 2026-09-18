@@ -45,6 +45,15 @@ export type WriteError =
 export interface InstrumentRepo {
   list(query?: InstrumentQuery): Promise<Page<Instrument>>
   getById(id: string): Promise<Instrument | null>
+  /**
+   * Приборы по списку идентификаторов, готовым указателем.
+   *
+   * Журнал хранит только `instrumentId`, а показать надо номер и название, и
+   * почти каждый экран после выборки событий достаёт приборы пачкой. По одному
+   * это отдельный запрос и отдельный переход в нативную часть на каждую строку:
+   * на выгрузке журнала их выходят тысячи.
+   */
+  byIds(ids: readonly string[]): Promise<ReadonlyMap<string, Instrument>>
   getByInventoryNumber(inventoryNumber: string): Promise<Instrument | null>
   /** Заводит прибор в статусе AVAILABLE и пишет в журнал событие CREATE. */
   create(draft: InstrumentDraft, operatorName: string): Promise<Result<Instrument, WriteError>>

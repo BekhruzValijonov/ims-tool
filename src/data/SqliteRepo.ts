@@ -68,6 +68,10 @@ export interface SqlDriver {
 
 type Row = Record<string, unknown>
 
+/* Предел подставляемых значений у SQLite — 999 в старых сборках; пятьсот
+   проходят везде. */
+const ID_CHUNK = 500
+
 export class SqliteRepo implements AppRepo {
   readonly backend: StorageBackend = "sqlite"
 
@@ -150,6 +154,7 @@ export class SqliteRepo implements AppRepo {
       const rows = await this.db.select<Row[]>("SELECT * FROM instrument WHERE id = ?;", [id])
       return rows[0] ? toInstrument(rows[0]) : null
     },
+    byIds: async (ids) => this.instrumentsByIds(ids),
     getByInventoryNumber: async (inventoryNumber) => {
       const rows = await this.db.select<Row[]>(
         "SELECT * FROM instrument WHERE inventory_number = ?;", [inventoryNumber])
@@ -358,6 +363,30 @@ export class SqliteRepo implements AppRepo {
   }
 
   // ——— внутреннее ———
+
+  /**
+   * Выборка пачкой, разбитая на части.
+   *
+   * SQLite ограничивает число подставляемых значений в запросе, и выгрузка
+   * журнала за год легко упирается в этот предел; части по пятьсот проходят
+   * везде и всё равно дешевле, чем запрос на каждый прибор.
+   */
+  private async instrumentsByIds(ids: readonly string[]): Promise<ReadonlyMap<string, Instrument>> {
+    const unique = [...new Set(ids)]
+    const found = new Map<string, Instrument>()
+
+    for (let start = 0; start < unique.length; start += ID_CHUNK) {
+      const chunk = unique.slice(start, start + ID_CHUNK)
+      const holes = chunk.map(() => "?").join(", ")
+      const rows = await this.db.select<Row[]>(
+        `SELECT * FROM instrument WHERE id IN (${ holes });`, chunk)
+      for (const row of rows) {
+        const instrument = toInstrument(row)
+        found.set(instrument.id, instrument)
+      }
+    }
+    return found
+  }
 
   private stamps() {
     const now = this.clock()

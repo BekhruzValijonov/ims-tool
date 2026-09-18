@@ -182,10 +182,8 @@ const journal: ReportDefinition = {
       to: input.to ?? undefined,
       pageSize: 100000,
     })
-    const ids = [...new Set(page.rows.map((event) => event.instrumentId))]
-    const loaded = await Promise.all(ids.map((id) => repo.instruments.getById(id)))
-    const instruments = new Map<string, Instrument>()
-    for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
+    const instruments = await repo.instruments.byIds(
+      page.rows.map((event) => event.instrumentId))
 
     const spec = [
       { field: "occurredAt", header: "Когда", width: 160, mono: true },

@@ -7,7 +7,6 @@ import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
 import { EVENT_LABELS } from "../features/operations/domain/labels"
 import type { EventKind, JournalQuery } from "../features/operations/domain/types"
-import type { Instrument } from "../features/instruments/domain/types"
 import { exportFileName, toXlsx } from "../shared/xlsx"
 import { saveBinaryFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
@@ -60,10 +59,8 @@ export function OperationsPage() {
 
   const state = useAsync(async () => {
     const journal = await repo.operations.journal({ ...query, page, pageSize: PAGE_SIZE })
-    const ids = [...new Set(journal.rows.map((event) => event.instrumentId))]
-    const loaded = await Promise.all(ids.map((id) => repo.instruments.getById(id)))
-    const instruments = new Map<string, Instrument>()
-    for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
+    const instruments = await repo.instruments.byIds(
+      journal.rows.map((event) => event.instrumentId))
     return { journal, instruments }
   }, [repo, params.toString(), page])
 
@@ -85,10 +82,8 @@ export function OperationsPage() {
     setExporting(true)
     try {
       const all = await repo.operations.journal({ ...query, page: 0, pageSize: 100000 })
-      const ids = [...new Set(all.rows.map((event) => event.instrumentId))]
-      const loaded = await Promise.all(ids.map((id) => repo.instruments.getById(id)))
-      const instruments = new Map<string, Instrument>()
-      for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
+      const instruments = await repo.instruments.byIds(
+        all.rows.map((event) => event.instrumentId))
 
       const rows = toOperationRows(all.rows, instruments, directories.data)
       const book = toXlsx("Операции", rows, [
