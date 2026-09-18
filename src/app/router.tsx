@@ -1,5 +1,6 @@
 import { createHashRouter, Navigate } from "react-router-dom"
 import { AppShell } from "./AppShell"
+import { ErrorScreen } from "./ErrorScreen"
 import { DashboardPage } from "../pages/DashboardPage"
 import { InstrumentsPage } from "../pages/InstrumentsPage"
 import { InstrumentPage } from "../pages/InstrumentPage"
@@ -22,6 +23,9 @@ export const router = createHashRouter([
   {
     path: "/",
     element: <AppShell/>,
+    /* Упавший экран не должен выглядеть сломанным приложением: роутер иначе
+       показывает свою страницу со стеком вызовов. */
+    errorElement: <ErrorScreen/>,
     children: [
       { index: true, element: <DashboardPage/> },
       { path: "instruments", element: <InstrumentsPage/> },
