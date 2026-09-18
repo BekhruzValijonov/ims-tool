@@ -22,6 +22,7 @@ import type { Instrument } from "../features/instruments/domain/types"
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
+import { DateField } from "../shared/ui/DateField"
 
 const PAGE_SIZE = 25
 
@@ -147,15 +148,15 @@ export function OperationsPage() {
                 <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
               )) }
             </TextField>
-            <TextField
-              size="small" type="date" label="С" slotProps={ { inputLabel: { shrink: true } } }
+            <DateField
+              label="С"
               value={ params.get("from") ?? "" }
-              onChange={ (event) => setParam("from", event.target.value) }
+              onChange={ (value) => setParam("from", value) }
             />
-            <TextField
-              size="small" type="date" label="По" slotProps={ { inputLabel: { shrink: true } } }
+            <DateField
+              label="По"
               value={ params.get("to") ?? "" }
-              onChange={ (event) => setParam("to", event.target.value) }
+              onChange={ (value) => setParam("to", value) }
             />
           </Stack>
         </CardContent>

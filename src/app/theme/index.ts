@@ -30,6 +30,7 @@ import { surfacesCustomizations } from "./customizations/surfaces"
 import { chartsCustomizations } from "./customizations/charts"
 import { dataGridCustomizations } from "./customizations/dataGrid"
 import { treeViewCustomizations } from "./customizations/treeView"
+import { datePickersCustomizations } from "./customizations/datePickers"
 
 /**
  * Тема приложения.
@@ -60,6 +61,7 @@ export function createAppTheme(): Theme {
       ...surfacesCustomizations,
       ...chartsCustomizations,
       ...dataGridCustomizations,
+      ...datePickersCustomizations,
       ...treeViewCustomizations,
     },
   } as ThemeOptions, coreRu, dataGridRu, dataGridRuPatch as ThemeOptions)

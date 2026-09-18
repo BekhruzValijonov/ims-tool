@@ -22,6 +22,7 @@ import type { OperationCommand, OperationKind, ReturnCondition } from "../domain
 import type { VerificationKind, VerificationResult } from "../../verification/domain/types"
 import { CONDITION_LABELS, OPERATION_LABELS, operationErrorText } from "../domain/labels"
 import { addMonths, formatDate } from "../../../shared/dates"
+import { DateField } from "../../../shared/ui/DateField"
 
 interface OperationDialogProps {
   readonly instrument: Instrument
@@ -31,7 +32,7 @@ interface OperationDialogProps {
   onDone(): void
 }
 
-/** Дата в поле type="date" — YYYY-MM-DD по местному времени. */
+/** Дата для поля ввода — YYYY-MM-DD по местному времени. */
 function toDateInput(timestamp: number): string {
   const date = new Date(timestamp)
   return [
@@ -195,10 +196,9 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
                     <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
                   )) }
                 </TextField>
-                <TextField
-                  type="date" label="Вернуть до" value={ expectedReturn }
-                  slotProps={ { inputLabel: { shrink: true } } }
-                  onChange={ (event) => setExpectedReturn(event.target.value) }
+                <DateField
+                  size="medium" label="Вернуть до" value={ expectedReturn }
+                  onChange={ setExpectedReturn }
                   helperText="Пусто — без срока. По этому полю считается просрочка"
                 />
               </>
@@ -320,16 +320,14 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
                     Непройденная поверка отправит прибор в ремонт, а не в наличие: пользоваться им нельзя
                   </Alert>
                 ) : null }
-                <TextField
-                  type="date" label="Дата поверки" value={ performedAt }
-                  slotProps={ { inputLabel: { shrink: true } } }
-                  onChange={ (event) => setPerformedAt(event.target.value) }
+                <DateField
+                  size="medium" label="Дата поверки" value={ performedAt }
+                  onChange={ setPerformedAt }
                 />
                 { result === "PASS" ? (
-                  <TextField
-                    type="date" label="Действительна до" value={ effectiveValidUntil }
-                    slotProps={ { inputLabel: { shrink: true } } }
-                    onChange={ (event) => setValidUntil(event.target.value) }
+                  <DateField
+                    size="medium" label="Действительна до" value={ effectiveValidUntil }
+                    onChange={ setValidUntil }
                     helperText={ type?.defaultVerificationIntervalMonths
                       ? `По умолчанию — ${ type.defaultVerificationIntervalMonths } мес. от даты поверки`
                       : " " }

@@ -21,6 +21,7 @@ import { STATUS_LABELS, formatPrice } from "../features/instruments/domain/label
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { formatDate, DAY_MS } from "../shared/dates"
+import { DateField } from "../shared/ui/DateField"
 import { VERIFICATION_HORIZON_MS } from "../data/settingsKeys"
 import { ROUTES } from "../app/routes"
 
@@ -188,15 +189,15 @@ export function InstrumentsPage() {
                 <MenuItem key={ employee.id } value={ employee.id }>{ employee.fullName }</MenuItem>
               )) }
             </TextField>
-            <TextField
-              size="small" type="date" label="Заведён с" slotProps={ { inputLabel: { shrink: true } } }
+            <DateField
+              label="Заведён с"
               value={ params.get("from") ?? "" }
-              onChange={ (event) => setParam("from", event.target.value) }
+              onChange={ (value) => setParam("from", value) }
             />
-            <TextField
-              size="small" type="date" label="Заведён по" slotProps={ { inputLabel: { shrink: true } } }
+            <DateField
+              label="Заведён по"
               value={ params.get("to") ?? "" }
-              onChange={ (event) => setParam("to", event.target.value) }
+              onChange={ (value) => setParam("to", value) }
             />
             <TextField
               size="small" select label="Особые" sx={ { minWidth: 200 } }

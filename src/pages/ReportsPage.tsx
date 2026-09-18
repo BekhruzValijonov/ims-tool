@@ -20,6 +20,7 @@ import { REPORTS, type ReportInput } from "../features/reports/data/reports"
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS } from "../shared/dates"
+import { DateField } from "../shared/ui/DateField"
 
 function toDateInput(timestamp: number): string {
   const date = new Date(timestamp)
@@ -103,14 +104,8 @@ export function ReportsPage() {
 
             { report.params.includes("period") ? (
               <>
-                <TextField
-                  size="small" type="date" label="С" slotProps={ { inputLabel: { shrink: true } } }
-                  value={ from } onChange={ (event) => setFrom(event.target.value) }
-                />
-                <TextField
-                  size="small" type="date" label="По" slotProps={ { inputLabel: { shrink: true } } }
-                  value={ to } onChange={ (event) => setTo(event.target.value) }
-                />
+                <DateField label="С" value={ from } onChange={ setFrom }/>
+                <DateField label="По" value={ to } onChange={ setTo }/>
               </>
             ) : null }
 

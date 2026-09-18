@@ -16,6 +16,7 @@ import { useDirectories } from "../features/directories/ui/useDirectories"
 import { useAsync } from "../shared/useAsync"
 import type { WriteError } from "../data/AppRepo"
 import { ROUTES } from "../app/routes"
+import { DateField } from "../shared/ui/DateField"
 
 interface FormState {
   inventoryNumber: string
@@ -276,10 +277,10 @@ export function InstrumentFormPage() {
               <Typography component="h3" variant="subtitle2" gutterBottom>Дополнительно</Typography>
               <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
                 <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField
-                    fullWidth size="small" type="date" label="Дата приобретения"
-                    slotProps={ { inputLabel: { shrink: true } } }
-                    { ...field("purchasedAt") }
+                  <DateField
+                    fullWidth label="Дата приобретения"
+                    value={ form.purchasedAt }
+                    onChange={ (value) => setForm((current) => ({ ...current, purchasedAt: value })) }
                   />
                 </Grid>
                 <Grid size={ { xs: 12, sm: 6 } }>
@@ -308,17 +309,19 @@ export function InstrumentFormPage() {
                 </Typography>
                 <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
                   <Grid size={ { xs: 12, sm: 6 } }>
-                    <TextField
-                      fullWidth size="small" type="date" label="Дата поверки"
-                      slotProps={ { inputLabel: { shrink: true } } }
-                      { ...field("verificationPerformedAt") }
+                    <DateField
+                      fullWidth label="Дата поверки"
+                      value={ form.verificationPerformedAt }
+                      onChange={ (value) =>
+                        setForm((current) => ({ ...current, verificationPerformedAt: value })) }
                     />
                   </Grid>
                   <Grid size={ { xs: 12, sm: 6 } }>
-                    <TextField
-                      fullWidth size="small" type="date" label="Действительна до"
-                      slotProps={ { inputLabel: { shrink: true } } }
-                      { ...field("verificationValidUntil") }
+                    <DateField
+                      fullWidth label="Действительна до"
+                      value={ form.verificationValidUntil }
+                      onChange={ (value) =>
+                        setForm((current) => ({ ...current, verificationValidUntil: value })) }
                     />
                   </Grid>
                   <Grid size={ { xs: 12, sm: 6 } }>
