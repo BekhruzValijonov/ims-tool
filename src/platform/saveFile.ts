@@ -22,7 +22,37 @@ export async function saveTextFile(fileName: string, contents: string): Promise<
     return true
   }
 
-  const blob = new Blob([contents], { type: "text/csv;charset=utf-8" })
+  return download(fileName, new Blob([contents], { type: "text/csv;charset=utf-8" }))
+}
+
+/**
+ * Сохранение книги Excel.
+ *
+ * Отличается от текстовой выгрузки не только байтами: системному диалогу нужен
+ * свой фильтр расширений, иначе он предложит сохранить книгу как `.csv`.
+ */
+export async function saveBinaryFile(fileName: string, contents: Uint8Array): Promise<boolean> {
+  if (isTauri()) {
+    const [{ save }, { writeFile }] = await Promise.all([
+      import("@tauri-apps/plugin-dialog"),
+      import("@tauri-apps/plugin-fs"),
+    ])
+    const path = await save({
+      defaultPath: fileName,
+      filters: [{ name: "Книга Excel", extensions: ["xlsx"] }],
+    })
+    if (!path) return false
+    await writeFile(path, contents)
+    return true
+  }
+
+  return download(fileName, new Blob([contents as BlobPart], {
+    type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+  }))
+}
+
+/** Загрузка файла в браузере: ссылка, нажатие, уборка. */
+function download(fileName: string, blob: Blob): boolean {
   const url = URL.createObjectURL(blob)
   const link = document.createElement("a")
   link.href = url

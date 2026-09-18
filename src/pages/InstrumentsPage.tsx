@@ -7,8 +7,8 @@ import { InstrumentsTable } from "../features/instruments/ui/InstrumentsTable"
 import { InstrumentForm } from "../features/instruments/ui/InstrumentForm"
 import { INSTRUMENT_STATUSES, type InstrumentQuery, type InstrumentStatus } from "../features/instruments/domain/types"
 import { STATUS_LABELS, formatPrice } from "../features/instruments/domain/labels"
-import { csvFileName, toCsv } from "../shared/csv"
-import { saveTextFile } from "../platform/saveFile"
+import { exportFileName, toXlsx } from "../shared/xlsx"
+import { saveBinaryFile } from "../platform/saveFile"
 import { formatDate, DAY_MS } from "../shared/dates"
 import { VERIFICATION_HORIZON_MS } from "../data/settingsKeys"
 import { ROUTES } from "../app/routes"
@@ -118,7 +118,7 @@ export function InstrumentsPage() {
       // просит «выгрузить приборы», а не «выгрузить то, что видно».
       const all = await repo.instruments.list({ ...query, page: 0, pageSize: 100000 })
       const dirs = directories.data
-      const csv = toCsv(all.rows, [
+      const book = toXlsx("Приборы", all.rows, [
         { header: "Инвентарный номер", value: (row) => row.inventoryNumber },
         { header: "Наименование", value: (row) => row.name },
         { header: "Тип", value: (row) => dirs.typeName(row.typeId) },
@@ -134,7 +134,7 @@ export function InstrumentsPage() {
         { header: "Поверка до", value: (row) => (row.nextVerificationAt ? formatDate(row.nextVerificationAt) : "") },
         { header: "Стоимость", value: (row) => formatPrice(row.priceMinor, row.currency) },
       ])
-      await saveTextFile(csvFileName("pribory"), csv)
+      await saveBinaryFile(exportFileName("pribory", "xlsx"), book)
     } finally {
       setExporting(false)
     }

@@ -8,8 +8,8 @@ import { toOperationRows } from "../features/operations/ui/operationRows"
 import { EVENT_LABELS } from "../features/operations/domain/labels"
 import type { EventKind, JournalQuery } from "../features/operations/domain/types"
 import type { Instrument } from "../features/instruments/domain/types"
-import { csvFileName, toCsv } from "../shared/csv"
-import { saveTextFile } from "../platform/saveFile"
+import { exportFileName, toXlsx } from "../shared/xlsx"
+import { saveBinaryFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { EmptyState } from "../shared/ui/EmptyState"
@@ -91,7 +91,7 @@ export function OperationsPage() {
       for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
 
       const rows = toOperationRows(all.rows, instruments, directories.data)
-      const csv = toCsv(rows, [
+      const book = toXlsx("Операции", rows, [
         { header: "Когда", value: (row) => formatDateTime(row.occurredAt) },
         { header: "Инвентарный номер", value: (row) => row.inventoryNumber },
         { header: "Прибор", value: (row) => row.instrumentName },
@@ -101,7 +101,7 @@ export function OperationsPage() {
         { header: "Внёс", value: (row) => row.operator },
         { header: "Примечание", value: (row) => row.note },
       ])
-      await saveTextFile(csvFileName("zhurnal-operaciy"), csv)
+      await saveBinaryFile(exportFileName("zhurnal-operaciy", "xlsx"), book)
     } finally {
       setExporting(false)
     }

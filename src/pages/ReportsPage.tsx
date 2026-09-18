@@ -4,7 +4,8 @@ import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { REPORTS, type ReportInput } from "../features/reports/data/reports"
 import { csvFileName, toCsv } from "../shared/csv"
-import { saveTextFile } from "../platform/saveFile"
+import { exportFileName, toXlsx } from "../shared/xlsx"
+import { saveBinaryFile, saveTextFile } from "../platform/saveFile"
 import { DAY_MS } from "../shared/dates"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { EmptyState } from "../shared/ui/EmptyState"
@@ -57,12 +58,16 @@ export function ReportsPage() {
     [repo, directories.data, report.id, input],
   )
 
-  async function exportCsv() {
+  async function download(kind: "xlsx" | "csv") {
     if (!state.data) return
     setExporting(true)
     try {
-      const csv = toCsv(state.data.rows, [...state.data.csv])
-      await saveTextFile(csvFileName(state.data.fileName), csv)
+      if (kind === "csv") {
+        await saveTextFile(csvFileName(state.data.fileName), toCsv(state.data.rows, [...state.data.csv]))
+        return
+      }
+      const book = toXlsx(report.title, state.data.rows, [...state.data.csv])
+      await saveBinaryFile(exportFileName(state.data.fileName, "xlsx"), book)
     } finally {
       setExporting(false)
     }
@@ -71,7 +76,7 @@ export function ReportsPage() {
   return (
     <Page>
       <PageHeader
-        title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"
+        title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его книгой Excel"
         tour="reports"
       />
 
@@ -148,14 +153,22 @@ export function ReportsPage() {
           ) : null }
 
           <Stack row grow/>
-          <Button
-            variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
-            onClick={ exportCsv }
-            disabled={ exporting || !state.data || state.data.rows.length === 0 }
-            data-tour="reports-export"
-          >
-            Выгрузить CSV
-          </Button>
+          <Stack row gap={ 1 } data-tour="reports-export">
+            <Button
+              variant="contained" startIcon={ <IconDownload size={ 18 }/> }
+              onClick={ () => download("xlsx") }
+              disabled={ exporting || !state.data || state.data.rows.length === 0 }
+            >
+              Выгрузить в Excel
+            </Button>
+            <Button
+              variant="outlined"
+              onClick={ () => download("csv") }
+              disabled={ exporting || !state.data || state.data.rows.length === 0 }
+            >
+              CSV
+            </Button>
+          </Stack>
         </Stack>
 
         { state.data ? (
