@@ -104,9 +104,14 @@ export function EmployeePage() {
                         type="button"
                         className="link"
                         onClick={ () => navigate(ROUTES.instrument(instrument.id)) }
+                        /* Свойства шрифта перечислены поштучно: сокращённое
+                            `font` сбрасывает и начертание, а оно задано в
+                            `.link` — кнопка выходила бы светлее таких же
+                            ссылок в таблицах. */
                         style={ {
                           padding: 0, border: "none", background: "none",
-                          textAlign: "left", font: "inherit",
+                          textAlign: "left",
+                          fontFamily: "inherit", fontSize: "inherit", lineHeight: "inherit",
                         } }
                       >
                         <span className="data-mono" style={ { marginRight: 8 } }>
