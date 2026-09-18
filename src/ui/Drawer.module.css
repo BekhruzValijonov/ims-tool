@@ -1,8 +1,12 @@
 .drawer {
   /* Панель у правого края во всю высоту. */
+  --drawer-width: min(420px, 100vw);
+
   position: fixed;
-  inset: 0 0 0 auto;
-  width: min(420px, 100vw);
+  top: 0;
+  bottom: 0;
+  left: auto;
+  width: var(--drawer-width);
   max-height: 100vh;
   height: 100vh;
   margin: 0;
@@ -20,24 +24,29 @@
    * `display` и `overlay` перечислены в переходе с `allow-discrete`: без них
    * нативный `<dialog>` исчезает мгновенно и обратной анимации не остаётся.
    * Браузер постарше просто покажет панель сразу — так же, как показывал.
+   *
+   * Едет она правым краем, а не `transform`, хотя тот дешевле: элемент с
+   * преобразованием становится точкой отсчёта для всего `position: fixed`
+   * внутри, и всплывающие панели — календарь, выпадающий список — улетали за
+   * край экрана, считая координаты от панели, а не от окна.
    */
-  transform: translateX(100%);
+  right: calc(-1 * var(--drawer-width));
   opacity: 0;
   transition:
-    transform 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    right 240ms cubic-bezier(0.32, 0.72, 0, 1),
     opacity 200ms ease,
     overlay 240ms allow-discrete,
     display 240ms allow-discrete;
 }
 
 .drawer[open] {
-  transform: translateX(0);
+  right: 0;
   opacity: 1;
 }
 
 @starting-style {
   .drawer[open] {
-    transform: translateX(100%);
+    right: calc(-1 * var(--drawer-width));
     opacity: 0;
   }
 }
