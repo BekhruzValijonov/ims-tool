@@ -10,13 +10,8 @@ import { TextField } from "../ui/Field"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
 
-const BACKEND_LABELS: Record<string, string> = {
-  sqlite: "Файл SQLite в каталоге данных приложения",
-  memory: "Оперативная память (режим разработки в браузере) — данные исчезнут при перезагрузке",
-}
-
 export function SettingsPage() {
-  const { operatorName, setOperatorName, backend } = useAppState()
+  const { operatorName, setOperatorName } = useAppState()
   const [draft, setDraft] = useState(operatorName ?? "")
   const [saved, setSaved] = useState(false)
 
@@ -55,8 +50,13 @@ export function SettingsPage() {
         </Card>
 
         <Card data-tour="settings-storage">
-          <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Хранилище</Text>
-          <Text>{ BACKEND_LABELS[backend] ?? backend }</Text>
+          <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Данные</Text>
+          {/* Чем и где именно данные записаны — забота приложения, а не
+              кладовщика. Ему важно одно: внесённое никуда не денется. */}
+          <Text>
+            Приборы, журнал и справочники хранятся на этом компьютере и остаются на месте
+            после закрытия приложения. Сеть для работы не нужна.
+          </Text>
           <Text tone="secondary" style={ { marginTop: 16 } }>
             Прибор попадает в список «истекает поверка» за { VERIFICATION_HORIZON_DAYS } дней до конца срока.
           </Text>
