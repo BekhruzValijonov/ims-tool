@@ -96,7 +96,7 @@ export function DirectoryScreen<T extends { id: string }>({
     {
       field: "__actions",
       headerName: "",
-      width: 210,
+      width: 180,
       sortable: false,
       filterable: false,
       renderCell: (params) => (

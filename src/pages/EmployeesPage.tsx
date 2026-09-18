@@ -31,8 +31,8 @@ export function EmployeesPage() {
     {
       field: "fullName",
       headerName: "Сотрудник",
-      flex: 1.4,
-      minWidth: 220,
+      flex: 1.3,
+      minWidth: 190,
       renderCell: (params) => (
         <Link
           component="button" type="button" underline="hover"
@@ -42,20 +42,20 @@ export function EmployeesPage() {
         </Link>
       ),
     },
-    { field: "personnelNumber", headerName: "Табельный", width: 120 },
+    { field: "personnelNumber", headerName: "Табельный", width: 105 },
     {
       field: "departmentId",
       headerName: "Подразделение",
       flex: 1,
-      minWidth: 160,
+      minWidth: 130,
       valueGetter: (value: string | null) => directories.data?.departmentName(value) ?? "—",
     },
-    { field: "position", headerName: "Должность", flex: 1, minWidth: 160 },
-    { field: "phone", headerName: "Телефон", width: 140 },
+    { field: "position", headerName: "Должность", flex: 1, minWidth: 140 },
+    { field: "phone", headerName: "Телефон", width: 120 },
     {
       field: "__onHands",
       headerName: "На руках",
-      width: 110,
+      width: 95,
       sortable: false,
       renderCell: (params) => {
         const count = state.data?.onHands.get(params.row.id) ?? 0
@@ -65,7 +65,7 @@ export function EmployeesPage() {
     {
       field: "isActive",
       headerName: "Состояние",
-      width: 120,
+      width: 115,
       renderCell: (params) => (params.row.isActive
         ? <Chip size="small" color="success" variant="outlined" label="Работает"/>
         : <Chip size="small" label="Уволен"/>),
