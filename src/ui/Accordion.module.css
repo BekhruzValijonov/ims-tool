@@ -42,4 +42,24 @@ button.summary:hover .chevron { color: var(--text-primary); }
 
 .label { display: flex; align-items: baseline; gap: 8px; flex: 1; min-width: 0; }
 
-.panel { padding-bottom: 4px; }
+/*
+ * Раскрытие ростом строки сетки: `height: auto` не анимируется, а считать
+ * высоту скриптом значило бы мерить её на каждом кадре. `0fr → 1fr` делает то
+ * же самое силами браузера.
+ */
+.panel {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 200ms ease;
+}
+
+.panel.open { grid-template-rows: 1fr; }
+
+.panelInner {
+  overflow: hidden;
+  padding-bottom: 4px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .panel { transition: none; }
+}

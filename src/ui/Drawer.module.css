@@ -11,11 +11,56 @@
   background-color: var(--bg-paper);
   color: var(--text-primary);
   box-shadow: var(--shadow-dialog);
+
+  /*
+   * Панель выезжает от края, а не возникает на месте: движение показывает,
+   * откуда она взялась и куда уйдёт, — иначе непонятно, закрылась она или
+   * страница сменилась.
+   *
+   * `display` и `overlay` перечислены в переходе с `allow-discrete`: без них
+   * нативный `<dialog>` исчезает мгновенно и обратной анимации не остаётся.
+   * Браузер постарше просто покажет панель сразу — так же, как показывал.
+   */
+  transform: translateX(100%);
+  opacity: 0;
+  transition:
+    transform 240ms cubic-bezier(0.32, 0.72, 0, 1),
+    opacity 200ms ease,
+    overlay 240ms allow-discrete,
+    display 240ms allow-discrete;
+}
+
+.drawer[open] {
+  transform: translateX(0);
+  opacity: 1;
+}
+
+@starting-style {
+  .drawer[open] {
+    transform: translateX(100%);
+    opacity: 0;
+  }
 }
 
 .drawer::backdrop {
   background-color: rgba(var(--grey-500-rgb), 0.48);
   backdrop-filter: blur(4px);
+  opacity: 0;
+  transition:
+    opacity 240ms ease,
+    overlay 240ms allow-discrete,
+    display 240ms allow-discrete;
+}
+
+.drawer[open]::backdrop { opacity: 1; }
+
+@starting-style {
+  .drawer[open]::backdrop { opacity: 0; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .drawer,
+  .drawer::backdrop { transition: none; }
 }
 
 .inner {

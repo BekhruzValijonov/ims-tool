@@ -22,11 +22,16 @@ const DEPARTMENTS = [department("shop", "Цех №1", 9), department("lab", "Л
 const LOCATIONS = [place("shelf", "Шкаф №1", "shop", 5), place("bench", "Верстак", "shop", 4)]
 
 describe("где приборы сейчас", () => {
-  it("свёрнут: показывает подразделения с их итогом", () => {
+  /* Свёрнутые места остаются в разметке — иначе раскрытие нечем анимировать, —
+     но помечены `inert`: ни курсор, ни читалка их не достают. */
+  const hidden = (name: string) => screen.getByText(name).closest("[inert]")
+
+  it("свёрнут: показывает подразделения с их итогом, а места прячет", () => {
     render(<PlacementList departments={ DEPARTMENTS } locations={ LOCATIONS }/>)
 
     expect(screen.getByRole("button", { name: /Цех №1/ })).toHaveTextContent("9")
-    expect(screen.queryByText("Шкаф №1")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: /Цех №1/ })).toHaveAttribute("aria-expanded", "false")
+    expect(hidden("Шкаф №1")).not.toBeNull()
   })
 
   it("раскрывает места хранения подразделения", async () => {
@@ -34,8 +39,8 @@ describe("где приборы сейчас", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Цех №1/ }))
 
-    expect(screen.getByText("Шкаф №1")).toBeInTheDocument()
-    expect(screen.getByText("Верстак")).toBeInTheDocument()
+    expect(hidden("Шкаф №1")).toBeNull()
+    expect(hidden("Верстак")).toBeNull()
     expect(screen.getByRole("button", { name: /Цех №1/ })).toHaveAttribute("aria-expanded", "true")
   })
 
@@ -56,6 +61,6 @@ describe("где приборы сейчас", () => {
 
     await userEvent.click(screen.getByRole("button", { name: /Вне подразделений/ }))
 
-    expect(screen.getByText("Общий склад")).toBeInTheDocument()
+    expect(screen.getByText("Общий склад").closest("[inert]")).toBeNull()
   })
 })

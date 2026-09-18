@@ -54,7 +54,15 @@ export function Accordion({ header, children, defaultOpen, empty }: AccordionPro
         { chevron }
         <span className={ styles.label }>{ header }</span>
       </button>
-      { open ? <div className={ styles.panel } id={ panelId }>{ children }</div> : null }
+      {/* Содержимое остаётся в разметке и в свёрнутом виде — иначе анимировать
+          нечего. `inert` убирает его и с пути курсора, и из речи читалки. */}
+      <div
+        className={ [styles.panel, open ? styles.open : null].filter(Boolean).join(" ") }
+        id={ panelId }
+        inert={ !open }
+      >
+        <div className={ styles.panelInner }>{ children }</div>
+      </div>
     </div>
   )
 }
