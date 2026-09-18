@@ -1,6 +1,6 @@
 import type { DepartmentSummary, LocationSummary } from "../../directories/domain/types"
+import { Accordion } from "../../../ui/Accordion"
 import { Card } from "../../../ui/Card"
-import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 
 interface PlacementListProps {
@@ -8,18 +8,10 @@ interface PlacementListProps {
   readonly locations: readonly LocationSummary[]
 }
 
-function Row({ name, count, lead }: { name: string; count: number; lead?: boolean }) {
+/** Название слева, число справа — одна разметка у подразделения и у места. */
+function Line({ name, count, lead }: { name: string; count: number; lead?: boolean }) {
   return (
-    <Stack
-      row
-      align="baseline"
-      gap={ 1 }
-      style={ {
-        padding: "8px 0",
-        paddingLeft: lead ? 0 : 16,
-        borderTop: lead ? "1px dashed var(--divider)" : undefined,
-      } }
-    >
+    <>
       <Text
         noWrap
         tone={ lead ? "primary" : "secondary" }
@@ -28,7 +20,7 @@ function Row({ name, count, lead }: { name: string; count: number; lead?: boolea
         { name }
       </Text>
       <Text mono tone={ count === 0 ? "disabled" : "primary" }>{ count }</Text>
-    </Stack>
+    </>
   )
 }
 
@@ -38,6 +30,12 @@ function Row({ name, count, lead }: { name: string; count: number; lead?: boolea
  * Счёт у подразделения — сумма его мест, то есть фактическое размещение. В
  * одном списке должна быть одна величина; сколько за подразделением числится,
  * показывает соседний график, и там это названо своими словами.
+ *
+ * Подразделения свёрнуты: на заводе их с десяток, а мест втрое больше, и
+ * развёрнутый список не помещался в карточку — приходилось листать его
+ * внутренней полосой прокрутки, которая лезла на числа у правого края.
+ * Свёрнутый список отвечает на вопрос «в каком цехе искать», раскрытый — «в
+ * каком шкафу».
  */
 export function PlacementList({ departments, locations }: PlacementListProps) {
   const groups = departments.map((department) => {
@@ -63,27 +61,25 @@ export function PlacementList({ departments, locations }: PlacementListProps) {
   return (
     <Card>
       <Text variant="h6" as="h2">Где приборы сейчас</Text>
-      <Text variant="caption" tone="secondary">Подразделение и места хранения в нём</Text>
+      <Text variant="caption" tone="secondary">Подразделение, внутри — его места хранения</Text>
 
-      {/* Место под полосу прокрутки резервируется всегда: иначе она наезжает
-          на числа, выровненные по правому краю, и список дёргается при
-          появлении полосы. */}
-      <div
-        style={ {
-          marginTop: 12,
-          maxHeight: 268,
-          overflowY: "auto",
-          scrollbarGutter: "stable",
-          paddingRight: 8,
-        } }
-      >
+      <div style={ { marginTop: 12 } }>
         { groups.map((group) => (
-          <div key={ group.id }>
-            <Row name={ group.name } count={ group.total } lead/>
+          <Accordion
+            key={ group.id }
+            empty={ group.places.length === 0 }
+            header={ <Line name={ group.name } count={ group.total } lead/> }
+          >
             { group.places.map((place) => (
-              <Row key={ place.locationId } name={ place.name } count={ place.total }/>
+              <div
+                key={ place.locationId }
+                /* Отступ вложенной строки равен значку и его зазору: названия встают в колонку. */
+                style={ { display: "flex", alignItems: "baseline", gap: 8, padding: "6px 8px 6px 32px" } }
+              >
+                <Line name={ place.name } count={ place.total }/>
+              </div>
             )) }
-          </div>
+          </Accordion>
         )) }
       </div>
     </Card>

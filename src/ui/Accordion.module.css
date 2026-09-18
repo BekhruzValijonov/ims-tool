@@ -1,0 +1,45 @@
+.item + .item { border-top: 1px dashed var(--divider); }
+
+.summary {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+  width: calc(100% + 16px);
+  margin: 0 -8px;
+  padding: 8px;
+  border-radius: var(--radius);
+  border: none;
+  background: none;
+  font: inherit;
+  color: inherit;
+  text-align: left;
+}
+
+button.summary { cursor: pointer; }
+
+/* Подсветка строкой, а не цветом подписи: графит и так цвет текста, смены
+   было бы не видно. */
+button.summary:hover { background-color: var(--action-hover); }
+button.summary:hover .chevron { color: var(--text-primary); }
+
+.summary:focus-visible {
+  outline: 2px solid var(--primary-main);
+  outline-offset: -2px;
+}
+
+/* Место под значок остаётся и там, где раскрывать нечего: иначе названия
+   съезжают друг относительно друга и колонка перестаёт читаться. */
+.chevron {
+  flex-shrink: 0;
+  width: 16px;
+  align-self: center;
+  color: var(--text-disabled);
+  transition: transform 150ms ease, color 150ms ease;
+}
+
+.chevron.open { transform: rotate(90deg); }
+.chevron.hidden { visibility: hidden; }
+
+.label { display: flex; align-items: baseline; gap: 8px; flex: 1; min-width: 0; }
+
+.panel { padding-bottom: 4px; }
