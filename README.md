@@ -40,6 +40,7 @@ yarn install
 yarn dev            # вёрстка в браузере: http://localhost:1420
 yarn tauri dev      # приложение целиком, нужен toolchain Rust
 yarn test           # 89 тестов
+yarn verify         # типы и тесты одной командой — перед пушем
 yarn build          # релизная сборка фронтенда
 ```
 

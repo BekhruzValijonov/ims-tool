@@ -6,6 +6,9 @@
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "verify": "tsc --noEmit && vitest run",
     "preview": "vite preview",
     "tauri": "tauri"
   },
