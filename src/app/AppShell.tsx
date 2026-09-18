@@ -153,18 +153,18 @@ export function AppShell() {
 
       <div className={ styles.body }>
         <header className={ [styles.header, scrolled ? styles.offset : null].filter(Boolean).join(" ") }>
-          <div style={ { display: "contents" } }>
+          <div className={ styles.headerInner }>
             <span className="only-narrow">
               <IconButton label="Меню" onClick={ () => setOpen(true) }>
                 <IconMenu/>
               </IconButton>
             </span>
+            <QuickSearch/>
+            <Stack row grow/>
+            <IconButton label={ dark ? "Светлая тема" : "Тёмная тема" } onClick={ toggle }>
+              { dark ? <IconSun/> : <IconMoon/> }
+            </IconButton>
           </div>
-          <QuickSearch/>
-          <Stack row grow/>
-          <IconButton label={ dark ? "Светлая тема" : "Тёмная тема" } onClick={ toggle }>
-            { dark ? <IconSun/> : <IconMoon/> }
-          </IconButton>
         </header>
 
         <main className={ styles.main }>
