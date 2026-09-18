@@ -17,6 +17,7 @@ import type {
   Employee,
   EmployeeQuery,
   InstrumentType,
+  LocationSummary,
   StorageLocation,
 } from "../features/directories/domain/types"
 import type {
@@ -34,6 +35,7 @@ import type {
   VerificationResult,
 } from "../features/verification/domain/types"
 import type { Counters, DailyFlow, StatusSlice } from "../features/dashboard/domain/types"
+import { buildStatusHistory, type DailyStatus } from "../features/dashboard/domain/history"
 import type {
   AppRepo,
   DashboardRepo,
@@ -87,10 +89,10 @@ export class SqliteRepo implements AppRepo {
   ) {}
 
   /** Боевой путь: база лежит файлом в каталоге данных приложения. */
-  static async load(): Promise<SqliteRepo> {
+  static async load(clock: () => number = Date.now): Promise<SqliteRepo> {
     const { default: Database } = await import("@tauri-apps/plugin-sql")
     const db = await Database.load("sqlite:ims.db")
-    return SqliteRepo.open(db as unknown as SqlDriver)
+    return SqliteRepo.open(db as unknown as SqlDriver, clock)
   }
 
   /** Путь для тестов и для любого другого драйвера с тем же интерфейсом. */
@@ -282,6 +284,23 @@ export class SqliteRepo implements AppRepo {
     },
 
     departmentSummary: async () => this.departmentSummary(),
+    locationSummary: async () => {
+      const rows = await this.db.select<Row[]>(
+        `SELECT l.id AS location_id, l.name AS name, l.department_id AS department_id,
+                count(i.id) AS total
+         FROM location l
+         LEFT JOIN instrument i
+           ON i.current_location_id = l.id AND i.status <> 'WRITTEN_OFF'
+         WHERE l.is_archived = 0
+         GROUP BY l.id, l.name, l.department_id
+         ORDER BY l.name;`)
+      return rows.map((row): LocationSummary => ({
+        locationId: String(row.location_id),
+        name: String(row.name),
+        departmentId: str(row.department_id),
+        total: Number(row.total),
+      }))
+    },
   }
 
   readonly verification: VerificationRepo = {
@@ -306,6 +325,7 @@ export class SqliteRepo implements AppRepo {
   readonly dashboard: DashboardRepo = {
     counters: async (now) => this.counters(now),
     flow: async (from, to) => this.flow(from, to),
+    statusHistory: async (from, to) => this.statusHistory(from, to),
     recent: async (limit) => {
       const rows = await this.db.select<Row[]>(
         "SELECT * FROM instrument_event ORDER BY occurred_at DESC, rowid DESC LIMIT ?;", [limit])
@@ -723,6 +743,28 @@ export class SqliteRepo implements AppRepo {
       else bucket.returned += 1
     }
     return [...buckets.entries()].map(([date, value]) => ({ date, ...value }))
+  }
+
+  private async statusHistory(from: number, to: number): Promise<DailyStatus[]> {
+    const current = await this.db.select<Row[]>("SELECT id, status FROM instrument;")
+    /* Верхней границы нет намеренно: состояние отматывается от нынешнего, и
+       события после запрошенного окна тоже нужно отмотать. */
+    const events = await this.db.select<Row[]>(
+      `SELECT instrument_id, occurred_at, kind, status_before
+       FROM instrument_event WHERE occurred_at >= ? ORDER BY occurred_at DESC;`,
+      [from])
+
+    return buildStatusHistory(
+      current.map((row) => ({ id: String(row.id), status: String(row.status) as InstrumentStatus })),
+      events.map((row) => ({
+        instrumentId: String(row.instrument_id),
+        occurredAt: Number(row.occurred_at),
+        kind: String(row.kind) as EventKind,
+        statusBefore: str(row.status_before) as InstrumentStatus | null,
+      })),
+      from,
+      to,
+    )
   }
 
   private async statusBreakdown(): Promise<StatusSlice[]> {

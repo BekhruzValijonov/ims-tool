@@ -1,20 +1,15 @@
-import { ThemeProvider, createTheme } from '@mui/material/styles'
-import CssBaseline from '@mui/material/CssBaseline'
-import Pages from "./components/Pages.tsx"
+import { RouterProvider } from "react-router-dom"
+import CssBaseline from "@mui/material/CssBaseline"
+import { AppProvider } from "./app/AppContext"
+import { router } from "./app/router"
 
-import './App.css'
+import "./App.css"
 
-const darkTheme = createTheme({
-  palette: {
-    mode: 'light',
-  },
-})
-
-function App() {
-  return <ThemeProvider theme={ darkTheme }>
-    <CssBaseline/>
-    <Pages/>
-  </ThemeProvider>
+export default function App() {
+  return (
+    <AppProvider>
+      <CssBaseline enableColorScheme/>
+      <RouterProvider router={ router }/>
+    </AppProvider>
+  )
 }
-
-export default App
