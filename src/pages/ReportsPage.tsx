@@ -19,22 +19,16 @@ import { Grid, Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
 import { IconDownload } from "../ui/icons"
 
-function toDateInput(timestamp: number): string {
-  const date = new Date(timestamp)
-  return [
-    date.getFullYear(),
-    String(date.getMonth() + 1).padStart(2, "0"),
-    String(date.getDate()).padStart(2, "0"),
-  ].join("-")
-}
-
 export function ReportsPage() {
   const repo = useRepo()
   const directories = useDirectories()
 
   const [selected, setSelected] = useState(REPORTS[0].id)
-  const [from, setFrom] = useState(toDateInput(Date.now() - 30 * DAY_MS))
-  const [to, setTo] = useState(toDateInput(Date.now()))
+  /* Период начинается пустым: у ведомости приборов и списка на руках он
+     ограничивает выборку, и подставленный «последний месяц» прятал бы почти
+     весь реестр, ничего об этом не говоря. */
+  const [from, setFrom] = useState("")
+  const [to, setTo] = useState("")
   const [horizonDays, setHorizonDays] = useState(30)
   const [instrumentId, setInstrumentId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
@@ -42,8 +36,9 @@ export function ReportsPage() {
   const report = REPORTS.find((item) => item.id === selected) ?? REPORTS[0]
 
   const input = useMemo<ReportInput>(() => ({
-    from: new Date(from).getTime(),
-    to: new Date(to).getTime() + DAY_MS - 1,
+    from: from === "" ? null : new Date(from).getTime(),
+    // Верхняя граница включает весь последний день, а не его первую секунду.
+    to: to === "" ? null : new Date(to).getTime() + DAY_MS - 1,
     horizonDays,
     instrumentId,
   }), [from, to, horizonDays, instrumentId])
@@ -113,10 +108,15 @@ export function ReportsPage() {
           <Text variant="subtitle2" style={ { minWidth: 200, paddingBottom: 8 } }>{ report.title }</Text>
 
           { report.params.includes("period") ? (
-            <>
-              <DateInput label="С" value={ from } onChange={ setFrom }/>
-              <DateInput label="По" value={ to } onChange={ setTo }/>
-            </>
+            /* Поля даты и подпись под ними — одним блоком: подпись под вторым
+               полем поднимала бы его над первым, они выравниваются по низу. */
+            <Stack gap={ 0.5 }>
+              <Stack row gap={ 2 } align="end">
+                <DateInput label={ `${ report.periodLabel ?? "Дата" } с` } value={ from } onChange={ setFrom }/>
+                <DateInput label="по" value={ to } onChange={ setTo }/>
+              </Stack>
+              <Text variant="caption" tone="secondary">Пусто — без ограничения по дате</Text>
+            </Stack>
           ) : null }
 
           { report.params.includes("horizon") ? (

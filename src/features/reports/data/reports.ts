@@ -13,10 +13,26 @@ import { toOperationRows } from "../../operations/ui/operationRows"
 export type ReportParam = "period" | "horizon" | "instrument"
 
 export interface ReportInput {
-  readonly from: number
-  readonly to: number
+  /** Границы периода. `null` — без ограничения: так отчёт строится за всё время. */
+  readonly from: number | null
+  readonly to: number | null
   readonly horizonDays: number
   readonly instrumentId: string | null
+}
+
+/** Что дописать к итогу, когда период задан: без этого непонятно, что посчитано. */
+function periodNote(input: ReportInput): string {
+  if (input.from === null && input.to === null) return " за всё время"
+  if (input.from === null) return ` по ${ formatDate(input.to) }`
+  if (input.to === null) return ` с ${ formatDate(input.from) }`
+  return ` с ${ formatDate(input.from) } по ${ formatDate(input.to) }`
+}
+
+/** Попадает ли отметка времени в заданный период. */
+function inPeriod(at: number | null, input: ReportInput): boolean {
+  if (at === null) return input.from === null && input.to === null
+  if (input.from !== null && at < input.from) return false
+  return input.to === null || at <= input.to
 }
 
 export interface ReportResult {
@@ -33,6 +49,8 @@ export interface ReportDefinition {
   readonly title: string
   readonly description: string
   readonly params: readonly ReportParam[]
+  /** Чем подписаны поля периода: у каждого отчёта дата означает своё событие. */
+  readonly periodLabel?: string
   run(repo: AppRepo, directories: Directories, input: ReportInput): Promise<ReportResult>
 }
 
@@ -64,9 +82,14 @@ const registry: ReportDefinition = {
   id: "registry",
   title: "Ведомость приборов",
   description: "Весь реестр на текущий момент — то, с чем сверяются при инвентаризации.",
-  params: [],
-  async run(repo, directories) {
-    const page = await repo.instruments.list({ pageSize: 100000 })
+  params: ["period"],
+  periodLabel: "Заведён",
+  async run(repo, directories, input) {
+    const page = await repo.instruments.list({
+      createdFrom: input.from ?? undefined,
+      createdTo: input.to ?? undefined,
+      pageSize: 100000,
+    })
     const spec = [
       { field: "inventoryNumber", header: "Инвентарный номер", width: 160, mono: true },
       { field: "name", header: "Наименование", flex: 1 },
@@ -90,7 +113,12 @@ const registry: ReportDefinition = {
       price: formatPrice(instrument.priceMinor, instrument.currency),
     })))
 
-    return { ...mirror(spec), rows, fileName: "vedomost-priborov", summary: `Приборов в реестре: ${ page.total }` }
+    return {
+      ...mirror(spec),
+      rows,
+      fileName: "vedomost-priborov",
+      summary: `Приборов в реестре${ periodNote(input) }: ${ page.total }`,
+    }
   },
 }
 
@@ -98,9 +126,14 @@ const onHands: ReportDefinition = {
   id: "on-hands",
   title: "На руках у сотрудников",
   description: "Кто что держит, с какого числа и сколько дней просрочено.",
-  params: [],
-  async run(repo, directories) {
-    const page = await repo.instruments.list({ statuses: ["CHECKED_OUT"], pageSize: 100000 })
+  params: ["period"],
+  periodLabel: "Выдан",
+  async run(repo, directories, input) {
+    const all = await repo.instruments.list({ statuses: ["CHECKED_OUT"], pageSize: 100000 })
+    /* Отбор по дате выдачи делается здесь, а не запросом: в реестре нет такого
+       фильтра, и заводить его ради одного отчёта незачем — выданных приборов
+       столько же, сколько сотрудников, а не сколько записей в журнале. */
+    const page = { rows: all.rows.filter((row) => inPeriod(row.issuedAt, input)) }
     const now = Date.now()
     const spec = [
       { field: "employee", header: "Сотрудник", flex: 1 },
@@ -132,7 +165,7 @@ const onHands: ReportDefinition = {
       ...mirror(spec),
       rows: withId(mapped),
       fileName: "na-rukah",
-      summary: `Выдано приборов: ${ mapped.length }, из них просрочено: ${ overdueCount }`,
+      summary: `Выдано приборов${ periodNote(input) }: ${ mapped.length }, из них просрочено: ${ overdueCount }`,
     }
   },
 }
@@ -142,8 +175,13 @@ const journal: ReportDefinition = {
   title: "Журнал операций за период",
   description: "Всё движение приборов между двумя датами.",
   params: ["period"],
+  periodLabel: "Операция",
   async run(repo, directories, input) {
-    const page = await repo.operations.journal({ from: input.from, to: input.to, pageSize: 100000 })
+    const page = await repo.operations.journal({
+      from: input.from ?? undefined,
+      to: input.to ?? undefined,
+      pageSize: 100000,
+    })
     const ids = [...new Set(page.rows.map((event) => event.instrumentId))]
     const loaded = await Promise.all(ids.map((id) => repo.instruments.getById(id)))
     const instruments = new Map<string, Instrument>()
@@ -168,7 +206,7 @@ const journal: ReportDefinition = {
       ...mirror(spec),
       rows,
       fileName: "zhurnal-operaciy",
-      summary: `Операций за период: ${ page.total }`,
+      summary: `Операций${ periodNote(input) }: ${ page.total }`,
     }
   },
 }
@@ -248,7 +286,8 @@ const passport: ReportDefinition = {
   id: "passport",
   title: "Паспорт движения прибора",
   description: "Вся история одного прибора одним документом.",
-  params: ["instrument"],
+  params: ["instrument", "period"],
+  periodLabel: "Событие",
   async run(repo, directories, input) {
     const spec = [
       { field: "occurredAt", header: "Когда", width: 160, mono: true },
@@ -269,7 +308,7 @@ const passport: ReportDefinition = {
       repo.operations.historyOf(input.instrumentId),
     ])
 
-    const rows = withId(history.map((event) => ({
+    const rows = withId(history.filter((event) => inPeriod(event.occurredAt, input)).map((event) => ({
       occurredAt: formatDateTime(event.occurredAt),
       kind: EVENT_LABELS[event.kind],
       employee: event.employeeId ? directories.employeeName(event.employeeId) : "",
@@ -284,7 +323,7 @@ const passport: ReportDefinition = {
       rows,
       fileName: `pasport-${ instrument?.inventoryNumber ?? "pribora" }`,
       summary: instrument
-        ? `${ instrument.inventoryNumber } · ${ instrument.name } — записей в истории: ${ history.length }`
+        ? `${ instrument.inventoryNumber } · ${ instrument.name } — записей${ periodNote(input) }: ${ rows.length }`
         : "Прибор не найден",
     }
   },
