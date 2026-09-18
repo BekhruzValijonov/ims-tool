@@ -19,11 +19,11 @@
 
 /* Заливка: главное действие экрана. */
 .contained { color: var(--primary-contrast); }
-.contained.primary { background-color: var(--primary-main); box-shadow: var(--shadow-primary); }
+.contained.primary { background-color: var(--primary-main); }
 .contained.primary:hover:not(:disabled) { background-color: var(--primary-dark); }
 .contained.error { background-color: var(--error-main); }
 .contained.error:hover:not(:disabled) { background-color: var(--error-dark); }
-.contained.inherit { background-color: var(--grey-800); color: #fff; box-shadow: none; }
+.contained.inherit { background-color: var(--grey-800); color: #fff; }
 .contained.inherit:hover:not(:disabled) { background-color: var(--grey-700); }
 
 /* Контур: действие рядом с главным. */

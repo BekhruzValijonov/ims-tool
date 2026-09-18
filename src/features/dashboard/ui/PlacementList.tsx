@@ -65,7 +65,18 @@ export function PlacementList({ departments, locations }: PlacementListProps) {
       <Text variant="h6" as="h2">Где приборы сейчас</Text>
       <Text variant="caption" tone="secondary">Подразделение и места хранения в нём</Text>
 
-      <div style={ { marginTop: 12, maxHeight: 268, overflowY: "auto" } }>
+      {/* Место под полосу прокрутки резервируется всегда: иначе она наезжает
+          на числа, выровненные по правому краю, и список дёргается при
+          появлении полосы. */}
+      <div
+        style={ {
+          marginTop: 12,
+          maxHeight: 268,
+          overflowY: "auto",
+          scrollbarGutter: "stable",
+          paddingRight: 8,
+        } }
+      >
         { groups.map((group) => (
           <div key={ group.id }>
             <Row name={ group.name } count={ group.total } lead/>
