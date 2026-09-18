@@ -1,37 +1,33 @@
-import Chip from "@mui/material/Chip"
-import type { GridColDef } from "@mui/x-data-grid"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { InstrumentType } from "../features/directories/domain/types"
+import { Chip } from "../ui/Chip"
+import type { Column } from "../ui/DataTable"
 
 export function InstrumentTypesPage() {
   const repo = useRepo()
   const state = useAsync(() => repo.directories.instrumentTypes(true), [repo])
 
-  const columns: GridColDef<InstrumentType>[] = [
-    { field: "name", headerName: "Тип прибора", flex: 1, minWidth: 220 },
+  const columns: Column<InstrumentType>[] = [
+    { key: "name", header: "Тип прибора", minWidth: 220, render: (row) => row.name },
     {
-      field: "requiresVerification",
-      headerName: "Поверка",
-      width: 150,
-      renderCell: (params) => (params.row.requiresVerification
-        ? <Chip size="small" color="info" variant="outlined" label="Требуется"/>
-        : <Chip size="small" label="Не требуется"/>),
+      key: "verification", header: "Поверка", width: 150,
+      render: (row) => (row.requiresVerification
+        ? <Chip color="info">Требуется</Chip>
+        : <Chip>Не требуется</Chip>),
     },
     {
-      field: "defaultVerificationIntervalMonths",
-      headerName: "Межповерочный интервал",
-      width: 210,
-      valueGetter: (value: number | null) => (value === null ? "—" : `${ value } мес.`),
+      key: "interval", header: "Межповерочный интервал", width: 210, mono: true,
+      render: (row) => (row.defaultVerificationIntervalMonths === null
+        ? "—"
+        : `${ row.defaultVerificationIntervalMonths } мес.`),
     },
     {
-      field: "isArchived",
-      headerName: "Состояние",
-      width: 130,
-      renderCell: (params) => (params.row.isArchived
-        ? <Chip size="small" label="В архиве"/>
-        : <Chip size="small" color="success" variant="outlined" label="Используется"/>),
+      key: "state", header: "Состояние", width: 150,
+      render: (row) => (row.isArchived
+        ? <Chip>В архиве</Chip>
+        : <Chip color="primary">Используется</Chip>),
     },
   ]
 
@@ -47,11 +43,7 @@ export function InstrumentTypesPage() {
       error={ state.error }
       fields={ [
         { kind: "text", key: "name", label: "Название", required: true },
-        {
-          kind: "switch",
-          key: "requiresVerification",
-          label: "Подлежит поверке",
-        },
+        { kind: "switch", key: "requiresVerification", label: "Подлежит поверке" },
         {
           kind: "number",
           key: "defaultVerificationIntervalMonths",

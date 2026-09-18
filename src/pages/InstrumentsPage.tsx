@@ -1,28 +1,25 @@
 import { useState } from "react"
 import { useNavigate, useSearchParams } from "react-router-dom"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import MenuItem from "@mui/material/MenuItem"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import AddIcon from "@mui/icons-material/Add"
-import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
-import { InstrumentsGrid } from "../features/instruments/ui/InstrumentsGrid"
+import { InstrumentsTable } from "../features/instruments/ui/InstrumentsTable"
 import { INSTRUMENT_STATUSES, type InstrumentQuery, type InstrumentStatus } from "../features/instruments/domain/types"
 import { STATUS_LABELS, formatPrice } from "../features/instruments/domain/labels"
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { formatDate, DAY_MS } from "../shared/dates"
-import { DateField } from "../shared/ui/DateField"
 import { VERIFICATION_HORIZON_MS } from "../data/settingsKeys"
 import { ROUTES } from "../app/routes"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { EmptyState } from "../shared/ui/EmptyState"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { DateInput } from "../ui/DateInput"
+import { Select, TextField } from "../ui/Field"
+import { Stack } from "../ui/layout"
+import { IconDownload, IconPlus } from "../ui/icons"
 
 const PAGE_SIZE = 25
 
@@ -57,6 +54,7 @@ export function InstrumentsPage() {
   /* Пустая таблица бывает двух разных бед: база ещё не заполнена или фильтры
      ничего не нашли. Действия у них тоже разные. */
   const filtered = [...params.keys()].length > 0
+
   const state = useAsync(
     () => repo.instruments.list({ ...query, page, pageSize: PAGE_SIZE }),
     [repo, params.toString(), page],
@@ -70,6 +68,16 @@ export function InstrumentsPage() {
     setPage(0)
   }
 
+  function setSpecial(value: string) {
+    const next = new URLSearchParams(params)
+    next.delete("overdue")
+    next.delete("verification")
+    if (value === "overdue") next.set("overdue", "1")
+    if (value === "verification") next.set("verification", "due")
+    setParams(next, { replace: true })
+    setPage(0)
+  }
+
   async function exportCsv() {
     if (!directories.data) return
     setExporting(true)
@@ -77,17 +85,18 @@ export function InstrumentsPage() {
       // Выгружается весь отфильтрованный список, а не текущая страница: человек
       // просит «выгрузить приборы», а не «выгрузить то, что видно».
       const all = await repo.instruments.list({ ...query, page: 0, pageSize: 100000 })
+      const dirs = directories.data
       const csv = toCsv(all.rows, [
         { header: "Инвентарный номер", value: (row) => row.inventoryNumber },
         { header: "Наименование", value: (row) => row.name },
-        { header: "Тип", value: (row) => directories.data!.typeName(row.typeId) },
+        { header: "Тип", value: (row) => dirs.typeName(row.typeId) },
         { header: "Серийный номер", value: (row) => row.serialNumber },
         { header: "Производитель", value: (row) => row.manufacturer },
         { header: "Модель", value: (row) => row.model },
         { header: "Статус", value: (row) => STATUS_LABELS[row.status] },
-        { header: "Подразделение", value: (row) => directories.data!.departmentName(row.currentDepartmentId) },
-        { header: "Место хранения", value: (row) => directories.data!.locationName(row.currentLocationId) },
-        { header: "У кого", value: (row) => (row.currentEmployeeId ? directories.data!.employeeName(row.currentEmployeeId) : "") },
+        { header: "Подразделение", value: (row) => dirs.departmentName(row.currentDepartmentId) },
+        { header: "Место хранения", value: (row) => dirs.locationName(row.currentLocationId) },
+        { header: "У кого", value: (row) => (row.currentEmployeeId ? dirs.employeeName(row.currentEmployeeId) : "") },
         { header: "Выдан", value: (row) => (row.issuedAt ? formatDate(row.issuedAt) : "") },
         { header: "Вернуть до", value: (row) => (row.expectedReturnAt ? formatDate(row.expectedReturnAt) : "") },
         { header: "Поверка до", value: (row) => (row.nextVerificationAt ? formatDate(row.nextVerificationAt) : "") },
@@ -100,26 +109,25 @@ export function InstrumentsPage() {
   }
 
   const filters = directories.data
+  const special = params.get("overdue") === "1"
+    ? "overdue"
+    : params.get("verification") === "due" ? "verification" : ""
 
   return (
-    <Box>
+    <div>
       <PageHeader
         title="Приборы"
         count={ state.data?.total }
         actions={ <>
           <Button
-            variant="outlined"
-            size="small"
-            startIcon={ <FileDownloadIcon/> }
+            variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
             onClick={ exportCsv }
             disabled={ exporting || !filters || (state.data?.total ?? 0) === 0 }
           >
             Экспорт
           </Button>
           <Button
-            variant="contained"
-            size="small"
-            startIcon={ <AddIcon/> }
+            variant="contained" startIcon={ <IconPlus size={ 18 }/> }
             onClick={ () => navigate(`${ ROUTES.instruments }/new`) }
           >
             Добавить прибор
@@ -127,99 +135,69 @@ export function InstrumentsPage() {
         </> }
       />
 
-      <Card sx={ { p: 2, mb: 2 } }>
-        <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
-            <TextField
-              size="small" label="Поиск" placeholder="Название, инв. или серийный номер"
-              sx={ { minWidth: 260 } }
-              defaultValue={ params.get("q") ?? "" }
-              onChange={ (event) => setParam("q", event.target.value) }
-            />
-            <TextField
-              size="small" select label="Статус" sx={ { minWidth: 160 } }
-              value={ params.get("status") ?? "" }
-              onChange={ (event) => setParam("status", event.target.value) }
-            >
-              <MenuItem value="">Любой</MenuItem>
-              { INSTRUMENT_STATUSES.map((status) => (
-                <MenuItem key={ status } value={ status }>{ STATUS_LABELS[status] }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Тип" sx={ { minWidth: 160 } }
-              value={ params.get("type") ?? "" }
-              onChange={ (event) => setParam("type", event.target.value) }
-            >
-              <MenuItem value="">Любой</MenuItem>
-              { filters?.types.map((type) => (
-                <MenuItem key={ type.id } value={ type.id }>{ type.name }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Подразделение" sx={ { minWidth: 180 } }
-              value={ params.get("department") ?? "" }
-              onChange={ (event) => setParam("department", event.target.value) }
-            >
-              <MenuItem value="">Любое</MenuItem>
-              { filters?.departments.map((department) => (
-                <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Место" sx={ { minWidth: 180 } }
-              value={ params.get("location") ?? "" }
-              onChange={ (event) => setParam("location", event.target.value) }
-            >
-              <MenuItem value="">Любое</MenuItem>
-              { filters?.locations.map((location) => (
-                <MenuItem key={ location.id } value={ location.id }>{ location.name }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Сотрудник" sx={ { minWidth: 200 } }
-              value={ params.get("employee") ?? "" }
-              onChange={ (event) => setParam("employee", event.target.value) }
-            >
-              <MenuItem value="">Любой</MenuItem>
-              { filters?.employees.map((employee) => (
-                <MenuItem key={ employee.id } value={ employee.id }>{ employee.fullName }</MenuItem>
-              )) }
-            </TextField>
-            <DateField
-              label="Заведён с"
-              value={ params.get("from") ?? "" }
-              onChange={ (value) => setParam("from", value) }
-            />
-            <DateField
-              label="Заведён по"
-              value={ params.get("to") ?? "" }
-              onChange={ (value) => setParam("to", value) }
-            />
-            <TextField
-              size="small" select label="Особые" sx={ { minWidth: 200 } }
-              value={ params.get("overdue") === "1" ? "overdue" : params.get("verification") === "due" ? "verification" : "" }
-              onChange={ (event) => {
-                const next = new URLSearchParams(params)
-                next.delete("overdue")
-                next.delete("verification")
-                if (event.target.value === "overdue") next.set("overdue", "1")
-                if (event.target.value === "verification") next.set("verification", "due")
-                setParams(next, { replace: true })
-                setPage(0)
-              } }
-            >
-              <MenuItem value="">Без ограничений</MenuItem>
-              <MenuItem value="overdue">Не вернули в срок</MenuItem>
-              <MenuItem value="verification">Истекает поверка</MenuItem>
-            </TextField>
+      <Card padding="tight" className="mb-2">
+        <Stack row gap={ 2 } wrap>
+          <TextField
+            label="Поиск" placeholder="Название, инв. или серийный номер"
+            value={ params.get("q") ?? "" }
+            onChange={ (value) => setParam("q", value) }
+            style={ { minWidth: 240, flex: "1 1 240px" } }
+          />
+          <Select
+            label="Статус" value={ params.get("status") ?? "" } emptyLabel="Любой"
+            options={ INSTRUMENT_STATUSES.map((status) => ({ value: status, label: STATUS_LABELS[status] })) }
+            onChange={ (value) => setParam("status", value) }
+            style={ { minWidth: 160 } }
+          />
+          <Select
+            label="Тип" value={ params.get("type") ?? "" } emptyLabel="Любой"
+            options={ (filters?.types ?? []).map((row) => ({ value: row.id, label: row.name })) }
+            onChange={ (value) => setParam("type", value) }
+            style={ { minWidth: 160 } }
+          />
+          <Select
+            label="Подразделение" value={ params.get("department") ?? "" } emptyLabel="Любое"
+            options={ (filters?.departments ?? []).map((row) => ({ value: row.id, label: row.name })) }
+            onChange={ (value) => setParam("department", value) }
+            style={ { minWidth: 180 } }
+          />
+          <Select
+            label="Место" value={ params.get("location") ?? "" } emptyLabel="Любое"
+            options={ (filters?.locations ?? []).map((row) => ({ value: row.id, label: row.name })) }
+            onChange={ (value) => setParam("location", value) }
+            style={ { minWidth: 180 } }
+          />
+          <Select
+            label="Сотрудник" value={ params.get("employee") ?? "" } emptyLabel="Любой"
+            options={ (filters?.employees ?? []).map((row) => ({ value: row.id, label: row.fullName })) }
+            onChange={ (value) => setParam("employee", value) }
+            style={ { minWidth: 200 } }
+          />
+          <DateInput
+            label="Заведён с" value={ params.get("from") ?? "" }
+            onChange={ (value) => setParam("from", value) }
+          />
+          <DateInput
+            label="Заведён по" value={ params.get("to") ?? "" }
+            onChange={ (value) => setParam("to", value) }
+          />
+          <Select
+            label="Особые" value={ special } emptyLabel="Без ограничений"
+            options={ [
+              { value: "overdue", label: "Не вернули в срок" },
+              { value: "verification", label: "Истекает поверка" },
+            ] }
+            onChange={ setSpecial }
+            style={ { minWidth: 200 } }
+          />
         </Stack>
       </Card>
 
-      { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
+      { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card>
+      <Card padding="none">
         { filters ? (
-          <InstrumentsGrid
+          <InstrumentsTable
             rows={ state.data?.rows ?? [] }
             directories={ filters }
             loading={ state.loading }
@@ -232,7 +210,7 @@ export function InstrumentsPage() {
                 title="Ничего не нашлось"
                 action={
                   <Button
-                    size="small" variant="outlined"
+                    variant="outlined"
                     onClick={ () => { setParams({}, { replace: true }); setPage(0) } }
                   >
                     Сбросить фильтры
@@ -247,7 +225,7 @@ export function InstrumentsPage() {
                 title="Приборов пока нет"
                 action={
                   <Button
-                    size="small" variant="contained" startIcon={ <AddIcon/> }
+                    variant="contained" startIcon={ <IconPlus size={ 18 }/> }
                     onClick={ () => navigate(`${ ROUTES.instruments }/new`) }
                   >
                     Добавить прибор
@@ -261,6 +239,6 @@ export function InstrumentsPage() {
           />
         ) : null }
       </Card>
-    </Box>
+    </div>
   )
 }

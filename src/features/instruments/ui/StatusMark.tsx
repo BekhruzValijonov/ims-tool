@@ -1,43 +1,22 @@
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
 import type { InstrumentStatus } from "../domain/types"
 import { STATUS_LABELS } from "../domain/labels"
-import { useStateColors } from "../../../app/theme/useStateColors"
+import { Chip, type ChipColor } from "../../../ui/Chip"
+
+const TONE: Record<InstrumentStatus, ChipColor> = {
+  AVAILABLE: "primary",
+  CHECKED_OUT: "info",
+  IN_REPAIR: "warning",
+  IN_VERIFICATION: "warning",
+  WRITTEN_OFF: "default",
+}
 
 /**
- * Состояние прибора: точка и слово.
+ * Состояние прибора.
  *
- * Пилюля в каждой строке таблицы превращает список в рябь, а цвет без слова
- * нечитаем для тех, кто его не различает. Списанный прибор помечен пустой
- * точкой — он отличается от остальных и формой, а не только цветом.
+ * Метка с мягкой заливкой — приём дизайн-системы. Цвет несёт тяжесть
+ * состояния, слово — причину: ремонт и поверка выглядят одинаково жёлтыми, и
+ * различает их подпись.
  */
-export function StatusMark({ status, bold }: { status: InstrumentStatus; bold?: boolean }) {
-  const { state } = useStateColors()
-  const color = {
-    AVAILABLE: state.ok,
-    CHECKED_OUT: state.work,
-    IN_REPAIR: state.wait,
-    IN_VERIFICATION: state.wait,
-    WRITTEN_OFF: state.gone,
-  }[status]
-  const hollow = status === "WRITTEN_OFF"
-
-  return (
-    <Stack direction="row" sx={ { alignItems: "center", gap: 1, minWidth: 0, height: "100%" } }>
-      <Box
-        sx={ {
-          width: 9,
-          height: 9,
-          borderRadius: "50%",
-          flexShrink: 0,
-          backgroundColor: hollow ? "transparent" : color,
-          border: hollow ? `1.5px solid ${ color }` : "none",
-        } }
-      />
-      <Typography variant="body2" noWrap sx={ { fontWeight: bold ? 500 : 400 } }>
-        { STATUS_LABELS[status] }
-      </Typography>
-    </Stack>
-  )
+export function StatusMark({ status }: { status: InstrumentStatus }) {
+  return <Chip color={ TONE[status] }>{ STATUS_LABELS[status] }</Chip>
 }

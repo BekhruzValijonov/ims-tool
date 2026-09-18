@@ -1,48 +1,13 @@
-import Box from "@mui/material/Box"
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import { styled } from "@mui/material/styles"
-import { PieChart } from "@mui/x-charts/PieChart"
-import { useDrawingArea } from "@mui/x-charts/hooks"
+import { useMemo } from "react"
+import type { ApexOptions } from "apexcharts"
 import type { StatusSlice } from "../domain/types"
-import { STATUS_LABELS } from "../../instruments/domain/labels"
 import type { InstrumentStatus } from "../../instruments/domain/types"
-import { MONO, SIZE, TABULAR } from "../../../app/theme/tokens"
+import { STATUS_LABELS } from "../../instruments/domain/labels"
+import { Card } from "../../../ui/Card"
+import { Chart } from "../../../ui/Chart"
+import { Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
 import { useStateColors } from "../../../app/theme/useStateColors"
-
-const CenterText = styled("text", {
-  shouldForwardProp: (prop) => prop !== "kind",
-})<{ kind: "value" | "label" }>(({ theme }) => ({
-  textAnchor: "middle",
-  dominantBaseline: "central",
-  fill: (theme.vars || theme).palette.text.secondary,
-  variants: [
-    {
-      props: { kind: "value" },
-      style: {
-        fontFamily: MONO,
-        fontSize: "1.75rem",
-        fontWeight: 500,
-        fontVariantNumeric: "tabular-nums",
-        fill: (theme.vars || theme).palette.text.primary,
-      },
-    },
-    { props: { kind: "label" }, style: { fontSize: SIZE.caption } },
-  ],
-}))
-
-function CenterLabel({ value, label }: { value: string; label: string }) {
-  const { width, height, left, top } = useDrawingArea()
-  const y = top + height / 2 - 8
-
-  return (
-    <>
-      <CenterText kind="value" x={ left + width / 2 } y={ y }>{ value }</CenterText>
-      <CenterText kind="label" x={ left + width / 2 } y={ y + 22 }>{ label }</CenterText>
-    </>
-  )
-}
 
 /**
  * Состояние парка.
@@ -53,75 +18,72 @@ function CenterLabel({ value, label }: { value: string; label: string }) {
  */
 export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
   const { series } = useStateColors()
-  const TONE: Record<InstrumentStatus, string> = {
+
+  const tone: Record<InstrumentStatus, string> = {
     AVAILABLE: series.available,
     CHECKED_OUT: series.checkedOut,
     IN_REPAIR: series.inRepair,
     IN_VERIFICATION: series.inVerification,
     WRITTEN_OFF: series.writtenOff,
   }
+
   const live = slices.filter((slice) => slice.status !== "WRITTEN_OFF")
   const writtenOff = slices.find((slice) => slice.status === "WRITTEN_OFF")?.count ?? 0
   const total = live.reduce((sum, slice) => sum + slice.count, 0)
 
+  const options = useMemo<ApexOptions>(() => ({
+    colors: live.map((slice) => tone[slice.status]),
+    labels: live.map((slice) => STATUS_LABELS[slice.status]),
+    stroke: { width: 0 },
+    plotOptions: {
+      pie: {
+        donut: {
+          size: "72%",
+          labels: {
+            show: true,
+            value: { fontSize: "1.75rem", fontWeight: 700, offsetY: 6 },
+            total: {
+              show: true,
+              label: "в парке",
+              fontSize: "0.75rem",
+              formatter: () => String(total),
+            },
+          },
+        },
+      },
+    },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [live.map((slice) => `${ slice.status }:${ slice.count }`).join("|"), series, total])
+
   return (
-    <Card sx={ { p: 2 } }>
-      <Typography variant="h6" component="h2">Состояние парка</Typography>
-      <Typography variant="caption" sx={ { color: "text.secondary" } }>
-        Все приборы, кроме списанных
-      </Typography>
+    <Card>
+      <Text variant="h6" as="h2">Состояние парка</Text>
+      <Text variant="caption" tone="secondary">Все приборы, кроме списанных</Text>
 
-      <Box sx={ { display: "flex", justifyContent: "center", my: 1 } }>
-        <PieChart
-          colors={ live.map((slice) => TONE[slice.status]) }
-          margin={ { left: 0, right: 0, top: 0, bottom: 0 } }
-          series={ [{
-            data: live.map((slice) => ({ label: STATUS_LABELS[slice.status], value: slice.count })),
-            innerRadius: 62,
-            outerRadius: 88,
-            paddingAngle: 1.5,
-            cornerRadius: 2,
-            highlightScope: { fade: "global", highlight: "item" },
-          }] }
-          height={ 190 }
-          width={ 190 }
-          hideLegend
-        >
-          <CenterLabel value={ String(total) } label="в парке"/>
-        </PieChart>
-      </Box>
+      <Chart type="donut" height={ 240 } series={ live.map((slice) => slice.count) } options={ options }/>
 
-      <Stack sx={ { gap: 0.25 } }>
+      <Stack gap={ 0 } style={ { marginTop: 8 } }>
         { live.map((slice) => (
           <Stack
             key={ slice.status }
-            direction="row"
-            sx={ {
-              alignItems: "center",
-              gap: 1,
-              py: 0.5,
-              borderTop: 1,
-              borderColor: "divider",
-            } }
+            row
+            align="center"
+            gap={ 1 }
+            style={ { padding: "8px 0", borderTop: "1px dashed var(--divider)" } }
           >
-            <Box sx={ {
-              width: 9, height: 9, borderRadius: "50%", flexShrink: 0,
-              backgroundColor: TONE[slice.status],
+            <span style={ {
+              width: 10, height: 10, borderRadius: "50%", backgroundColor: tone[slice.status],
             } }/>
-            <Typography variant="body2" sx={ { flexGrow: 1 } }>
-              { STATUS_LABELS[slice.status] }
-            </Typography>
-            <Typography variant="body2" sx={ { fontFamily: MONO, ...TABULAR } }>
-              { slice.count }
-            </Typography>
+            <Text style={ { flexGrow: 1 } }>{ STATUS_LABELS[slice.status] }</Text>
+            <Text mono>{ slice.count }</Text>
           </Stack>
         )) }
       </Stack>
 
       { writtenOff > 0 ? (
-        <Typography variant="caption" sx={ { color: "text.secondary", display: "block", mt: 1 } }>
+        <Text variant="caption" tone="secondary" style={ { display: "block", marginTop: 12 } }>
           Списано за всё время: { writtenOff }
-        </Typography>
+        </Text>
       ) : null }
     </Card>
   )

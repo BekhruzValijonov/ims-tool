@@ -1,9 +1,7 @@
 import { createContext, useCallback, useContext, useEffect, useMemo, useState, type ReactNode } from "react"
-import Box from "@mui/material/Box"
-import Alert from "@mui/material/Alert"
-import AlertTitle from "@mui/material/AlertTitle"
-import CircularProgress from "@mui/material/CircularProgress"
-import Typography from "@mui/material/Typography"
+import { Alert } from "../ui/Alert"
+import { Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
 import { getRepo } from "../data"
 import type { AppRepo, StorageBackend } from "../data/AppRepo"
 
@@ -67,20 +65,19 @@ export function AppProvider({ children, repo: injected }: AppProviderProps) {
 
   if (failure) {
     return (
-      <Box sx={ { display: "grid", placeItems: "center", minHeight: "100vh", p: 3 } }>
-        <Alert severity="error" sx={ { maxWidth: 560 } }>
-          <AlertTitle>База данных недоступна</AlertTitle>
-          <Typography variant="body2">{ failure }</Typography>
+      <Stack align="center" justify="center" style={ { minHeight: "100vh", padding: 24 } }>
+        <Alert severity="error" title="База данных недоступна" className="app-boot-alert">
+          { failure }
         </Alert>
-      </Box>
+      </Stack>
     )
   }
 
   if (!value) {
     return (
-      <Box sx={ { display: "grid", placeItems: "center", minHeight: "100vh" } }>
-        <CircularProgress/>
-      </Box>
+      <Stack align="center" justify="center" style={ { minHeight: "100vh" } }>
+        <Text tone="secondary">Открываем базу…</Text>
+      </Stack>
     )
   }
 

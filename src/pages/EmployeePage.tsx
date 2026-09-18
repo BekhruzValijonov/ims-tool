@@ -1,25 +1,21 @@
 import { useNavigate, useParams } from "react-router-dom"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Chip from "@mui/material/Chip"
-import Card from "@mui/material/Card"
-import Grid from "@mui/material/Grid"
-import Link from "@mui/material/Link"
-import Skeleton from "@mui/material/Skeleton"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
-import { OperationsGrid } from "../features/operations/ui/OperationsGrid"
+import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
 import type { Instrument } from "../features/instruments/domain/types"
 import { formatDate } from "../shared/dates"
-import { monoSx } from "../shared/ui/dataText"
 import { useStateColors } from "../app/theme/useStateColors"
 import { ROUTES } from "../app/routes"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { Chip } from "../ui/Chip"
+import { Skeleton } from "../ui/Skeleton"
+import { Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
+import { IconArrowLeft } from "../ui/icons"
 
 /**
  * Карточка сотрудника.
@@ -51,7 +47,7 @@ export function EmployeePage() {
     return { employee, onHands, journal, instruments }
   }, [repo, id])
 
-  if (state.loading && !state.data) return <Skeleton variant="rounded" height={ 360 }/>
+  if (state.loading && !state.data) return <Skeleton height={ 360 }/>
   if (state.error) return <Alert severity="error">{ state.error }</Alert>
   if (!state.data) return <Alert severity="warning">Сотрудник не найден</Alert>
 
@@ -60,89 +56,90 @@ export function EmployeePage() {
   const now = Date.now()
 
   return (
-    <Box>
+    <div>
       <Button
-        size="small" startIcon={ <ArrowBackIcon/> } sx={ { mb: 1, ml: -1 } }
+        startIcon={ <IconArrowLeft size={ 18 }/> }
         onClick={ () => navigate(ROUTES.employees) }
+        style={ { marginLeft: -12, marginBottom: 8 } }
       >
         К списку сотрудников
       </Button>
 
-      <Stack direction="row" sx={ { alignItems: "center", gap: 1.5, mb: 1, flexWrap: "wrap" } }>
-        <Typography variant="h4" component="h1">{ employee.fullName }</Typography>
-        { employee.isActive ? null : <Chip size="small" label="Уволен"/> }
+      <Stack row align="center" gap={ 1.5 } wrap style={ { marginBottom: 24 } }>
+        <Text variant="h4" as="h1">{ employee.fullName }</Text>
+        { employee.isActive ? null : <Chip>Уволен</Chip> }
       </Stack>
-      <Box sx={ { borderBottom: 1, borderColor: "text.primary", mb: 2.5 } }/>
 
-      <Grid container spacing={ 2 } columns={ 12 }>
-        <Grid size={ { xs: 12, md: 4 } }>
-          <Card sx={ { p: 2 } }>
-              <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Сотрудник</Typography>
-              <Stack sx={ { gap: 0.75 } }>
-                <Typography variant="body2">
-                  Подразделение: { dirs?.departmentName(employee.departmentId) ?? "—" }
-                </Typography>
-                <Typography variant="body2">Должность: { employee.position ?? "—" }</Typography>
-                <Typography variant="body2">Табельный: { employee.personnelNumber ?? "—" }</Typography>
-                <Typography variant="body2">Телефон: { employee.phone ?? "—" }</Typography>
-              </Stack>
-          </Card>
-
-          <Card sx={ { p: 2, mt: 2 } }>
-              <Typography variant="h6" component="h2" sx={ { mb: 1 } }>
-                Сейчас на руках: { onHands.length }
-              </Typography>
-
-              { onHands.length === 0 ? (
-                <Typography variant="body2" sx={ { color: "text.secondary", mt: 1 } }>
-                  Приборов нет
-                </Typography>
-              ) : (
-                <Stack sx={ { gap: 1.25, mt: 1 } }>
-                  { onHands.map((instrument) => {
-                    const overdue = instrument.expectedReturnAt !== null && instrument.expectedReturnAt < now
-                    return (
-                      <Stack key={ instrument.id } sx={ { gap: 0.25 } }>
-                        <Link
-                          component="button" type="button"
-                          sx={ { textAlign: "left" } }
-                          onClick={ () => navigate(ROUTES.instrument(instrument.id)) }
-                        >
-                          <Typography component="span" variant="body2" sx={ { ...monoSx, mr: 1 } }>
-                            { instrument.inventoryNumber }
-                          </Typography>
-                          <Typography component="span" variant="body2">{ instrument.name }</Typography>
-                        </Link>
-                        <Typography variant="caption" sx={ { color: "text.secondary" } }>
-                          Выдан { formatDate(instrument.issuedAt) }
-                          { instrument.expectedReturnAt === null ? ", без срока возврата" : null }
-                        </Typography>
-                        { instrument.expectedReturnAt !== null ? (
-                          <Typography
-                            variant="caption"
-                            sx={ { color: overdue ? tone.signal : "text.secondary", fontWeight: overdue ? 500 : 400 } }
-                          >
-                            { overdue ? "Просрочен с " : "Вернуть до " }
-                            { formatDate(instrument.expectedReturnAt) }
-                          </Typography>
-                        ) : null }
-                      </Stack>
-                    )
-                  }) }
-                </Stack>
-              ) }
-          </Card>
-        </Grid>
-
-        <Grid size={ { xs: 12, md: 8 } }>
+      <Stack row gap={ 2 } wrap align="stretch">
+        <Stack gap={ 2 } style={ { flex: "2 1 300px", minWidth: 0 } }>
           <Card>
-            <Typography variant="h6" component="h2" sx={ { p: 2, pb: 1 } }>История выдач</Typography>
+            <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Сотрудник</Text>
+            <Stack gap={ 0.75 }>
+              <Text>Подразделение: { dirs?.departmentName(employee.departmentId) ?? "—" }</Text>
+              <Text>Должность: { employee.position ?? "—" }</Text>
+              <Text>Табельный: { employee.personnelNumber ?? "—" }</Text>
+              <Text>Телефон: { employee.phone ?? "—" }</Text>
+            </Stack>
+          </Card>
+
+          <Card>
+            <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>
+              Сейчас на руках: { onHands.length }
+            </Text>
+
+            { onHands.length === 0 ? (
+              <Text tone="secondary">Приборов нет</Text>
+            ) : (
+              <Stack gap={ 1.5 }>
+                { onHands.map((instrument) => {
+                  const overdue = instrument.expectedReturnAt !== null && instrument.expectedReturnAt < now
+                  return (
+                    <Stack key={ instrument.id } gap={ 0.25 }>
+                      <button
+                        type="button"
+                        onClick={ () => navigate(ROUTES.instrument(instrument.id)) }
+                        style={ {
+                          padding: 0, border: "none", background: "none", cursor: "pointer",
+                          textAlign: "left", font: "inherit", color: "var(--primary-main)", fontWeight: 600,
+                        } }
+                      >
+                        <span className="data-mono" style={ { marginRight: 8 } }>
+                          { instrument.inventoryNumber }
+                        </span>
+                        { instrument.name }
+                      </button>
+                      <Text variant="caption" tone="secondary">
+                        Выдан { formatDate(instrument.issuedAt) }
+                        { instrument.expectedReturnAt === null ? ", без срока возврата" : null }
+                      </Text>
+                      { instrument.expectedReturnAt !== null ? (
+                        <Text
+                          variant="caption"
+                          style={ overdue
+                            ? { color: tone.signal, fontWeight: 600 }
+                            : { color: "var(--text-secondary)" } }
+                        >
+                          { overdue ? "Просрочен с " : "Вернуть до " }
+                          { formatDate(instrument.expectedReturnAt) }
+                        </Text>
+                      ) : null }
+                    </Stack>
+                  )
+                }) }
+              </Stack>
+            ) }
+          </Card>
+        </Stack>
+
+        <div style={ { flex: "3 1 420px", minWidth: 0 } }>
+          <Card padding="none">
+            <Text variant="h6" as="h2" style={ { padding: "20px 20px 8px" } }>История выдач</Text>
             { dirs ? (
-              <OperationsGrid rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
+              <OperationsTable rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
             ) : null }
           </Card>
-        </Grid>
-      </Grid>
-    </Box>
+        </div>
+      </Stack>
+    </div>
   )
 }

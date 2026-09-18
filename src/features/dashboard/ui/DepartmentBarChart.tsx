@@ -1,9 +1,10 @@
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import Box from "@mui/material/Box"
-import { BarChart } from "@mui/x-charts/BarChart"
+import { useMemo } from "react"
+import type { ApexOptions } from "apexcharts"
 import type { DepartmentSummary } from "../../directories/domain/types"
+import { Card } from "../../../ui/Card"
+import { Chart } from "../../../ui/Chart"
+import { Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
 import { useStateColors } from "../../../app/theme/useStateColors"
 
 /**
@@ -16,49 +17,47 @@ import { useStateColors } from "../../../app/theme/useStateColors"
 export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSummary[] }) {
   const { series } = useStateColors()
   const rows = summary.filter((row) => row.total > 0)
-  const SERIES = [
-    { id: "available", label: "В наличии", color: series.available },
-    { id: "checkedOut", label: "Выдано", color: series.checkedOut },
-    { id: "inRepair", label: "В ремонте", color: series.inRepair },
-    { id: "inVerification", label: "На поверке", color: series.inVerification },
-  ] as const
+
+  const legend = [
+    { label: "В наличии", color: series.available },
+    { label: "Выдано", color: series.checkedOut },
+    { label: "В ремонте", color: series.inRepair },
+    { label: "На поверке", color: series.inVerification },
+  ]
+
+  const options = useMemo<ApexOptions>(() => ({
+    colors: legend.map((item) => item.color),
+    chart: { stacked: true },
+    plotOptions: { bar: { columnWidth: "48%", borderRadius: 4, borderRadiusApplication: "end" } },
+    xaxis: { categories: rows.map((row) => row.name) },
+    yaxis: { min: 0, forceNiceScale: true, labels: { formatter: (value) => String(Math.round(value)) } },
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }), [rows.map((row) => row.name).join("|"), series])
 
   return (
-    <Card sx={ { p: 2 } }>
-      <Typography variant="h6" component="h2">Числится за подразделениями</Typography>
-      <Typography variant="caption" sx={ { color: "text.secondary" } }>
-        Столбец — подразделение, цвет — состояние приборов
-      </Typography>
+    <Card>
+      <Text variant="h6" as="h2">Числится за подразделениями</Text>
+      <Text variant="caption" tone="secondary">Столбец — подразделение, цвет — состояние приборов</Text>
 
-      <Stack direction="row" sx={ { gap: 2, mt: 1.5, flexWrap: "wrap" } }>
-        { SERIES.map((series) => (
-          <Stack key={ series.id } direction="row" sx={ { alignItems: "center", gap: 0.75 } }>
-            <Box sx={ { width: 9, height: 9, borderRadius: "50%", backgroundColor: series.color } }/>
-            <Typography variant="caption" sx={ { color: "text.secondary" } }>{ series.label }</Typography>
+      <Stack row gap={ 2 } wrap style={ { marginTop: 12 } }>
+        { legend.map((item) => (
+          <Stack key={ item.label } row align="center" gap={ 0.75 }>
+            <span style={ { width: 10, height: 10, borderRadius: "50%", backgroundColor: item.color } }/>
+            <Text variant="caption" tone="secondary">{ item.label }</Text>
           </Stack>
         )) }
       </Stack>
 
-      <BarChart
-        borderRadius={ 6 }
-        colors={ SERIES.map((series) => series.color) }
-        xAxis={ [{
-          scaleType: "band",
-          categoryGapRatio: 0.55,
-          data: rows.map((row) => row.name),
-          height: 24,
-        }] }
-        yAxis={ [{ width: 32 }] }
-        series={ SERIES.map((series) => ({
-          id: series.id,
-          label: series.label,
-          data: rows.map((row) => row[series.id]),
-          stack: "A",
-        })) }
-        height={ 232 }
-        margin={ { left: 0, right: 0, top: 16, bottom: 0 } }
-        grid={ { horizontal: true } }
-        hideLegend
+      <Chart
+        type="bar"
+        height={ 260 }
+        series={ [
+          { name: "В наличии", data: rows.map((row) => row.available) },
+          { name: "Выдано", data: rows.map((row) => row.checkedOut) },
+          { name: "В ремонте", data: rows.map((row) => row.inRepair) },
+          { name: "На поверке", data: rows.map((row) => row.inVerification) },
+        ] }
+        options={ options }
       />
     </Card>
   )

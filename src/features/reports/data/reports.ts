@@ -1,4 +1,4 @@
-import type { GridColDef } from "@mui/x-data-grid"
+import type { Column } from "../../../ui/DataTable"
 import type { AppRepo } from "../../../data/AppRepo"
 import type { Directories } from "../../directories/ui/useDirectories"
 import type { CsvColumn } from "../../../shared/csv"
@@ -7,7 +7,7 @@ import { STATUS_LABELS, formatPrice } from "../../instruments/domain/labels"
 import { EVENT_LABELS, CONDITION_LABELS } from "../../operations/domain/labels"
 import { DAY_MS, formatDate, formatDateTime } from "../../../shared/dates"
 import { toOperationRows } from "../../operations/ui/operationRows"
-import { MONO_CELL } from "../../../shared/ui/dataText"
+
 
 /** Что спрашивать у человека перед построением. */
 export type ReportParam = "period" | "horizon" | "instrument"
@@ -20,7 +20,7 @@ export interface ReportInput {
 }
 
 export interface ReportResult {
-  readonly columns: readonly GridColDef[]
+  readonly columns: readonly Column<Record<string, unknown>>[]
   readonly rows: readonly Record<string, unknown>[]
   readonly csv: readonly CsvColumn<Record<string, unknown>>[]
   readonly fileName: string
@@ -39,15 +39,15 @@ export interface ReportDefinition {
 /** Колонки таблицы и колонки выгрузки — одно и то же: расходиться им незачем. */
 function mirror(
   spec: readonly { field: string; header: string; width?: number; flex?: number; mono?: boolean }[],
-): { columns: GridColDef[]; csv: CsvColumn<Record<string, unknown>>[] } {
+): { columns: Column<Record<string, unknown>>[]; csv: CsvColumn<Record<string, unknown>>[] } {
   return {
     columns: spec.map((column) => ({
-      field: column.field,
-      headerName: column.header,
-      width: column.width,
-      flex: column.flex,
+      key: column.field,
+      header: column.header,
+      width: column.flex ? undefined : column.width,
       minWidth: column.flex ? 140 : undefined,
-      cellClassName: column.mono ? MONO_CELL : undefined,
+      mono: column.mono,
+      render: (row) => String(row[column.field] ?? ""),
     })),
     csv: spec.map((column) => ({
       header: column.header,

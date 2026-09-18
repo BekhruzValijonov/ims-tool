@@ -1,12 +1,8 @@
 import type { ReactNode } from "react"
-import Box from "@mui/material/Box"
-import Grid from "@mui/material/Grid"
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import { SparkLineChart } from "@mui/x-charts/SparkLineChart"
-import { lineClasses } from "@mui/x-charts/LineChart"
-import { BADGE_RADIUS, MONO, SIZE, TABULAR } from "../../../app/theme/tokens"
+import { Card } from "../../../ui/Card"
+import { Grid, Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
+import { Sparkline } from "../../../ui/Chart"
 
 export interface Gauge {
   readonly key: string
@@ -19,105 +15,61 @@ export interface Gauge {
   readonly icon: ReactNode
 }
 
-function AreaGradient({ color, id }: { color: string; id: string }) {
-  return (
-    <defs>
-      <linearGradient id={ id } x1="50%" y1="0%" x2="50%" y2="100%">
-        <stop offset="0%" stopColor={ color } stopOpacity={ 0.35 }/>
-        <stop offset="100%" stopColor={ color } stopOpacity={ 0 }/>
-      </linearGradient>
-    </defs>
-  )
-}
-
 /**
  * Изменение за окно — штуками, а не процентами.
  *
  * «+700%» при росте с одного прибора до восьми технически верно и бесполезно:
  * на малых числах процент говорит о размере базы, а не о событии.
  */
-function delta(series: readonly number[]): { text: string; sign: number } {
+function delta(series: readonly number[]): { text: string; changed: boolean } {
   const first = series[0] ?? 0
   const last = series[series.length - 1] ?? 0
   const value = last - first
-  if (value === 0) return { text: "без изменений", sign: 0 }
-  return { text: `${ value > 0 ? "+" : "−" }${ Math.abs(value) } за месяц`, sign: Math.sign(value) }
+  if (value === 0) return { text: "без изменений", changed: false }
+  return { text: `${ value > 0 ? "+" : "−" }${ Math.abs(value) } за месяц`, changed: true }
 }
 
-/**
- * Карточки показаний.
- *
- * Силуэт Corona: крупное число, изменение рядом, квадратный значок справа.
- * Отличие в содержании — и число, и спарклайн, и подпись изменения считаются
- * по одному и тому же ряду из журнала, поэтому карточка не может показать
- * рост, которого не было на графике под ней.
- */
-export function StatCards({ gauges, labels }: { gauges: readonly Gauge[]; labels: readonly string[] }) {
+export function StatCards({ gauges }: { gauges: readonly Gauge[] }) {
   return (
-    <Grid container spacing={ 2 } columns={ 12 }>
+    <Grid cols={ { xs: 1, sm: 2, md: 4 } } gap={ 2 }>
       { gauges.map((gauge) => {
         const change = delta(gauge.series)
 
         return (
-          <Grid key={ gauge.key } size={ { xs: 12, sm: 6, md: 3 } }>
-            <Card data-gauge={ gauge.key } sx={ { p: 2.5, height: "100%" } }>
-              <Stack direction="row" sx={ { alignItems: "flex-start", gap: 2 } }>
-                <Box sx={ { flexGrow: 1, minWidth: 0 } }>
-                  <Stack direction="row" sx={ { alignItems: "baseline", gap: 1.5, flexWrap: "wrap" } }>
-                    <Typography
-                      component="p"
-                      sx={ {
-                        fontFamily: MONO,
-                        fontSize: SIZE.readout,
-                        fontWeight: 500,
-                        lineHeight: 1.1,
-                        ...TABULAR,
-                      } }
-                    >
+          <Card key={ gauge.key } padding="none">
+            <div data-gauge={ gauge.key } style={ { padding: 20 } }>
+              <Stack row align="start" gap={ 2 }>
+                <Stack grow gap={ 0.5 }>
+                  <Stack row align="baseline" gap={ 1.5 } wrap>
+                    <Text variant="h4" as="p" mono style={ { fontSize: "2rem", lineHeight: 1.1 } }>
                       { gauge.value.toLocaleString("ru-RU") }
-                    </Typography>
-                    <Typography
+                    </Text>
+                    <Text
                       variant="caption"
-                      sx={ { color: change.sign === 0 ? "text.secondary" : gauge.color, fontWeight: 500 } }
+                      style={ { fontWeight: 600, color: change.changed ? gauge.color : "var(--text-secondary)" } }
                     >
                       { change.text }
-                    </Typography>
+                    </Text>
                   </Stack>
-                  <Typography variant="body2" sx={ { color: "text.secondary", mt: 0.5 } }>
-                    { gauge.label }
-                  </Typography>
-                </Box>
+                  <Text variant="body2" tone="secondary">{ gauge.label }</Text>
+                </Stack>
 
-                <Box
-                  sx={ {
-                    width: 38, height: 38, flexShrink: 0,
-                    borderRadius: `${ BADGE_RADIUS }px`,
+                <span
+                  style={ {
+                    width: 40, height: 40, flexShrink: 0,
                     display: "grid", placeItems: "center",
+                    borderRadius: 12,
                     backgroundColor: gauge.soft,
                     color: gauge.color,
-                    "& svg": { fontSize: 20 },
                   } }
                 >
                   { gauge.icon }
-                </Box>
+                </span>
               </Stack>
 
-              <Box sx={ { height: 44, mt: 1.5 } }>
-                <SparkLineChart
-                  color={ gauge.color }
-                  data={ [...gauge.series] }
-                  area
-                  showHighlight
-                  showTooltip
-                  xAxis={ { scaleType: "band", data: [...labels] } }
-                  margin={ { top: 4, right: 0, bottom: 0, left: 0 } }
-                  sx={ { [`& .${ lineClasses.area }`]: { fill: `url(#stat-${ gauge.key })` } } }
-                >
-                  <AreaGradient color={ gauge.color } id={ `stat-${ gauge.key }` }/>
-                </SparkLineChart>
-              </Box>
-            </Card>
-          </Grid>
+              <Sparkline data={ gauge.series } color={ gauge.color }/>
+            </div>
+          </Card>
         )
       }) }
     </Grid>

@@ -1,13 +1,12 @@
 import { useNavigate } from "react-router-dom"
-import Chip from "@mui/material/Chip"
-import Link from "@mui/material/Link"
-import type { GridColDef } from "@mui/x-data-grid"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { Employee } from "../features/directories/domain/types"
 import { ROUTES } from "../app/routes"
+import { Chip } from "../ui/Chip"
+import type { Column } from "../ui/DataTable"
 
 export function EmployeesPage() {
   const repo = useRepo()
@@ -27,48 +26,36 @@ export function EmployeesPage() {
     return { employees, onHands }
   }, [repo])
 
-  const columns: GridColDef<Employee>[] = [
+  const columns: Column<Employee>[] = [
     {
-      field: "fullName",
-      headerName: "Сотрудник",
-      flex: 1.3,
-      minWidth: 190,
-      renderCell: (params) => (
-        <Link
-          component="button" type="button" underline="hover"
-          onClick={ () => navigate(ROUTES.employee(params.row.id)) }
+      key: "fullName", header: "Сотрудник", minWidth: 200,
+      render: (row) => (
+        <a
+          href={ `#${ ROUTES.employee(row.id) }` }
+          onClick={ (event) => { event.preventDefault(); navigate(ROUTES.employee(row.id)) } }
+          style={ { color: "var(--primary-main)", fontWeight: 600, textDecoration: "none" } }
         >
-          { params.value }
-        </Link>
+          { row.fullName }
+        </a>
       ),
     },
-    { field: "personnelNumber", headerName: "Табельный", width: 105 },
+    { key: "personnelNumber", header: "Табельный", width: 110, mono: true, render: (row) => row.personnelNumber ?? "—" },
     {
-      field: "departmentId",
-      headerName: "Подразделение",
-      flex: 1,
-      minWidth: 130,
-      valueGetter: (value: string | null) => directories.data?.departmentName(value) ?? "—",
+      key: "department", header: "Подразделение", minWidth: 140,
+      render: (row) => directories.data?.departmentName(row.departmentId) ?? "—",
     },
-    { field: "position", headerName: "Должность", flex: 1, minWidth: 140 },
-    { field: "phone", headerName: "Телефон", width: 120 },
+    { key: "position", header: "Должность", minWidth: 150, render: (row) => row.position ?? "—" },
+    { key: "phone", header: "Телефон", width: 130, render: (row) => row.phone ?? "—" },
     {
-      field: "__onHands",
-      headerName: "На руках",
-      width: 95,
-      sortable: false,
-      renderCell: (params) => {
-        const count = state.data?.onHands.get(params.row.id) ?? 0
-        return count === 0 ? "—" : <Chip size="small" color="info" variant="outlined" label={ count }/>
+      key: "onHands", header: "На руках", width: 100, align: "right",
+      render: (row) => {
+        const count = state.data?.onHands.get(row.id) ?? 0
+        return count === 0 ? "—" : <Chip color="info">{ count }</Chip>
       },
     },
     {
-      field: "isActive",
-      headerName: "Состояние",
-      width: 115,
-      renderCell: (params) => (params.row.isActive
-        ? <Chip size="small" color="success" variant="outlined" label="Работает"/>
-        : <Chip size="small" label="Уволен"/>),
+      key: "state", header: "Состояние", width: 130,
+      render: (row) => (row.isActive ? <Chip color="primary">Работает</Chip> : <Chip>Уволен</Chip>),
     },
   ]
 

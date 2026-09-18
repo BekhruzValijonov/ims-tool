@@ -1,7 +1,6 @@
 import type { ReactNode } from "react"
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
+import { Stack } from "../../ui/layout"
+import { Text } from "../../ui/Text"
 
 interface EmptyStateProps {
   readonly title: string
@@ -19,23 +18,10 @@ interface EmptyStateProps {
  */
 export function EmptyState({ title, children, action }: EmptyStateProps) {
   return (
-    <Stack sx={ { alignItems: "center", textAlign: "center", gap: 1, px: 3, py: 4 } }>
-      <Typography variant="subtitle1">{ title }</Typography>
-      <Typography variant="body2" sx={ { color: "text.secondary", maxWidth: 440 } }>
-        { children }
-      </Typography>
-      { action ? <Box sx={ { mt: 1 } }>{ action }</Box> : null }
+    <Stack align="center" gap={ 1 } style={ { textAlign: "center", padding: "48px 24px" } }>
+      <Text variant="subtitle1">{ title }</Text>
+      <Text tone="secondary" style={ { maxWidth: 440 } }>{ children }</Text>
+      { action ? <div style={ { marginTop: 8 } }>{ action }</div> : null }
     </Stack>
   )
-}
-
-/** Обёртка для слота noRowsOverlay у таблицы: он растягивается на всю высоту. */
-export function emptyOverlay(node: ReactNode) {
-  return function NoRows() {
-    return (
-      <Box sx={ { display: "grid", placeItems: "center", height: "100%", pointerEvents: "auto" } }>
-        { node }
-      </Box>
-    )
-  }
 }

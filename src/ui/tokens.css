@@ -1,0 +1,104 @@
+/*
+ * Токены дизайн-системы Minimal, перенесённые из проекта dashboard-ui.
+ *
+ * Там они жили как объект темы MUI; здесь это переменные CSS — значения те же,
+ * до последней цифры. Схема переключается атрибутом data-theme на <html>.
+ */
+
+:root {
+  /* Фирменный */
+  --primary-lighter: #C8FAD6;
+  --primary-light: #5BE49B;
+  --primary-main: #00A76F;
+  --primary-dark: #007867;
+  --primary-darker: #004B50;
+  --primary-contrast: #FFFFFF;
+
+  --secondary-lighter: #EFD6FF;
+  --secondary-light: #C684FF;
+  --secondary-main: #8E33FF;
+  --secondary-dark: #5119B7;
+  --secondary-darker: #27097A;
+
+  --info-lighter: #CAFDF5;
+  --info-light: #61F3F3;
+  --info-main: #00B8D9;
+  --info-dark: #006C9C;
+  --info-darker: #003768;
+
+  --success-lighter: #D3FCD2;
+  --success-light: #77ED8B;
+  --success-main: #22C55E;
+  --success-dark: #118D57;
+  --success-darker: #065E49;
+
+  --warning-lighter: #FFF5CC;
+  --warning-light: #FFD666;
+  --warning-main: #FFAB00;
+  --warning-dark: #B76E00;
+  --warning-darker: #7A4100;
+
+  --error-lighter: #FFE9D5;
+  --error-light: #FFAC82;
+  --error-main: #FF5630;
+  --error-dark: #B71D18;
+  --error-darker: #7A0916;
+
+  /* Серая шкала */
+  --grey-50: #FCFDFD;
+  --grey-100: #F9FAFB;
+  --grey-200: #F4F6F8;
+  --grey-300: #DFE3E8;
+  --grey-400: #C4CDD5;
+  --grey-500: #919EAB;
+  --grey-600: #637381;
+  --grey-700: #454F5B;
+  --grey-800: #1C252E;
+  --grey-900: #141A21;
+  --grey-500-rgb: 145, 158, 171;
+
+  /* Поверхности и текст — светлая схема */
+  --bg-default: var(--grey-100);
+  --bg-paper: #FFFFFF;
+  --bg-neutral: var(--grey-200);
+  --text-primary: var(--grey-800);
+  --text-secondary: var(--grey-600);
+  --text-disabled: var(--grey-500);
+  --divider: rgba(var(--grey-500-rgb), 0.2);
+  --action-hover: rgba(var(--grey-500-rgb), 0.08);
+  --action-selected: rgba(var(--grey-500-rgb), 0.16);
+
+  /* Тени дизайн-системы */
+  --shadow-card: 0 0 2px 0 rgba(var(--grey-500-rgb), 0.2), 0 12px 24px -4px rgba(var(--grey-500-rgb), 0.12);
+  --shadow-dropdown: 0 0 2px 0 rgba(var(--grey-500-rgb), 0.24), -20px 20px 40px -4px rgba(var(--grey-500-rgb), 0.24);
+  --shadow-dialog: -40px 40px 80px -8px rgba(var(--grey-500-rgb), 0.24);
+  --shadow-primary: 0 8px 16px 0 rgba(0, 167, 111, 0.24);
+
+  /* Геометрия */
+  --radius: 8px;
+  --radius-card: 16px;
+  --radius-pill: 999px;
+
+  /* Шрифты */
+  --font-sans: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
+  --font-display: 'Barlow', var(--font-sans);
+  --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
+
+  /* Размеры оболочки */
+  --sidebar-width: 260px;
+  --header-height: 72px;
+}
+
+[data-theme='dark'] {
+  --bg-default: var(--grey-900);
+  --bg-paper: var(--grey-800);
+  --bg-neutral: #28323D;
+  --text-primary: #FFFFFF;
+  --text-secondary: var(--grey-500);
+  --text-disabled: var(--grey-600);
+
+  /* На тёмном фоне тени строятся от чёрного, иначе они светлее фона. */
+  --shadow-card: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 12px 24px -4px rgba(0, 0, 0, 0.12);
+  --shadow-dropdown: 0 0 2px 0 rgba(0, 0, 0, 0.24), -20px 20px 40px -4px rgba(0, 0, 0, 0.24);
+  --shadow-dialog: -40px 40px 80px -8px rgba(0, 0, 0, 0.24);
+}

@@ -1,0 +1,26 @@
+.text { margin: 0; }
+
+.h3 { font-family: var(--font-display); font-weight: 700; font-size: 1.5rem; line-height: 1.5; }
+.h4 { font-weight: 700; font-size: 1.25rem; line-height: 1.5; }
+.h5 { font-weight: 700; font-size: 1.125rem; line-height: 1.5; }
+.h6 { font-weight: 600; font-size: 1.0625rem; line-height: 1.556; }
+.subtitle1 { font-weight: 600; font-size: 1rem; line-height: 1.5; }
+.subtitle2 { font-weight: 600; font-size: 0.875rem; line-height: 1.571; }
+.body1 { font-size: 1rem; line-height: 1.5; }
+.body2 { font-size: 0.875rem; line-height: 1.571; }
+.caption { font-size: 0.75rem; line-height: 1.5; }
+.overline {
+  font-weight: 700;
+  font-size: 0.75rem;
+  line-height: 1.5;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+}
+
+.primary { color: var(--text-primary); }
+.secondary { color: var(--text-secondary); }
+.disabled { color: var(--text-disabled); }
+.inherit { color: inherit; }
+
+.mono { font-family: var(--font-mono); font-variant-numeric: tabular-nums; }
+.noWrap { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

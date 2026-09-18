@@ -1,0 +1,28 @@
+.stack {
+  display: flex;
+  min-width: 0;
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(var(--cols-xs), minmax(0, 1fr));
+}
+
+@media (min-width: 600px) {
+  .grid { grid-template-columns: repeat(var(--cols-sm), minmax(0, 1fr)); }
+}
+
+@media (min-width: 900px) {
+  .grid { grid-template-columns: repeat(var(--cols-md), minmax(0, 1fr)); }
+}
+
+@media (min-width: 1200px) {
+  .grid { grid-template-columns: repeat(var(--cols-lg), minmax(0, 1fr)); }
+}
+
+/* Занять несколько колонок сетки. */
+.span2 { grid-column: span 2; }
+
+@media (max-width: 599px) {
+  .span2 { grid-column: span 1; }
+}

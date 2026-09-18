@@ -1,34 +1,28 @@
-import Chip from "@mui/material/Chip"
-import type { GridColDef } from "@mui/x-data-grid"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { StorageLocation } from "../features/directories/domain/types"
+import { Chip } from "../ui/Chip"
+import type { Column } from "../ui/DataTable"
 
 export function LocationsPage() {
   const repo = useRepo()
   const directories = useDirectories()
   const state = useAsync(() => repo.directories.locations(true), [repo])
 
-  const columns: GridColDef<StorageLocation>[] = [
-    { field: "name", headerName: "Место хранения", flex: 1, minWidth: 200 },
+  const columns: Column<StorageLocation>[] = [
+    { key: "name", header: "Место хранения", minWidth: 200, render: (row) => row.name },
     {
-      field: "departmentId",
-      headerName: "Подразделение",
-      flex: 1,
-      minWidth: 180,
-      valueGetter: (value: string | null) =>
-        (value ? directories.data?.departmentName(value) ?? "—" : "Общее"),
+      key: "department", header: "Подразделение", minWidth: 180,
+      render: (row) => (row.departmentId ? directories.data?.departmentName(row.departmentId) ?? "—" : "Общее"),
     },
-    { field: "code", headerName: "Код", width: 110 },
+    { key: "code", header: "Код", width: 110, render: (row) => row.code ?? "—" },
     {
-      field: "isArchived",
-      headerName: "Состояние",
-      width: 130,
-      renderCell: (params) => (params.row.isArchived
-        ? <Chip size="small" label="В архиве"/>
-        : <Chip size="small" color="success" variant="outlined" label="Используется"/>),
+      key: "state", header: "Состояние", width: 150,
+      render: (row) => (row.isArchived
+        ? <Chip>В архиве</Chip>
+        : <Chip color="primary">Используется</Chip>),
     },
   ]
 

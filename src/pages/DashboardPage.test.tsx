@@ -2,6 +2,7 @@ import { describe, expect, it } from "vitest"
 import { render, screen, waitFor } from "@testing-library/react"
 import { MemoryRouter } from "react-router-dom"
 import { AppProvider } from "../app/AppContext"
+import { ThemeModeProvider } from "../app/ThemeMode"
 import { DashboardPage } from "./DashboardPage"
 import { MemoryRepo } from "../data/MemoryRepo"
 import type { AppRepo } from "../data/AppRepo"
@@ -22,11 +23,13 @@ async function withRepo(fill?: (repo: AppRepo) => Promise<void>) {
   await fill?.(repo)
 
   render(
-    <AppProvider repo={ repo }>
-      <MemoryRouter>
-        <DashboardPage/>
-      </MemoryRouter>
-    </AppProvider>,
+    <ThemeModeProvider>
+      <AppProvider repo={ repo }>
+        <MemoryRouter>
+          <DashboardPage/>
+        </MemoryRouter>
+      </AppProvider>
+    </ThemeModeProvider>,
   )
   return repo
 }
@@ -92,7 +95,7 @@ describe("дашборд", () => {
     expect(gauge("total")).toHaveTextContent("2")
 
     // Число в центре бублика — то же самое «всего», и расходиться оно не имеет права.
-    const park = screen.getByText("Состояние парка").closest(".MuiPaper-root")
+    const park = screen.getByText("Состояние парка").closest("[class*='card']")
     expect(park).toHaveTextContent("2")
     expect(park).toHaveTextContent("Списано за всё время: 1")
   })

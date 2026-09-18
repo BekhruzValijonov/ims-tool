@@ -1,17 +1,9 @@
 import { useState } from "react"
 import { useSearchParams } from "react-router-dom"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import MenuItem from "@mui/material/MenuItem"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
-import { OperationsGrid } from "../features/operations/ui/OperationsGrid"
+import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
 import { EVENT_LABELS } from "../features/operations/domain/labels"
 import type { EventKind, JournalQuery } from "../features/operations/domain/types"
@@ -19,9 +11,15 @@ import type { Instrument } from "../features/instruments/domain/types"
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
-import { DateField } from "../shared/ui/DateField"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { EmptyState } from "../shared/ui/EmptyState"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { DateInput } from "../ui/DateInput"
+import { Select } from "../ui/Field"
+import { Stack } from "../ui/layout"
+import { IconDownload } from "../ui/icons"
 
 const PAGE_SIZE = 25
 
@@ -51,6 +49,7 @@ export function OperationsPage() {
 
   const query = readQuery(params)
   const filtered = [...params.keys()].length > 0
+
   const state = useAsync(async () => {
     const journal = await repo.operations.journal({ ...query, page, pageSize: PAGE_SIZE })
     const ids = [...new Set(journal.rows.map((event) => event.instrumentId))]
@@ -98,71 +97,53 @@ export function OperationsPage() {
   const dirs = directories.data
 
   return (
-    <Box>
+    <div>
       <PageHeader
         title="Операции"
         count={ state.data?.journal.total }
         hint="Всё, что происходило с приборами: выдачи, возвраты, перемещения, ремонты и поверки"
         actions={
           <Button
-            variant="outlined" size="small" startIcon={ <FileDownloadIcon/> }
-            onClick={ exportCsv } disabled={ exporting || !dirs || (state.data?.journal.total ?? 0) === 0 }
+            variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
+            onClick={ exportCsv }
+            disabled={ exporting || !dirs || (state.data?.journal.total ?? 0) === 0 }
           >
             Экспорт
           </Button>
         }
       />
 
-      <Card sx={ { p: 2, mb: 2 } }>
-        <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
-            <TextField
-              size="small" select label="Операция" sx={ { minWidth: 180 } }
-              value={ params.get("kind") ?? "" }
-              onChange={ (event) => setParam("kind", event.target.value) }
-            >
-              <MenuItem value="">Любая</MenuItem>
-              { (Object.keys(EVENT_LABELS) as EventKind[]).map((kind) => (
-                <MenuItem key={ kind } value={ kind }>{ EVENT_LABELS[kind] }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Сотрудник" sx={ { minWidth: 220 } }
-              value={ params.get("employee") ?? "" }
-              onChange={ (event) => setParam("employee", event.target.value) }
-            >
-              <MenuItem value="">Любой</MenuItem>
-              { dirs?.employees.map((employee) => (
-                <MenuItem key={ employee.id } value={ employee.id }>{ employee.fullName }</MenuItem>
-              )) }
-            </TextField>
-            <TextField
-              size="small" select label="Подразделение" sx={ { minWidth: 200 } }
-              value={ params.get("department") ?? "" }
-              onChange={ (event) => setParam("department", event.target.value) }
-            >
-              <MenuItem value="">Любое</MenuItem>
-              { dirs?.departments.map((department) => (
-                <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
-              )) }
-            </TextField>
-            <DateField
-              label="С"
-              value={ params.get("from") ?? "" }
-              onChange={ (value) => setParam("from", value) }
-            />
-            <DateField
-              label="По"
-              value={ params.get("to") ?? "" }
-              onChange={ (value) => setParam("to", value) }
-            />
+      <Card padding="tight" className="mb-2">
+        <Stack row gap={ 2 } wrap>
+          <Select
+            label="Операция" value={ params.get("kind") ?? "" } emptyLabel="Любая"
+            options={ (Object.keys(EVENT_LABELS) as EventKind[])
+              .map((kind) => ({ value: kind, label: EVENT_LABELS[kind] })) }
+            onChange={ (value) => setParam("kind", value) }
+            style={ { minWidth: 180 } }
+          />
+          <Select
+            label="Сотрудник" value={ params.get("employee") ?? "" } emptyLabel="Любой"
+            options={ (dirs?.employees ?? []).map((row) => ({ value: row.id, label: row.fullName })) }
+            onChange={ (value) => setParam("employee", value) }
+            style={ { minWidth: 220 } }
+          />
+          <Select
+            label="Подразделение" value={ params.get("department") ?? "" } emptyLabel="Любое"
+            options={ (dirs?.departments ?? []).map((row) => ({ value: row.id, label: row.name })) }
+            onChange={ (value) => setParam("department", value) }
+            style={ { minWidth: 200 } }
+          />
+          <DateInput label="С" value={ params.get("from") ?? "" } onChange={ (value) => setParam("from", value) }/>
+          <DateInput label="По" value={ params.get("to") ?? "" } onChange={ (value) => setParam("to", value) }/>
         </Stack>
       </Card>
 
-      { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
+      { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card>
+      <Card padding="none">
         { dirs && state.data ? (
-          <OperationsGrid
+          <OperationsTable
             rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }
             loading={ state.loading }
             rowCount={ state.data.journal.total }
@@ -174,7 +155,7 @@ export function OperationsPage() {
                 title="Операций не найдено"
                 action={
                   <Button
-                    size="small" variant="outlined"
+                    variant="outlined"
                     onClick={ () => { setParams({}, { replace: true }); setPage(0) } }
                   >
                     Сбросить фильтры
@@ -192,6 +173,6 @@ export function OperationsPage() {
           />
         ) : null }
       </Card>
-    </Box>
+    </div>
   )
 }

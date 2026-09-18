@@ -1,23 +1,19 @@
 import { useEffect, useState, type FormEvent } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Grid from "@mui/material/Grid"
-import MenuItem from "@mui/material/MenuItem"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
 import { useRepo, useOperatorName } from "../app/AppContext"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { useAsync } from "../shared/useAsync"
 import type { WriteError } from "../data/AppRepo"
 import { ROUTES } from "../app/routes"
 import { PageHeader } from "../shared/ui/PageHeader"
-import { DateField } from "../shared/ui/DateField"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { DateInput } from "../ui/DateInput"
+import { Select, TextArea, TextField } from "../ui/Field"
+import { Grid, Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
+import { IconArrowLeft } from "../ui/icons"
 
 interface FormState {
   inventoryNumber: string
@@ -119,15 +115,12 @@ export function InstrumentFormPage() {
     })
   }, [existing.data])
 
-  function field(key: keyof FormState) {
-    return {
-      value: form[key],
-      onChange: (event: { target: { value: string } }) =>
-        setForm((current) => ({ ...current, [key]: event.target.value })),
-    }
+  function set(key: keyof FormState) {
+    return (value: string) => setForm((current) => ({ ...current, [key]: value }))
   }
 
-  const type = directories.data?.typeById(form.typeId || null) ?? null
+  const dirs = directories.data
+  const type = dirs?.typeById(form.typeId || null) ?? null
   const showMetrology = Boolean(type?.requiresVerification)
 
   async function submit(event: FormEvent) {
@@ -186,11 +179,13 @@ export function InstrumentFormPage() {
     }
   }
 
-  const dirs = directories.data
-
   return (
-    <Box sx={ { width: "100%", maxWidth: 900 } }>
-      <Button size="small" startIcon={ <ArrowBackIcon/> } sx={ { mb: 1, ml: -1 } } onClick={ () => navigate(-1) }>
+    <div style={ { maxWidth: 900 } }>
+      <Button
+        startIcon={ <IconArrowLeft size={ 18 }/> }
+        onClick={ () => navigate(-1) }
+        style={ { marginLeft: -12, marginBottom: 8 } }
+      >
         Назад
       </Button>
       <PageHeader
@@ -201,147 +196,100 @@ export function InstrumentFormPage() {
       />
 
       <form onSubmit={ submit }>
-        <Stack sx={ { gap: 2 } }>
-          <Card variant="outlined">
-            <CardContent>
-              <Typography component="h3" variant="subtitle2" gutterBottom>Основное</Typography>
-              <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth required size="small" label="Наименование" { ...field("name") }/>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth select size="small" label="Тип" { ...field("typeId") }>
-                    <MenuItem value="">Не указан</MenuItem>
-                    { dirs?.types.filter((row) => !row.isArchived).map((row) => (
-                      <MenuItem key={ row.id } value={ row.id }>{ row.name }</MenuItem>
-                    )) }
-                  </TextField>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField
-                    fullWidth required size="small" label="Инвентарный номер"
-                    helperText="Уникален. По нему сверяются с бухгалтерией"
-                    { ...field("inventoryNumber") }
-                  />
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth size="small" label="Серийный номер" { ...field("serialNumber") }/>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth size="small" label="Производитель" { ...field("manufacturer") }/>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth size="small" label="Модель" { ...field("model") }/>
-                </Grid>
-              </Grid>
-            </CardContent>
+        <Stack gap={ 2 }>
+          <Card>
+            <Text variant="h6" as="h2" style={ { marginBottom: 16 } }>Основное</Text>
+            <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 }>
+              <TextField label="Наименование" required value={ form.name } onChange={ set("name") } fullWidth/>
+              <Select
+                label="Тип" value={ form.typeId } onChange={ set("typeId") } emptyLabel="Не указан"
+                options={ (dirs?.types ?? []).filter((row) => !row.isArchived)
+                  .map((row) => ({ value: row.id, label: row.name })) }
+                fullWidth
+              />
+              <TextField
+                label="Инвентарный номер" required value={ form.inventoryNumber }
+                onChange={ set("inventoryNumber") }
+                helper="Уникален. По нему сверяются с бухгалтерией"
+                fullWidth
+              />
+              <TextField label="Серийный номер" value={ form.serialNumber } onChange={ set("serialNumber") } fullWidth/>
+              <TextField label="Производитель" value={ form.manufacturer } onChange={ set("manufacturer") } fullWidth/>
+              <TextField label="Модель" value={ form.model } onChange={ set("model") } fullWidth/>
+            </Grid>
           </Card>
 
-          <Card variant="outlined">
-            <CardContent>
-              <Typography component="h3" variant="subtitle2" gutterBottom>Учёт</Typography>
-              <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField fullWidth select size="small" label="Подразделение" { ...field("ownerDepartmentId") }>
-                    <MenuItem value="">Не указано</MenuItem>
-                    { dirs?.departments.filter((row) => !row.isArchived).map((row) => (
-                      <MenuItem key={ row.id } value={ row.id }>{ row.name }</MenuItem>
-                    )) }
-                  </TextField>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField
-                    fullWidth select size="small" label="Место хранения"
-                    helperText="Сюда прибор вернётся при возврате"
-                    { ...field("baseLocationId") }
-                  >
-                    <MenuItem value="">Не указано</MenuItem>
-                    { dirs?.locations.filter((row) => !row.isArchived).map((row) => (
-                      <MenuItem key={ row.id } value={ row.id }>{ row.name }</MenuItem>
-                    )) }
-                  </TextField>
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField
-                    fullWidth select size="small" label="Материально ответственное лицо"
-                    { ...field("responsibleEmployeeId") }
-                  >
-                    <MenuItem value="">Не указано</MenuItem>
-                    { dirs?.employees.filter((row) => row.isActive).map((row) => (
-                      <MenuItem key={ row.id } value={ row.id }>{ row.fullName }</MenuItem>
-                    )) }
-                  </TextField>
-                </Grid>
-              </Grid>
-            </CardContent>
+          <Card>
+            <Text variant="h6" as="h2" style={ { marginBottom: 16 } }>Учёт</Text>
+            <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 }>
+              <Select
+                label="Подразделение" value={ form.ownerDepartmentId }
+                onChange={ set("ownerDepartmentId") } emptyLabel="Не указано"
+                options={ (dirs?.departments ?? []).filter((row) => !row.isArchived)
+                  .map((row) => ({ value: row.id, label: row.name })) }
+                fullWidth
+              />
+              <Select
+                label="Место хранения" value={ form.baseLocationId }
+                onChange={ set("baseLocationId") } emptyLabel="Не указано"
+                helper="Сюда прибор вернётся при возврате"
+                options={ (dirs?.locations ?? []).filter((row) => !row.isArchived)
+                  .map((row) => ({ value: row.id, label: row.name })) }
+                fullWidth
+              />
+              <Select
+                label="Материально ответственное лицо" value={ form.responsibleEmployeeId }
+                onChange={ set("responsibleEmployeeId") } emptyLabel="Не указано"
+                options={ (dirs?.employees ?? []).filter((row) => row.isActive)
+                  .map((row) => ({ value: row.id, label: row.fullName })) }
+                fullWidth
+              />
+            </Grid>
           </Card>
 
-          <Card variant="outlined">
-            <CardContent>
-              <Typography component="h3" variant="subtitle2" gutterBottom>Дополнительно</Typography>
-              <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <DateField
-                    fullWidth label="Дата приобретения"
-                    value={ form.purchasedAt }
-                    onChange={ (value) => setForm((current) => ({ ...current, purchasedAt: value })) }
-                  />
-                </Grid>
-                <Grid size={ { xs: 12, sm: 6 } }>
-                  <TextField
-                    fullWidth size="small" type="number" label="Стоимость, сум"
-                    { ...field("price") }
-                  />
-                </Grid>
-                <Grid size={ 12 }>
-                  <TextField fullWidth size="small" label="Описание" multiline minRows={ 2 } { ...field("description") }/>
-                </Grid>
-                <Grid size={ 12 }>
-                  <TextField fullWidth size="small" label="Комментарий" multiline minRows={ 2 } { ...field("note") }/>
-                </Grid>
-              </Grid>
-            </CardContent>
+          <Card>
+            <Text variant="h6" as="h2" style={ { marginBottom: 16 } }>Дополнительно</Text>
+            <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 }>
+              <DateInput label="Дата приобретения" value={ form.purchasedAt } onChange={ set("purchasedAt") } fullWidth/>
+              <TextField label="Стоимость, сум" type="number" value={ form.price } onChange={ set("price") } fullWidth/>
+            </Grid>
+            <Stack gap={ 2 } style={ { marginTop: 16 } }>
+              <TextArea label="Описание" value={ form.description } onChange={ set("description") } fullWidth/>
+              <TextArea label="Комментарий" value={ form.note } onChange={ set("note") } fullWidth/>
+            </Stack>
           </Card>
 
           { showMetrology && !editing ? (
-            <Card variant="outlined">
-              <CardContent>
-                <Typography component="h3" variant="subtitle2" gutterBottom>Метрология</Typography>
-                <Typography variant="caption" sx={ { color: "text.secondary" } }>
-                  Действующее свидетельство, если оно уже есть. Дальше поверки заносятся операцией
-                  «Принять с поверки» и копятся историей.
-                </Typography>
-                <Grid container spacing={ 2 } sx={ { mt: 0.5 } }>
-                  <Grid size={ { xs: 12, sm: 6 } }>
-                    <DateField
-                      fullWidth label="Дата поверки"
-                      value={ form.verificationPerformedAt }
-                      onChange={ (value) =>
-                        setForm((current) => ({ ...current, verificationPerformedAt: value })) }
-                    />
-                  </Grid>
-                  <Grid size={ { xs: 12, sm: 6 } }>
-                    <DateField
-                      fullWidth label="Действительна до"
-                      value={ form.verificationValidUntil }
-                      onChange={ (value) =>
-                        setForm((current) => ({ ...current, verificationValidUntil: value })) }
-                    />
-                  </Grid>
-                  <Grid size={ { xs: 12, sm: 6 } }>
-                    <TextField fullWidth size="small" label="Номер свидетельства" { ...field("certificateNumber") }/>
-                  </Grid>
-                  <Grid size={ { xs: 12, sm: 6 } }>
-                    <TextField fullWidth size="small" label="Кто поверял" { ...field("organization") }/>
-                  </Grid>
-                </Grid>
-              </CardContent>
+            <Card>
+              <Text variant="h6" as="h2">Метрология</Text>
+              <Text variant="caption" tone="secondary">
+                Действующее свидетельство, если оно уже есть. Дальше поверки заносятся операцией
+                «Принять с поверки» и копятся историей.
+              </Text>
+              <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 } style={ { marginTop: 16 } }>
+                <DateInput
+                  label="Дата поверки" value={ form.verificationPerformedAt }
+                  onChange={ set("verificationPerformedAt") } fullWidth
+                />
+                <DateInput
+                  label="Действительна до" value={ form.verificationValidUntil }
+                  onChange={ set("verificationValidUntil") } fullWidth
+                />
+                <TextField
+                  label="Номер свидетельства" value={ form.certificateNumber }
+                  onChange={ set("certificateNumber") } fullWidth
+                />
+                <TextField
+                  label="Кто поверял" value={ form.organization }
+                  onChange={ set("organization") } fullWidth
+                />
+              </Grid>
             </Card>
           ) : null }
 
           { failure ? <Alert severity="error">{ failure }</Alert> : null }
 
-          <Stack direction="row" sx={ { gap: 1 } }>
+          <Stack row gap={ 1 }>
             <Button type="submit" variant="contained" disabled={ busy }>
               { editing ? "Сохранить" : "Завести прибор" }
             </Button>
@@ -349,6 +297,6 @@ export function InstrumentFormPage() {
           </Stack>
         </Stack>
       </form>
-    </Box>
+    </div>
   )
 }

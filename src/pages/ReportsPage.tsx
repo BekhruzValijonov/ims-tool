@@ -1,17 +1,4 @@
 import { useMemo, useState } from "react"
-import Alert from "@mui/material/Alert"
-import Autocomplete from "@mui/material/Autocomplete"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import ButtonBase from "@mui/material/ButtonBase"
-import Card from "@mui/material/Card"
-import Grid from "@mui/material/Grid"
-import MenuItem from "@mui/material/MenuItem"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
-import FileDownloadIcon from "@mui/icons-material/FileDownload"
-import { DataGrid } from "@mui/x-data-grid"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
@@ -19,9 +6,17 @@ import { REPORTS, type ReportInput } from "../features/reports/data/reports"
 import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS } from "../shared/dates"
-import { DateField } from "../shared/ui/DateField"
 import { PageHeader } from "../shared/ui/PageHeader"
-import { EmptyState, emptyOverlay } from "../shared/ui/EmptyState"
+import { EmptyState } from "../shared/ui/EmptyState"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { DataTable } from "../ui/DataTable"
+import { DateInput } from "../ui/DateInput"
+import { Select } from "../ui/Field"
+import { Grid, Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
+import { IconDownload } from "../ui/icons"
 
 function toDateInput(timestamp: number): string {
   const date = new Date(timestamp)
@@ -78,119 +73,109 @@ export function ReportsPage() {
   }
 
   return (
-    <Box>
+    <div>
       <PageHeader title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"/>
 
-      <Grid container spacing={ 1.5 } columns={ 12 } sx={ { mb: 2 } }>
+      <Grid cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1.5 } style={ { marginBottom: 16 } }>
         { REPORTS.map((item) => {
           const active = item.id === selected
           return (
-            <Grid key={ item.id } size={ { xs: 12, sm: 6, lg: 4 } }>
-              <ButtonBase
-                onClick={ () => setSelected(item.id) }
-                sx={ {
-                  width: "100%", height: "100%", textAlign: "left", display: "block",
-                  p: 1.5, borderRadius: 1,
-                  border: 1,
-                  borderColor: active ? "text.primary" : "divider",
-                  backgroundColor: "background.paper",
-                  /* Выбранный отчёт отмечен планкой слева и рамкой потемнее —
-                     тем же приёмом, что и текущий раздел в меню. */
-                  boxShadow: active ? (theme) => `inset 3px 0 0 ${ theme.palette.text.primary }` : "none",
-                } }
-              >
-                <Typography variant="subtitle2">{ item.title }</Typography>
-                <Typography variant="caption" sx={ { color: "text.secondary", display: "block" } }>
-                  { item.description }
-                </Typography>
-              </ButtonBase>
-            </Grid>
+            <button
+              key={ item.id }
+              type="button"
+              onClick={ () => setSelected(item.id) }
+              style={ {
+                width: "100%", height: "100%", textAlign: "left", cursor: "pointer",
+                padding: 16, borderRadius: "var(--radius-card)",
+                background: "var(--bg-paper)",
+                border: `1px solid ${ active ? "var(--primary-main)" : "transparent" }`,
+                boxShadow: "var(--shadow-card)",
+              } }
+            >
+              <Text variant="subtitle2">{ item.title }</Text>
+              <Text variant="caption" tone="secondary" style={ { display: "block", marginTop: 4 } }>
+                { item.description }
+              </Text>
+            </button>
           )
         }) }
       </Grid>
 
-      <Card sx={ { p: 2, mb: 2 } }>
-          <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap", alignItems: "center" } }>
-            <Typography variant="subtitle2" sx={ { minWidth: 220 } }>{ report.title }</Typography>
+      <Card padding="tight" className="mb-2">
+        <Stack row gap={ 2 } wrap align="end">
+          <Text variant="subtitle2" style={ { minWidth: 200, paddingBottom: 8 } }>{ report.title }</Text>
 
-            { report.params.includes("period") ? (
-              <>
-                <DateField label="С" value={ from } onChange={ setFrom }/>
-                <DateField label="По" value={ to } onChange={ setTo }/>
-              </>
-            ) : null }
+          { report.params.includes("period") ? (
+            <>
+              <DateInput label="С" value={ from } onChange={ setFrom }/>
+              <DateInput label="По" value={ to } onChange={ setTo }/>
+            </>
+          ) : null }
 
-            { report.params.includes("horizon") ? (
-              <TextField
-                size="small" select label="Горизонт" sx={ { minWidth: 180 } }
-                value={ horizonDays }
-                onChange={ (event) => setHorizonDays(Number(event.target.value)) }
-              >
-                <MenuItem value={ 30 }>30 дней</MenuItem>
-                <MenuItem value={ 60 }>60 дней</MenuItem>
-                <MenuItem value={ 90 }>90 дней</MenuItem>
-              </TextField>
-            ) : null }
+          { report.params.includes("horizon") ? (
+            <Select
+              label="Горизонт"
+              value={ String(horizonDays) }
+              options={ [
+                { value: "30", label: "30 дней" },
+                { value: "60", label: "60 дней" },
+                { value: "90", label: "90 дней" },
+              ] }
+              onChange={ (value) => setHorizonDays(Number(value)) }
+              style={ { minWidth: 160 } }
+            />
+          ) : null }
 
-            { report.params.includes("instrument") ? (
-              <Autocomplete
-                size="small"
-                sx={ { minWidth: 360 } }
-                options={ instruments.data ?? [] }
-                getOptionLabel={ (option) => `${ option.inventoryNumber } — ${ option.name }` }
-                value={ (instruments.data ?? []).find((row) => row.id === instrumentId) ?? null }
-                onChange={ (_event, value) => setInstrumentId(value?.id ?? null) }
-                renderInput={ (params) => <TextField { ...params } label="Прибор"/> }
-              />
-            ) : null }
+          { report.params.includes("instrument") ? (
+            <Select
+              label="Прибор"
+              value={ instrumentId ?? "" }
+              emptyLabel="Выберите прибор"
+              options={ (instruments.data ?? []).map((row) => ({
+                value: row.id,
+                label: `${ row.inventoryNumber } — ${ row.name }`,
+              })) }
+              onChange={ (value) => setInstrumentId(value || null) }
+              style={ { minWidth: 320 } }
+            />
+          ) : null }
 
-            <Box sx={ { flexGrow: 1 } }/>
-            <Button
-              variant="outlined" size="small" startIcon={ <FileDownloadIcon/> }
-              onClick={ exportCsv } disabled={ exporting || !state.data || state.data.rows.length === 0 }
-            >
-              Выгрузить CSV
-            </Button>
-          </Stack>
+          <Stack row grow/>
+          <Button
+            variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
+            onClick={ exportCsv }
+            disabled={ exporting || !state.data || state.data.rows.length === 0 }
+          >
+            Выгрузить CSV
+          </Button>
+        </Stack>
 
         { state.data ? (
-          <Typography variant="body2" sx={ { color: "text.secondary", mt: 1.5 } }>
-            { state.data.summary }
-          </Typography>
+          <Text tone="secondary" style={ { marginTop: 12 } }>{ state.data.summary }</Text>
         ) : null }
       </Card>
 
-      { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
+      { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card>
-        <DataGrid
-          rows={ [...(state.data?.rows ?? [])] }
-          columns={ [...(state.data?.columns ?? [])] }
+      <Card padding="none">
+        <DataTable
+          columns={ state.data?.columns ?? [] }
+          rows={ state.data?.rows ?? [] }
+          rowKey={ (row) => String(row.id) }
           loading={ state.loading }
-          rowHeight={ 40 }
-          columnHeaderHeight={ 40 }
-          disableColumnResize
-          disableRowSelectionOnClick
-          initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
-          pageSizeOptions={ [25, 50, 100] }
-          sx={ { minHeight: 320 } }
-          slots={ {
-            noRowsOverlay: emptyOverlay(
-              report.params.includes("instrument") && !instrumentId ? (
-                <EmptyState title="Выберите прибор">
-                  Паспорт движения строится по одному прибору. Найдите его в поле выше —
-                  по инвентарному номеру или названию.
-                </EmptyState>
-              ) : (
-                <EmptyState title="Для отчёта нет данных">
-                  Отчёты строятся по журналу и реестру. Как только появятся приборы и первые
-                  операции, эта таблица заполнится.
-                </EmptyState>
-              ),
-            ),
-          } }
+          empty={ report.params.includes("instrument") && !instrumentId ? (
+            <EmptyState title="Выберите прибор">
+              Паспорт движения строится по одному прибору. Найдите его в поле выше —
+              по инвентарному номеру или названию.
+            </EmptyState>
+          ) : (
+            <EmptyState title="Для отчёта нет данных">
+              Отчёты строятся по журналу и реестру. Как только появятся приборы и первые
+              операции, эта таблица заполнится.
+            </EmptyState>
+          ) }
         />
       </Card>
-    </Box>
+    </div>
   )
 }

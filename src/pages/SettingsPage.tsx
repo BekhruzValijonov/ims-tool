@@ -1,14 +1,13 @@
 import { useState } from "react"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import { useAppState } from "../app/AppContext"
 import { VERIFICATION_HORIZON_DAYS } from "../data/settingsKeys"
 import { PageHeader } from "../shared/ui/PageHeader"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { TextField } from "../ui/Field"
+import { Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
 
 const BACKEND_LABELS: Record<string, string> = {
   sqlite: "Файл SQLite в каталоге данных приложения",
@@ -26,39 +25,42 @@ export function SettingsPage() {
   }
 
   return (
-    <Box sx={ { maxWidth: 760 } }>
+    <div style={ { maxWidth: 760 } }>
       <PageHeader title="Настройки"/>
 
-      <Card sx={ { p: 2, mb: 2 } }>
-          <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Оператор</Typography>
-          <Typography variant="body2" sx={ { color: "text.secondary", mb: 2 } }>
+      <Stack gap={ 2 }>
+        <Card>
+          <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Оператор</Text>
+          <Text tone="secondary" style={ { marginBottom: 16 } }>
             Этим именем подписываются новые записи журнала. Уже сделанные записи останутся
             подписанными тем, кто их внёс: смена имени не переписывает прошлое.
-          </Typography>
-          <Stack direction="row" sx={ { gap: 2, alignItems: "flex-start", flexWrap: "wrap" } }>
+          </Text>
+          <Stack row gap={ 2 } align="end" wrap>
             <TextField
-              size="small" label="Фамилия Имя Отчество" sx={ { minWidth: 320 } }
+              label="Фамилия Имя Отчество"
               value={ draft }
-              onChange={ (event) => { setDraft(event.target.value); setSaved(false) } }
+              onChange={ (value) => { setDraft(value); setSaved(false) } }
+              style={ { minWidth: 320 } }
             />
             <Button
-              variant="contained" size="medium"
+              variant="contained"
               onClick={ save }
               disabled={ draft.trim().length < 3 || draft.trim() === operatorName }
             >
               Сохранить
             </Button>
           </Stack>
-          { saved ? <Alert severity="success" sx={ { mt: 2 } }>Имя оператора сохранено</Alert> : null }
-      </Card>
+          { saved ? <Alert severity="success" className="mb-2">Имя оператора сохранено</Alert> : null }
+        </Card>
 
-      <Card sx={ { p: 2 } }>
-          <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Хранилище</Typography>
-          <Typography variant="body2">{ BACKEND_LABELS[backend] ?? backend }</Typography>
-          <Typography variant="body2" sx={ { color: "text.secondary", mt: 2 } }>
+        <Card>
+          <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Хранилище</Text>
+          <Text>{ BACKEND_LABELS[backend] ?? backend }</Text>
+          <Text tone="secondary" style={ { marginTop: 16 } }>
             Прибор попадает в список «истекает поверка» за { VERIFICATION_HORIZON_DAYS } дней до конца срока.
-          </Typography>
-      </Card>
-    </Box>
+          </Text>
+        </Card>
+      </Stack>
+    </div>
   )
 }

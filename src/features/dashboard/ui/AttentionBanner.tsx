@@ -1,11 +1,9 @@
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined"
 import { useNavigate } from "react-router-dom"
-import { MONO, TABULAR } from "../../../app/theme/tokens"
+import { Card } from "../../../ui/Card"
+import { Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
+import { IconCheck } from "../../../ui/icons"
+import { PALETTE } from "../../../app/theme/tokens"
 import { ROUTES } from "../../../app/routes"
 
 interface Item {
@@ -19,26 +17,23 @@ function Count({ item }: { item: Item }) {
   const navigate = useNavigate()
 
   return (
-    <Stack direction="row" sx={ { alignItems: "center", gap: 2, minWidth: 0 } }>
-      <Typography
-        component="p"
-        sx={ { fontFamily: MONO, fontSize: "2rem", fontWeight: 500, lineHeight: 1, ...TABULAR } }
-      >
+    <Stack row align="center" gap={ 2 }>
+      <Text as="p" mono style={ { fontSize: "2rem", fontWeight: 700, lineHeight: 1 } }>
         { item.value }
-      </Typography>
-      <Box sx={ { minWidth: 0 } }>
-        <Typography variant="subtitle2" sx={ { color: "inherit" } }>{ item.title }</Typography>
-        <Button
-          size="small"
+      </Text>
+      <div>
+        <Text variant="subtitle2">{ item.title }</Text>
+        <button
+          type="button"
           onClick={ () => navigate(item.to) }
-          sx={ {
-            p: 0, minWidth: 0, color: "inherit", textDecoration: "underline",
-            textUnderlineOffset: 3, "&:hover": { background: "transparent", opacity: 0.85 },
+          style={ {
+            padding: 0, border: "none", background: "none", cursor: "pointer",
+            color: "inherit", font: "inherit", textDecoration: "underline", textUnderlineOffset: 3,
           } }
         >
           { item.action }
-        </Button>
-      </Box>
+        </button>
+      </div>
     </Stack>
   )
 }
@@ -46,28 +41,25 @@ function Count({ item }: { item: Item }) {
 /**
  * Полоса «требует действия».
  *
- * Занимает то же место, где в шаблоне Corona стоит рекламный баннер, но
- * несёт настоящую работу и загорается, только когда есть что предъявить:
- * постоянно красный экран перестаёт быть сигналом. Когда всё в порядке,
- * полоса говорит об этом спокойно — это тоже ответ на вопрос «как дела».
+ * Загорается, только когда есть что предъявить: постоянно красный экран
+ * перестаёт быть сигналом. Когда всё в порядке, полоса говорит об этом
+ * спокойно — это тоже ответ на вопрос «как дела».
  *
  * Две просрочки не складываются в одно число: невозврат в срок и истёкшая
  * поверка требуют разных действий от разных людей.
  */
 export function AttentionBanner({ overdue, verificationDue }: { overdue: number; verificationDue: number }) {
-  const calm = overdue === 0 && verificationDue === 0
-
-  if (calm) {
+  if (overdue === 0 && verificationDue === 0) {
     return (
-      <Card sx={ { p: 2.5 } }>
-        <Stack direction="row" sx={ { alignItems: "center", gap: 1.5 } }>
-          <CheckCircleOutlinedIcon sx={ { color: "primary.main" } }/>
-          <Box>
-            <Typography variant="subtitle1">Всё в срок</Typography>
-            <Typography variant="body2" sx={ { color: "text.secondary" } }>
+      <Card padding="tight">
+        <Stack row align="center" gap={ 1.5 }>
+          <span style={ { color: PALETTE.primary.main, display: "flex" } }><IconCheck size={ 24 }/></span>
+          <div>
+            <Text variant="subtitle1">Всё в срок</Text>
+            <Text tone="secondary">
               Невозвращённых приборов нет, поверки в ближайший месяц не истекают.
-            </Typography>
-          </Box>
+            </Text>
+          </div>
         </Stack>
       </Card>
     )
@@ -75,44 +67,35 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
 
   return (
     <Card
-      sx={ (theme) => ({
-        p: 3,
-        border: "none",
-        color: theme.vars.palette.error.contrastText,
+      padding="none"
+      style={ {
+        padding: 24,
+        color: "#fff",
         /* Красный, а не оранжевый: речь о просрочке, а не о предупреждении.
-           Градиент — приём самой дизайн-системы, здесь он достаётся
-           единственному месту, которое обязано перебивать всё остальное. */
-        background: `linear-gradient(135deg, ${ theme.vars.palette.error.main } 0%, ${ theme.vars.palette.error.dark } 100%)`,
-      }) }
+           Градиент — приём дизайн-системы, здесь он достаётся единственному
+           месту, которое обязано перебивать всё остальное. */
+        background: `linear-gradient(135deg, ${ PALETTE.error.main } 0%, ${ PALETTE.error.dark } 100%)`,
+      } }
     >
-      <Stack
-        direction={ { xs: "column", md: "row" } }
-        sx={ { alignItems: { md: "center" }, gap: { xs: 2.5, md: 5 } } }
-      >
-        <Box sx={ { flexGrow: 1 } }>
-          <Typography variant="h5" component="h2" sx={ { color: "inherit" } }>
-            Требует действия сегодня
-          </Typography>
-          <Typography variant="body2" sx={ { color: "inherit", opacity: 0.85, mt: 0.25 } }>
+      <Stack row gap={ 5 } align="center" wrap>
+        <Stack grow gap={ 0.5 } style={ { minWidth: 260 } }>
+          <Text variant="h5" as="h2">Требует действия сегодня</Text>
+          <Text style={ { opacity: 0.85 } }>
             Приборы, которые не вернули вовремя, и поверки, которые вот-вот кончатся.
-          </Typography>
-        </Box>
+          </Text>
+        </Stack>
 
-        <Stack direction={ { xs: "column", sm: "row" } } sx={ { gap: { xs: 2, sm: 4 } } }>
+        <Stack row gap={ 4 } wrap>
           { overdue > 0 ? (
             <Count item={ {
-              value: overdue,
-              title: "не вернули в срок",
-              action: "Кто держит",
-              to: `${ ROUTES.instruments }?overdue=1`,
+              value: overdue, title: "не вернули в срок",
+              action: "Кто держит", to: `${ ROUTES.instruments }?overdue=1`,
             } }/>
           ) : null }
           { verificationDue > 0 ? (
             <Count item={ {
-              value: verificationDue,
-              title: "истекает поверка",
-              action: "Что поверять",
-              to: `${ ROUTES.instruments }?verification=due`,
+              value: verificationDue, title: "истекает поверка",
+              action: "Что поверять", to: `${ ROUTES.instruments }?verification=due`,
             } }/>
           ) : null }
         </Stack>

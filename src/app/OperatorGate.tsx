@@ -1,12 +1,10 @@
 import { useState, type FormEvent } from "react"
-import Button from "@mui/material/Button"
-import Dialog from "@mui/material/Dialog"
-import DialogActions from "@mui/material/DialogActions"
-import DialogContent from "@mui/material/DialogContent"
-import DialogContentText from "@mui/material/DialogContentText"
-import DialogTitle from "@mui/material/DialogTitle"
-import TextField from "@mui/material/TextField"
 import { useAppState } from "./AppContext"
+import { Button } from "../ui/Button"
+import { Dialog } from "../ui/Dialog"
+import { TextField } from "../ui/Field"
+import { Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
 
 /**
  * «Представьтесь» при первом запуске.
@@ -32,31 +30,32 @@ export function OperatorGate() {
   }
 
   return (
-    <Dialog open={ operatorName === null } maxWidth="xs" fullWidth>
-      <form onSubmit={ submit }>
-        <DialogTitle>Представьтесь</DialogTitle>
-        <DialogContent>
-          <DialogContentText sx={ { mb: 2 } }>
-            Каждая операция в журнале подписывается тем, кто её внёс. Введите своё
-            полное имя — оно будет подставляться в записи. Изменить его можно в настройках.
-          </DialogContentText>
-          <TextField
-            autoFocus
-            fullWidth
-            label="Фамилия Имя Отчество"
-            value={ draft }
-            onChange={ (event) => setDraft(event.target.value) }
-            onBlur={ () => setTouched(true) }
-            error={ invalid }
-            helperText={ invalid ? "Укажите полное имя" : " " }
-          />
-        </DialogContent>
-        <DialogActions>
-          <Button type="submit" variant="contained" disabled={ trimmed.length < 3 }>
-            Продолжить
-          </Button>
-        </DialogActions>
-      </form>
+    <Dialog
+      open={ operatorName === null }
+      title="Представьтесь"
+      onSubmit={ submit }
+      actions={
+        <Button type="submit" variant="contained" disabled={ trimmed.length < 3 }>
+          Продолжить
+        </Button>
+      }
+    >
+      <Stack gap={ 2 }>
+        <Text tone="secondary">
+          Каждая операция в журнале подписывается тем, кто её внёс. Введите своё полное
+          имя — оно будет подставляться в записи. Изменить его можно в настройках.
+        </Text>
+        <TextField
+          label="Фамилия Имя Отчество"
+          value={ draft }
+          onChange={ (value) => { setDraft(value); setTouched(false) } }
+          onBlur={ () => setTouched(true) }
+          error={ invalid }
+          helper={ invalid ? "Укажите полное имя" : undefined }
+          autoFocus
+          fullWidth
+        />
+      </Stack>
     </Dialog>
   )
 }

@@ -1,8 +1,6 @@
 import type { ReactNode } from "react"
-import Box from "@mui/material/Box"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import { monoSx } from "./dataText"
+import { Stack } from "../../ui/layout"
+import { Text } from "../../ui/Text"
 
 interface PageHeaderProps {
   readonly title: string
@@ -12,32 +10,19 @@ interface PageHeaderProps {
   readonly actions?: ReactNode
 }
 
-/**
- * Заголовок экрана.
- *
- * Линия под ним отделяет постановку задачи от содержимого — это дешевле и
- * тише, чем заворачивать каждый экран в ещё одну карточку.
- */
 export function PageHeader({ title, count, hint, actions }: PageHeaderProps) {
   return (
-    <Box sx={ { mb: 2.5 } }>
-      <Stack
-        direction="row"
-        sx={ { justifyContent: "space-between", alignItems: "baseline", gap: 2, flexWrap: "wrap", mb: 1 } }
-      >
-        <Stack direction="row" sx={ { alignItems: "baseline", gap: 1.5 } }>
-          <Typography variant="h4" component="h1">{ title }</Typography>
+    <Stack gap={ 0.5 } style={ { marginBottom: 24 } }>
+      <Stack row align="baseline" justify="between" gap={ 2 } wrap>
+        <Stack row align="baseline" gap={ 1.5 }>
+          <Text variant="h4" as="h1">{ title }</Text>
           { count === undefined ? null : (
-            <Typography variant="body2" sx={ { ...monoSx, color: "text.secondary" } }>
-              { count.toLocaleString("ru-RU") }
-            </Typography>
+            <Text variant="body2" tone="secondary" mono>{ count.toLocaleString("ru-RU") }</Text>
           ) }
         </Stack>
-        { actions ? <Stack direction="row" sx={ { gap: 1 } }>{ actions }</Stack> : null }
+        { actions ? <Stack row gap={ 1 } wrap>{ actions }</Stack> : null }
       </Stack>
-      { hint ? (
-        <Typography variant="body2" sx={ { color: "text.secondary" } }>{ hint }</Typography>
-      ) : null }
-    </Box>
+      { hint ? <Text tone="secondary">{ hint }</Text> : null }
+    </Stack>
   )
 }

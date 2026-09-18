@@ -1,24 +1,22 @@
-import Chip from "@mui/material/Chip"
-import type { GridColDef } from "@mui/x-data-grid"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { Department } from "../features/directories/domain/types"
+import { Chip } from "../ui/Chip"
+import type { Column } from "../ui/DataTable"
 
 export function DepartmentsPage() {
   const repo = useRepo()
   const state = useAsync(() => repo.directories.departments(true), [repo])
 
-  const columns: GridColDef<Department>[] = [
-    { field: "name", headerName: "Подразделение", flex: 1, minWidth: 200 },
-    { field: "code", headerName: "Код", width: 120 },
+  const columns: Column<Department>[] = [
+    { key: "name", header: "Подразделение", minWidth: 200, render: (row) => row.name },
+    { key: "code", header: "Код", width: 120, render: (row) => row.code ?? "—" },
     {
-      field: "isArchived",
-      headerName: "Состояние",
-      width: 140,
-      renderCell: (params) => (params.row.isArchived
-        ? <Chip size="small" label="В архиве"/>
-        : <Chip size="small" color="success" variant="outlined" label="Работает"/>),
+      key: "state", header: "Состояние", width: 140,
+      render: (row) => (row.isArchived
+        ? <Chip>В архиве</Chip>
+        : <Chip color="primary">Работает</Chip>),
     },
   ]
 

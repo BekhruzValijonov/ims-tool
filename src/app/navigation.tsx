@@ -1,13 +1,8 @@
 import type { ReactNode } from "react"
-import DashboardIcon from "@mui/icons-material/Dashboard"
-import StraightenIcon from "@mui/icons-material/Straighten"
-import SwapHorizIcon from "@mui/icons-material/SwapHoriz"
-import BadgeIcon from "@mui/icons-material/Badge"
-import ApartmentIcon from "@mui/icons-material/Apartment"
-import Inventory2Icon from "@mui/icons-material/Inventory2"
-import CategoryIcon from "@mui/icons-material/Category"
-import BarChartIcon from "@mui/icons-material/BarChart"
-import SettingsIcon from "@mui/icons-material/Settings"
+import {
+  IconDashboard, IconInstrument, IconOperations, IconEmployees,
+  IconDepartments, IconLocations, IconTypes, IconReports, IconSettings,
+} from "../ui/icons"
 import { ROUTES } from "./routes"
 
 export interface NavItem {
@@ -17,45 +12,33 @@ export interface NavItem {
 }
 
 export interface NavSection {
-  readonly title: string | null
-  /**
-   * Тон значков раздела.
-   *
-   * В Corona каждый пункт меню своего цвета просто так. Здесь цвет значка
-   * говорит, как часто в раздел заходят: фиолетовый — ежедневная работа,
-   * бирюзовый — справочники, которые заполняют один раз, серый — всё
-   * остальное.
-   */
-  readonly tone: "brand" | "muted" | "neutral"
+  readonly title: string
   readonly items: readonly NavItem[]
 }
 
 export const NAVIGATION: readonly NavSection[] = [
   {
     title: "Учёт",
-    tone: "brand",
     items: [
-      { path: ROUTES.dashboard, title: "Дашборд", icon: <DashboardIcon/> },
-      { path: ROUTES.instruments, title: "Приборы", icon: <StraightenIcon/> },
-      { path: ROUTES.operations, title: "Операции", icon: <SwapHorizIcon/> },
+      { path: ROUTES.dashboard, title: "Дашборд", icon: <IconDashboard size={ 22 }/> },
+      { path: ROUTES.instruments, title: "Приборы", icon: <IconInstrument size={ 22 }/> },
+      { path: ROUTES.operations, title: "Операции", icon: <IconOperations size={ 22 }/> },
     ],
   },
   {
     title: "Справочники",
-    tone: "muted",
     items: [
-      { path: ROUTES.employees, title: "Сотрудники", icon: <BadgeIcon/> },
-      { path: ROUTES.departments, title: "Подразделения", icon: <ApartmentIcon/> },
-      { path: ROUTES.locations, title: "Места хранения", icon: <Inventory2Icon/> },
-      { path: ROUTES.instrumentTypes, title: "Типы приборов", icon: <CategoryIcon/> },
+      { path: ROUTES.employees, title: "Сотрудники", icon: <IconEmployees size={ 22 }/> },
+      { path: ROUTES.departments, title: "Подразделения", icon: <IconDepartments size={ 22 }/> },
+      { path: ROUTES.locations, title: "Места хранения", icon: <IconLocations size={ 22 }/> },
+      { path: ROUTES.instrumentTypes, title: "Типы приборов", icon: <IconTypes size={ 22 }/> },
     ],
   },
   {
-    title: null,
-    tone: "neutral",
+    title: "Прочее",
     items: [
-      { path: ROUTES.reports, title: "Отчёты", icon: <BarChartIcon/> },
-      { path: ROUTES.settings, title: "Настройки", icon: <SettingsIcon/> },
+      { path: ROUTES.reports, title: "Отчёты", icon: <IconReports size={ 22 }/> },
+      { path: ROUTES.settings, title: "Настройки", icon: <IconSettings size={ 22 }/> },
     ],
   },
 ]

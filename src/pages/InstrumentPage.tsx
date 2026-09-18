@@ -1,15 +1,5 @@
-import { useState } from "react"
+import { useState, type ReactNode } from "react"
 import { useNavigate, useParams } from "react-router-dom"
-import Alert from "@mui/material/Alert"
-import Box from "@mui/material/Box"
-import Button from "@mui/material/Button"
-import Grid from "@mui/material/Grid"
-import Card from "@mui/material/Card"
-import Skeleton from "@mui/material/Skeleton"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
-import ArrowBackIcon from "@mui/icons-material/ArrowBack"
-import EditIcon from "@mui/icons-material/Edit"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
@@ -20,9 +10,15 @@ import type { OperationKind } from "../features/operations/domain/types"
 import { StatusMark } from "../features/instruments/ui/StatusMark"
 import { formatPrice } from "../features/instruments/domain/labels"
 import { formatDate, formatDateTime } from "../shared/dates"
-import { monoSx } from "../shared/ui/dataText"
 import { useStateColors } from "../app/theme/useStateColors"
 import { ROUTES } from "../app/routes"
+import { Alert } from "../ui/Alert"
+import { Button } from "../ui/Button"
+import { Card } from "../ui/Card"
+import { Skeleton } from "../ui/Skeleton"
+import { Stack } from "../ui/layout"
+import { Text } from "../ui/Text"
+import { IconArrowLeft, IconEdit } from "../ui/icons"
 
 /** Порядок кнопок — от частого к редкому: выдача и возврат сверху, списание последним. */
 const OPERATION_ORDER: readonly OperationKind[] = [
@@ -32,22 +28,17 @@ const OPERATION_ORDER: readonly OperationKind[] = [
 
 function Field({ label, value, mono }: { label: string; value: string; mono?: boolean }) {
   return (
-    <Stack
-      direction="row"
-      sx={ { justifyContent: "space-between", gap: 2, py: 0.75, borderTop: 1, borderColor: "divider" } }
-    >
-      <Typography variant="body2" sx={ { color: "text.secondary" } }>{ label }</Typography>
-      <Typography variant="body2" sx={ { textAlign: "right", ...(mono ? monoSx : {}) } }>
-        { value }
-      </Typography>
+    <Stack row justify="between" gap={ 2 } style={ { padding: "8px 0", borderTop: "1px dashed var(--divider)" } }>
+      <Text tone="secondary">{ label }</Text>
+      <Text mono={ mono } style={ { textAlign: "right" } }>{ value }</Text>
     </Stack>
   )
 }
 
-function Block({ title, children }: { title: string; children: React.ReactNode }) {
+function Block({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <Card sx={ { p: 2 } }>
-      <Typography variant="h6" component="h2" sx={ { mb: 1 } }>{ title }</Typography>
+    <Card>
+      <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>{ title }</Text>
       { children }
     </Card>
   )
@@ -56,9 +47,9 @@ function Block({ title, children }: { title: string; children: React.ReactNode }
 /** Факт в истории: подпись слева, значение справа. Без склеек через точку. */
 function Fact({ label, value }: { label: string; value: string }) {
   return (
-    <Stack direction="row" sx={ { gap: 1 } }>
-      <Typography variant="caption" sx={ { color: "text.secondary", minWidth: 58 } }>{ label }</Typography>
-      <Typography variant="caption">{ value }</Typography>
+    <Stack row gap={ 1 }>
+      <Text variant="caption" tone="secondary" style={ { minWidth: 70 } }>{ label }</Text>
+      <Text variant="caption">{ value }</Text>
     </Stack>
   )
 }
@@ -81,7 +72,7 @@ export function InstrumentPage() {
     return { instrument, history, verifications }
   }, [repo, id])
 
-  if (state.loading && !state.data) return <Skeleton variant="rounded" height={ 400 }/>
+  if (state.loading && !state.data) return <Skeleton height={ 400 }/>
   if (state.error) return <Alert severity="error">{ state.error }</Alert>
   if (!state.data) return <Alert severity="warning">Прибор не найден</Alert>
 
@@ -92,36 +83,32 @@ export function InstrumentPage() {
     && instrument.expectedReturnAt < Date.now()
 
   return (
-    <Box>
+    <div>
       <Button
-        size="small" startIcon={ <ArrowBackIcon/> } sx={ { mb: 1, ml: -1 } }
+        startIcon={ <IconArrowLeft size={ 18 }/> }
         onClick={ () => navigate(ROUTES.instruments) }
+        style={ { marginLeft: -12, marginBottom: 8 } }
       >
         К списку приборов
       </Button>
 
-      <Stack
-        direction="row"
-        sx={ { justifyContent: "space-between", alignItems: "flex-end", gap: 2, flexWrap: "wrap", mb: 1 } }
-      >
-        <Box>
+      <Stack row justify="between" align="end" gap={ 2 } wrap style={ { marginBottom: 24 } }>
+        <div>
           {/* Инвентарный номер стоит над названием и набран моноширинным:
               это идентификатор, по которому прибор ищут, а не подпись. */}
-          <Typography variant="body2" sx={ { ...monoSx, color: "text.secondary" } }>
-            { instrument.inventoryNumber }
-          </Typography>
-          <Typography variant="h4" component="h1" sx={ { mb: 0.75 } }>{ instrument.name }</Typography>
-          <Stack direction="row" sx={ { gap: 2, alignItems: "center", flexWrap: "wrap" } }>
-            <StatusMark status={ instrument.status } bold/>
+          <Text variant="body2" tone="secondary" mono>{ instrument.inventoryNumber }</Text>
+          <Text variant="h4" as="h1" style={ { margin: "2px 0 8px" } }>{ instrument.name }</Text>
+          <Stack row gap={ 2 } align="center" wrap>
+            <StatusMark status={ instrument.status }/>
             { overdue ? (
-              <Typography variant="body2" sx={ { color: tone.signal, fontWeight: 500 } }>
+              <Text style={ { color: tone.signal, fontWeight: 600 } }>
                 Не вернули в срок — ждали до { formatDate(instrument.expectedReturnAt) }
-              </Typography>
+              </Text>
             ) : null }
           </Stack>
-        </Box>
+        </div>
 
-        <Stack direction="row" sx={ { gap: 1, flexWrap: "wrap" } }>
+        <Stack row gap={ 1 } wrap>
           { OPERATION_ORDER
             .filter((kind) => isOperationAllowed(instrument.status, kind))
             /* Недоступная операция не гасится, а отсутствует: серая кнопка
@@ -138,7 +125,7 @@ export function InstrumentPage() {
               </Button>
             )) }
           <Button
-            size="small" startIcon={ <EditIcon/> }
+            size="small" startIcon={ <IconEdit size={ 16 }/> }
             onClick={ () => navigate(`${ ROUTES.instrument(instrument.id) }/edit`) }
           >
             Редактировать
@@ -146,96 +133,89 @@ export function InstrumentPage() {
         </Stack>
       </Stack>
 
-      <Box sx={ { borderBottom: 1, borderColor: "text.primary", mb: 2.5 } }/>
+      <Stack row gap={ 2 } wrap align="stretch">
+        <Stack gap={ 2 } style={ { flex: "2 1 340px", minWidth: 0 } }>
+          <Block title="Паспорт">
+            <Field label="Серийный номер" value={ instrument.serialNumber ?? "—" } mono/>
+            <Field label="Тип" value={ dirs?.typeName(instrument.typeId) ?? "—" }/>
+            <Field label="Производитель" value={ instrument.manufacturer ?? "—" }/>
+            <Field label="Модель" value={ instrument.model ?? "—" }/>
+            <Field label="Приобретён" value={ formatDate(instrument.purchasedAt) } mono/>
+            <Field label="Стоимость" value={ formatPrice(instrument.priceMinor, instrument.currency) } mono/>
+          </Block>
 
-      <Grid container spacing={ 2 } columns={ 12 }>
-        <Grid size={ { xs: 12, md: 5 } }>
-          <Stack sx={ { gap: 2 } }>
-            <Block title="Паспорт">
-              <Field label="Серийный номер" value={ instrument.serialNumber ?? "—" } mono/>
-              <Field label="Тип" value={ dirs?.typeName(instrument.typeId) ?? "—" }/>
-              <Field label="Производитель" value={ instrument.manufacturer ?? "—" }/>
-              <Field label="Модель" value={ instrument.model ?? "—" }/>
-              <Field label="Приобретён" value={ formatDate(instrument.purchasedAt) } mono/>
-              <Field label="Стоимость" value={ formatPrice(instrument.priceMinor, instrument.currency) } mono/>
-            </Block>
+          <Block title="Учёт">
+            <Field label="Числится за" value={ dirs?.departmentName(instrument.ownerDepartmentId) ?? "—" }/>
+            <Field label="Возвращается в" value={ dirs?.locationName(instrument.baseLocationId) ?? "—" }/>
+            <Field label="Сейчас в" value={ dirs?.departmentName(instrument.currentDepartmentId) ?? "—" }/>
+            <Field label="Сейчас на месте" value={ dirs?.locationName(instrument.currentLocationId) ?? "—" }/>
+            <Field
+              label="Материально ответственный"
+              value={ instrument.responsibleEmployeeId
+                ? dirs?.employeeName(instrument.responsibleEmployeeId) ?? "—"
+                : "—" }
+            />
+            { instrument.currentEmployeeId ? (
+              <>
+                <Field label="На руках у" value={ dirs?.employeeName(instrument.currentEmployeeId) ?? "—" }/>
+                <Field label="Выдан" value={ formatDateTime(instrument.issuedAt) } mono/>
+                <Field label="Вернуть до" value={ formatDate(instrument.expectedReturnAt) } mono/>
+              </>
+            ) : null }
+          </Block>
 
-            <Block title="Учёт">
-              <Field label="Числится за" value={ dirs?.departmentName(instrument.ownerDepartmentId) ?? "—" }/>
-              <Field label="Возвращается в" value={ dirs?.locationName(instrument.baseLocationId) ?? "—" }/>
-              <Field label="Сейчас в" value={ dirs?.departmentName(instrument.currentDepartmentId) ?? "—" }/>
-              <Field label="Сейчас на месте" value={ dirs?.locationName(instrument.currentLocationId) ?? "—" }/>
-              <Field
-                label="Материально ответственный"
-                value={ instrument.responsibleEmployeeId
-                  ? dirs?.employeeName(instrument.responsibleEmployeeId) ?? "—"
-                  : "—" }
-              />
-              { instrument.currentEmployeeId ? (
-                <>
-                  <Field label="На руках у" value={ dirs?.employeeName(instrument.currentEmployeeId) ?? "—" }/>
-                  <Field label="Выдан" value={ formatDateTime(instrument.issuedAt) } mono/>
-                  <Field label="Вернуть до" value={ formatDate(instrument.expectedReturnAt) } mono/>
-                </>
-              ) : null }
-            </Block>
+          <Block title="Метрология">
+            <Field label="Поверка действительна до" value={ formatDate(instrument.nextVerificationAt) } mono/>
+            <Field label="Калибровка действительна до" value={ formatDate(instrument.nextCalibrationAt) } mono/>
 
-            <Block title="Метрология">
-              <Field label="Поверка действительна до" value={ formatDate(instrument.nextVerificationAt) } mono/>
-              <Field label="Калибровка действительна до" value={ formatDate(instrument.nextCalibrationAt) } mono/>
+            { verifications.length === 0 ? (
+              <Text tone="secondary" style={ { marginTop: 12 } }>
+                Свидетельств пока нет. Первое появится после операции «Принять с поверки».
+              </Text>
+            ) : (
+              <Stack gap={ 1.5 } style={ { marginTop: 12 } }>
+                { verifications.map((record) => (
+                  <div key={ record.id }>
+                    <Stack row justify="between" gap={ 1 }>
+                      <Text variant="subtitle2">
+                        { record.kind === "CALIBRATION" ? "Калибровка" : "Поверка" }
+                        { record.result === "FAIL" ? " — не годен" : "" }
+                      </Text>
+                      <Text mono>{ formatDate(record.performedAt) }</Text>
+                    </Stack>
+                    { record.certificateNumber ? (
+                      <Fact label="Свидетельство" value={ record.certificateNumber }/>
+                    ) : null }
+                    { record.organization ? <Fact label="Поверял" value={ record.organization }/> : null }
+                    { record.validUntil ? (
+                      <Fact label="Годно до" value={ formatDate(record.validUntil) }/>
+                    ) : null }
+                  </div>
+                )) }
+              </Stack>
+            ) }
+          </Block>
+        </Stack>
 
-              { verifications.length === 0 ? (
-                <Typography variant="body2" sx={ { color: "text.secondary", mt: 1.5 } }>
-                  Свидетельств пока нет. Первое появится после операции «Принять с поверки».
-                </Typography>
-              ) : (
-                <Stack sx={ { gap: 1.25, mt: 1.5 } }>
-                  { verifications.map((record) => (
-                    <Box key={ record.id }>
-                      <Stack direction="row" sx={ { justifyContent: "space-between", gap: 1 } }>
-                        <Typography variant="body2" sx={ { fontWeight: 500 } }>
-                          { record.kind === "CALIBRATION" ? "Калибровка" : "Поверка" }
-                          { record.result === "FAIL" ? " — не годен" : "" }
-                        </Typography>
-                        <Typography variant="body2" sx={ monoSx }>
-                          { formatDate(record.performedAt) }
-                        </Typography>
-                      </Stack>
-                      { record.certificateNumber ? (
-                        <Fact label="Свидетельство" value={ record.certificateNumber }/>
-                      ) : null }
-                      { record.organization ? <Fact label="Поверял" value={ record.organization }/> : null }
-                      { record.validUntil ? (
-                        <Fact label="Годно до" value={ formatDate(record.validUntil) }/>
-                      ) : null }
-                    </Box>
-                  )) }
-                </Stack>
-              ) }
-            </Block>
-          </Stack>
-        </Grid>
-
-        <Grid size={ { xs: 12, md: 7 } }>
+        <div style={ { flex: "3 1 420px", minWidth: 0 } }>
           <Block title="История">
-            <Stack sx={ { gap: 1.5, mt: 1 } }>
+            <Stack gap={ 1.5 } style={ { marginTop: 8 } }>
               { history.map((event) => (
                 <Stack
                   key={ event.id }
-                  direction="row"
-                  sx={ { gap: 2, pt: 1.5, borderTop: 1, borderColor: "divider" } }
+                  row
+                  gap={ 2 }
+                  wrap
+                  style={ { paddingTop: 12, borderTop: "1px dashed var(--divider)" } }
                 >
-                  <Typography
-                    variant="body2"
-                    sx={ { ...monoSx, color: "text.secondary", minWidth: 118, flexShrink: 0 } }
-                  >
+                  <Text tone="secondary" mono style={ { minWidth: 140 } }>
                     { formatDateTime(event.occurredAt) }
-                  </Typography>
-                  <Box sx={ { minWidth: 0 } }>
-                    <Typography variant="body2" sx={ { fontWeight: 500, mb: 0.25 } }>
+                  </Text>
+                  <div style={ { minWidth: 0 } }>
+                    <Text variant="subtitle2" style={ { marginBottom: 2 } }>
                       { EVENT_LABELS[event.kind] }
                       { event.condition ? ` — ${ CONDITION_LABELS[event.condition] }` : "" }
-                    </Typography>
+                    </Text>
                     { event.employeeId ? (
                       <Fact label="Сотрудник" value={ dirs?.employeeName(event.employeeId) ?? "—" }/>
                     ) : null }
@@ -245,13 +225,13 @@ export function InstrumentPage() {
                     { event.reason ? <Fact label="Причина" value={ event.reason }/> : null }
                     { event.note ? <Fact label="Примечание" value={ event.note }/> : null }
                     <Fact label="Внёс" value={ event.operatorName }/>
-                  </Box>
+                  </div>
                 </Stack>
               )) }
             </Stack>
           </Block>
-        </Grid>
-      </Grid>
+        </div>
+      </Stack>
 
       { dirs ? (
         <OperationDialog
@@ -262,6 +242,6 @@ export function InstrumentPage() {
           onDone={ state.reload }
         />
       ) : null }
-    </Box>
+    </div>
   )
 }

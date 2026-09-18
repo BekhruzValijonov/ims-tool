@@ -1,9 +1,7 @@
-import Box from "@mui/material/Box"
-import Card from "@mui/material/Card"
-import Stack from "@mui/material/Stack"
-import Typography from "@mui/material/Typography"
 import type { DepartmentSummary, LocationSummary } from "../../directories/domain/types"
-import { MONO, TABULAR } from "../../../app/theme/tokens"
+import { Card } from "../../../ui/Card"
+import { Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
 
 interface PlacementListProps {
   readonly departments: readonly DepartmentSummary[]
@@ -13,29 +11,23 @@ interface PlacementListProps {
 function Row({ name, count, lead }: { name: string; count: number; lead?: boolean }) {
   return (
     <Stack
-      direction="row"
-      sx={ {
-        alignItems: "baseline",
-        gap: 1,
-        py: 0.5,
-        pl: lead ? 0 : 2,
-        borderTop: lead ? 1 : 0,
-        borderColor: "divider",
+      row
+      align="baseline"
+      gap={ 1 }
+      style={ {
+        padding: "8px 0",
+        paddingLeft: lead ? 0 : 16,
+        borderTop: lead ? "1px dashed var(--divider)" : undefined,
       } }
     >
-      <Typography
-        variant="body2"
+      <Text
         noWrap
-        sx={ { flexGrow: 1, fontWeight: lead ? 500 : 400, color: lead ? "text.primary" : "text.secondary" } }
+        tone={ lead ? "primary" : "secondary" }
+        style={ { flexGrow: 1, fontWeight: lead ? 600 : 400 } }
       >
         { name }
-      </Typography>
-      <Typography
-        variant="body2"
-        sx={ { fontFamily: MONO, ...TABULAR, color: count === 0 ? "text.disabled" : "text.primary" } }
-      >
-        { count }
-      </Typography>
+      </Text>
+      <Text mono tone={ count === 0 ? "disabled" : "primary" }>{ count }</Text>
     </Stack>
   )
 }
@@ -46,9 +38,6 @@ function Row({ name, count, lead }: { name: string; count: number; lead?: boolea
  * Счёт у подразделения — сумма его мест, то есть фактическое размещение. В
  * одном списке должна быть одна величина; сколько за подразделением числится,
  * показывает соседний график, и там это названо своими словами.
- *
- * Список, а не сворачиваемое дерево: мест на заводе десятки, и все числа
- * должны быть видны сразу, без раскрытия веток.
  */
 export function PlacementList({ departments, locations }: PlacementListProps) {
   const groups = departments.map((department) => {
@@ -72,22 +61,20 @@ export function PlacementList({ departments, locations }: PlacementListProps) {
   }
 
   return (
-    <Card sx={ { p: 2 } }>
-      <Typography variant="h6" component="h2">Где приборы сейчас</Typography>
-      <Typography variant="caption" sx={ { color: "text.secondary" } }>
-        Подразделение и места хранения в нём
-      </Typography>
+    <Card>
+      <Text variant="h6" as="h2">Где приборы сейчас</Text>
+      <Text variant="caption" tone="secondary">Подразделение и места хранения в нём</Text>
 
-      <Box sx={ { mt: 1.5, maxHeight: 258, overflowY: "auto" } }>
+      <div style={ { marginTop: 12, maxHeight: 268, overflowY: "auto" } }>
         { groups.map((group) => (
-          <Box key={ group.id }>
+          <div key={ group.id }>
             <Row name={ group.name } count={ group.total } lead/>
             { group.places.map((place) => (
               <Row key={ place.locationId } name={ place.name } count={ place.total }/>
             )) }
-          </Box>
+          </div>
         )) }
-      </Box>
+      </div>
     </Card>
   )
 }

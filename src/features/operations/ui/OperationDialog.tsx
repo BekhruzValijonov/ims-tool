@@ -1,20 +1,4 @@
 import { useMemo, useState, type FormEvent } from "react"
-import Alert from "@mui/material/Alert"
-import Button from "@mui/material/Button"
-import Checkbox from "@mui/material/Checkbox"
-import Dialog from "@mui/material/Dialog"
-import DialogActions from "@mui/material/DialogActions"
-import DialogContent from "@mui/material/DialogContent"
-import DialogTitle from "@mui/material/DialogTitle"
-import FormControlLabel from "@mui/material/FormControlLabel"
-import FormControl from "@mui/material/FormControl"
-import FormLabel from "@mui/material/FormLabel"
-import MenuItem from "@mui/material/MenuItem"
-import Radio from "@mui/material/Radio"
-import RadioGroup from "@mui/material/RadioGroup"
-import Stack from "@mui/material/Stack"
-import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import { useRepo, useOperatorName } from "../../../app/AppContext"
 import type { Directories } from "../../directories/ui/useDirectories"
 import type { Instrument } from "../../instruments/domain/types"
@@ -22,8 +6,13 @@ import type { OperationCommand, OperationKind, ReturnCondition } from "../domain
 import type { VerificationKind, VerificationResult } from "../../verification/domain/types"
 import { CONDITION_LABELS, OPERATION_LABELS, operationErrorText } from "../domain/labels"
 import { addMonths, formatDate } from "../../../shared/dates"
-import { DateField } from "../../../shared/ui/DateField"
-import { monoSx } from "../../../shared/ui/dataText"
+import { Alert } from "../../../ui/Alert"
+import { Button } from "../../../ui/Button"
+import { DateInput } from "../../../ui/DateInput"
+import { Dialog } from "../../../ui/Dialog"
+import { Select, TextArea, TextField } from "../../../ui/Field"
+import { Stack } from "../../../ui/layout"
+import { Text } from "../../../ui/Text"
 
 interface OperationDialogProps {
   readonly instrument: Instrument
@@ -84,7 +73,18 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
   const [validUntil, setValidUntil] = useState<string | null>(null)
   const effectiveValidUntil = validUntil ?? defaultValidUntil
 
-  if (!kind) return null
+  const employeeOptions = directories.employees
+    .filter((employee) => employee.isActive)
+    .map((employee) => ({
+      value: employee.id,
+      label: employee.position ? `${ employee.fullName } — ${ employee.position }` : employee.fullName,
+    }))
+  const departmentOptions = directories.departments
+    .filter((row) => !row.isArchived)
+    .map((row) => ({ value: row.id, label: row.name }))
+  const locationOptions = directories.locations
+    .filter((row) => !row.isArchived)
+    .map((row) => ({ value: row.id, label: row.name }))
 
   function buildCommand(): OperationCommand | string {
     // Объявление функции поднимается выше проверки kind, поэтому сужение типа
@@ -159,234 +159,189 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
     }
   }
 
-  const employeeOptions = directories.employees.filter((employee) => employee.isActive)
+  if (!kind) return null
 
   return (
-    <Dialog open onClose={ busy ? undefined : onClose } maxWidth="sm" fullWidth>
-      <form onSubmit={ submit }>
-        <DialogTitle>{ OPERATION_LABELS[kind] }</DialogTitle>
-        <DialogContent>
-          <Stack direction="row" sx={ { gap: 1, alignItems: "baseline", mb: 2 } }>
-            <Typography variant="body2" sx={ { ...monoSx, color: "text.secondary" } }>
-              { instrument.inventoryNumber }
-            </Typography>
-            <Typography variant="body2">{ instrument.name }</Typography>
-          </Stack>
+    <Dialog
+      open
+      title={ OPERATION_LABELS[kind] }
+      onClose={ busy ? undefined : onClose }
+      onSubmit={ submit }
+      actions={ <>
+        <Button onClick={ onClose } disabled={ busy }>Отмена</Button>
+        <Button type="submit" variant="contained" disabled={ busy }>{ OPERATION_LABELS[kind] }</Button>
+      </> }
+    >
+      <Stack gap={ 2 }>
+        <Stack row gap={ 1 } align="baseline">
+          <Text variant="body2" tone="secondary" mono>{ instrument.inventoryNumber }</Text>
+          <Text variant="body2">{ instrument.name }</Text>
+        </Stack>
 
-          <Stack sx={ { gap: 2 } }>
-            { kind === "CHECK_OUT" && (
-              <>
-                <TextField
-                  select required label="Кому" value={ employeeId }
-                  onChange={ (event) => {
-                    setEmployeeId(event.target.value)
-                    const employee = employeeOptions.find((row) => row.id === event.target.value)
-                    if (employee?.departmentId) setDepartmentId(employee.departmentId)
-                  } }
-                >
-                  { employeeOptions.map((employee) => (
-                    <MenuItem key={ employee.id } value={ employee.id }>
-                      { employee.fullName }
-                      { employee.position ? ` — ${ employee.position }` : "" }
-                    </MenuItem>
-                  )) }
-                </TextField>
-                <TextField
-                  select label="Подразделение" value={ departmentId }
-                  onChange={ (event) => setDepartmentId(event.target.value) }
-                >
-                  <MenuItem value="">Не менять</MenuItem>
-                  { directories.departments.filter((row) => !row.isArchived).map((department) => (
-                    <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
-                  )) }
-                </TextField>
-                <DateField
-                  size="medium" label="Вернуть до" value={ expectedReturn }
-                  onChange={ setExpectedReturn }
-                  helperText="Пусто — без срока. По этому полю считается просрочка"
-                />
-              </>
-            ) }
-
-            { kind === "RETURN" && (
-              <FormControl>
-                <FormLabel>Состояние прибора</FormLabel>
-                <RadioGroup
-                  value={ condition }
-                  onChange={ (event) => setCondition(event.target.value as ReturnCondition) }
-                >
-                  { (Object.keys(CONDITION_LABELS) as ReturnCondition[]).map((value) => (
-                    <FormControlLabel
-                      key={ value } value={ value } control={ <Radio/> }
-                      label={ CONDITION_LABELS[value] }
-                    />
-                  )) }
-                </RadioGroup>
-                <Typography variant="caption" sx={ { color: "text.secondary" } }>
-                  Повреждённый и требующий ремонта прибор уходит в ремонт, а не в наличие
-                </Typography>
-              </FormControl>
-            ) }
-
-            { kind === "TRANSFER" && (
-              <>
-                <TextField
-                  select label="Подразделение" value={ departmentId }
-                  onChange={ (event) => setDepartmentId(event.target.value) }
-                >
-                  <MenuItem value="">Не менять</MenuItem>
-                  { directories.departments.filter((row) => !row.isArchived).map((department) => (
-                    <MenuItem key={ department.id } value={ department.id }>{ department.name }</MenuItem>
-                  )) }
-                </TextField>
-                <TextField
-                  select label="Место хранения" value={ locationId }
-                  onChange={ (event) => setLocationId(event.target.value) }
-                >
-                  <MenuItem value="">Не менять</MenuItem>
-                  { directories.locations.filter((row) => !row.isArchived).map((location) => (
-                    <MenuItem key={ location.id } value={ location.id }>{ location.name }</MenuItem>
-                  )) }
-                </TextField>
-                <FormControlLabel
-                  control={ <Checkbox checked={ permanent } onChange={ (event) => setPermanent(event.target.checked) }/> }
-                  label="Перевести насовсем"
-                />
-                <Typography variant="caption" sx={ { color: "text.secondary", mt: -1.5 } }>
-                  { permanent
-                    ? "Сменится и балансовая принадлежность, и место, куда прибор вернётся"
-                    : "Командировка: «Вернуть» приведёт прибор на прежнее место" }
-                </Typography>
-                <TextField
-                  label="Причина" value={ reason }
-                  onChange={ (event) => setReason(event.target.value) }
-                />
-              </>
-            ) }
-
-            { kind === "REPAIR_SEND" && (
-              <>
-                <TextField
-                  select label="Куда" value={ locationId }
-                  onChange={ (event) => setLocationId(event.target.value) }
-                >
-                  <MenuItem value="">Оставить на месте</MenuItem>
-                  { directories.locations.filter((row) => !row.isArchived).map((location) => (
-                    <MenuItem key={ location.id } value={ location.id }>{ location.name }</MenuItem>
-                  )) }
-                </TextField>
-                <TextField
-                  required label="Что случилось" value={ reason }
-                  onChange={ (event) => setReason(event.target.value) }
-                />
-              </>
-            ) }
-
-            { kind === "VERIFY_SEND" && (
-              <>
-                <TextField
-                  select label="Вид работ" value={ verificationKind }
-                  onChange={ (event) => setVerificationKind(event.target.value as VerificationKind) }
-                >
-                  <MenuItem value="VERIFICATION">Поверка</MenuItem>
-                  <MenuItem value="CALIBRATION">Калибровка</MenuItem>
-                </TextField>
-                <TextField
-                  select label="Куда" value={ locationId }
-                  onChange={ (event) => setLocationId(event.target.value) }
-                >
-                  <MenuItem value="">Оставить на месте</MenuItem>
-                  { directories.locations.filter((row) => !row.isArchived).map((location) => (
-                    <MenuItem key={ location.id } value={ location.id }>{ location.name }</MenuItem>
-                  )) }
-                </TextField>
-              </>
-            ) }
-
-            { kind === "VERIFY_DONE" && (
-              <>
-                <TextField
-                  select label="Вид работ" value={ verificationKind }
-                  onChange={ (event) => setVerificationKind(event.target.value as VerificationKind) }
-                >
-                  <MenuItem value="VERIFICATION">Поверка</MenuItem>
-                  <MenuItem value="CALIBRATION">Калибровка</MenuItem>
-                </TextField>
-                <TextField
-                  select label="Результат" value={ result }
-                  onChange={ (event) => setResult(event.target.value as VerificationResult) }
-                >
-                  <MenuItem value="PASS">Годен</MenuItem>
-                  <MenuItem value="FAIL">Не годен</MenuItem>
-                </TextField>
-                { result === "FAIL" ? (
-                  <Alert severity="warning">
-                    Непройденная поверка отправит прибор в ремонт, а не в наличие: пользоваться им нельзя
-                  </Alert>
-                ) : null }
-                <DateField
-                  size="medium" label="Дата поверки" value={ performedAt }
-                  onChange={ setPerformedAt }
-                />
-                { result === "PASS" ? (
-                  <DateField
-                    size="medium" label="Действительна до" value={ effectiveValidUntil }
-                    onChange={ setValidUntil }
-                    helperText={ type?.defaultVerificationIntervalMonths
-                      ? `По умолчанию — ${ type.defaultVerificationIntervalMonths } мес. от даты поверки`
-                      : " " }
-                  />
-                ) : null }
-                <TextField
-                  label="Номер свидетельства" value={ certificate }
-                  onChange={ (event) => setCertificate(event.target.value) }
-                />
-                <TextField
-                  label="Кто поверял" value={ organization }
-                  onChange={ (event) => setOrganization(event.target.value) }
-                />
-              </>
-            ) }
-
-            { kind === "WRITE_OFF" && (
-              <>
-                <Alert severity="warning">
-                  Списание необратимо: с прибором больше нельзя будет работать. Журнал сохранится.
-                </Alert>
-                <TextField
-                  required label="Причина списания" value={ reason }
-                  onChange={ (event) => setReason(event.target.value) }
-                />
-              </>
-            ) }
-
-            { kind === "REPAIR_DONE" && (
-              <Typography variant="body2">
-                Прибор вернётся на своё место — { directories.locationName(instrument.baseLocationId) }.
-              </Typography>
-            ) }
-
-            <TextField
-              label="Примечание" value={ note } multiline minRows={ 2 }
-              onChange={ (event) => setNote(event.target.value) }
+        { kind === "CHECK_OUT" ? (
+          <>
+            <Select
+              label="Кому" required value={ employeeId } options={ employeeOptions }
+              emptyLabel="Выберите сотрудника"
+              onChange={ (value) => {
+                setEmployeeId(value)
+                const employee = directories.employees.find((row) => row.id === value)
+                if (employee?.departmentId) setDepartmentId(employee.departmentId)
+              } }
+              fullWidth
             />
+            <Select
+              label="Подразделение" value={ departmentId } options={ departmentOptions }
+              emptyLabel="Не менять" onChange={ setDepartmentId } fullWidth
+            />
+            <DateInput
+              label="Вернуть до" value={ expectedReturn } onChange={ setExpectedReturn }
+              helper="Пусто — без срока. По этому полю считается просрочка" fullWidth
+            />
+          </>
+        ) : null }
 
-            { instrument.expectedReturnAt !== null && kind === "RETURN" ? (
-              <Typography variant="caption" sx={ { color: "text.secondary" } }>
-                Ожидался до { formatDate(instrument.expectedReturnAt) }
-              </Typography>
+        { kind === "RETURN" ? (
+          <fieldset style={ { border: "none", padding: 0, margin: 0 } }>
+            <Text variant="subtitle2" as="legend">Состояние прибора</Text>
+            <Stack gap={ 0.5 } style={ { marginTop: 8 } }>
+              { (Object.keys(CONDITION_LABELS) as ReturnCondition[]).map((value) => (
+                <label key={ value } style={ { display: "flex", gap: 10, alignItems: "center" } }>
+                  <input
+                    type="radio"
+                    name="condition"
+                    checked={ condition === value }
+                    onChange={ () => setCondition(value) }
+                  />
+                  <Text>{ CONDITION_LABELS[value] }</Text>
+                </label>
+              )) }
+            </Stack>
+            <Text variant="caption" tone="secondary" style={ { display: "block", marginTop: 8 } }>
+              Повреждённый и требующий ремонта прибор уходит в ремонт, а не в наличие
+            </Text>
+          </fieldset>
+        ) : null }
+
+        { kind === "TRANSFER" ? (
+          <>
+            <Select
+              label="Подразделение" value={ departmentId } options={ departmentOptions }
+              emptyLabel="Не менять" onChange={ setDepartmentId } fullWidth
+            />
+            <Select
+              label="Место хранения" value={ locationId } options={ locationOptions }
+              emptyLabel="Не менять" onChange={ setLocationId } fullWidth
+            />
+            <label style={ { display: "flex", gap: 10, alignItems: "center" } }>
+              <input
+                type="checkbox"
+                checked={ permanent }
+                onChange={ (event) => setPermanent(event.target.checked) }
+              />
+              <Text>Перевести насовсем</Text>
+            </label>
+            <Text variant="caption" tone="secondary">
+              { permanent
+                ? "Сменится и балансовая принадлежность, и место, куда прибор вернётся"
+                : "Командировка: «Вернуть» приведёт прибор на прежнее место" }
+            </Text>
+            <TextField label="Причина" value={ reason } onChange={ setReason } fullWidth/>
+          </>
+        ) : null }
+
+        { kind === "REPAIR_SEND" ? (
+          <>
+            <Select
+              label="Куда" value={ locationId } options={ locationOptions }
+              emptyLabel="Оставить на месте" onChange={ setLocationId } fullWidth
+            />
+            <TextField label="Что случилось" required value={ reason } onChange={ setReason } fullWidth/>
+          </>
+        ) : null }
+
+        { kind === "VERIFY_SEND" ? (
+          <>
+            <Select
+              label="Вид работ" value={ verificationKind }
+              options={ [
+                { value: "VERIFICATION", label: "Поверка" },
+                { value: "CALIBRATION", label: "Калибровка" },
+              ] }
+              onChange={ (value) => setVerificationKind(value as VerificationKind) }
+              fullWidth
+            />
+            <Select
+              label="Куда" value={ locationId } options={ locationOptions }
+              emptyLabel="Оставить на месте" onChange={ setLocationId } fullWidth
+            />
+          </>
+        ) : null }
+
+        { kind === "VERIFY_DONE" ? (
+          <>
+            <Select
+              label="Вид работ" value={ verificationKind }
+              options={ [
+                { value: "VERIFICATION", label: "Поверка" },
+                { value: "CALIBRATION", label: "Калибровка" },
+              ] }
+              onChange={ (value) => setVerificationKind(value as VerificationKind) }
+              fullWidth
+            />
+            <Select
+              label="Результат" value={ result }
+              options={ [{ value: "PASS", label: "Годен" }, { value: "FAIL", label: "Не годен" }] }
+              onChange={ (value) => setResult(value as VerificationResult) }
+              fullWidth
+            />
+            { result === "FAIL" ? (
+              <Alert severity="warning">
+                Непройденная поверка отправит прибор в ремонт, а не в наличие: пользоваться им нельзя
+              </Alert>
             ) : null }
+            <DateInput label="Дата поверки" value={ performedAt } onChange={ setPerformedAt } fullWidth/>
+            { result === "PASS" ? (
+              <DateInput
+                label="Действительна до"
+                value={ effectiveValidUntil }
+                onChange={ setValidUntil }
+                helper={ type?.defaultVerificationIntervalMonths
+                  ? `По умолчанию — ${ type.defaultVerificationIntervalMonths } мес. от даты поверки`
+                  : undefined }
+                fullWidth
+              />
+            ) : null }
+            <TextField label="Номер свидетельства" value={ certificate } onChange={ setCertificate } fullWidth/>
+            <TextField label="Кто поверял" value={ organization } onChange={ setOrganization } fullWidth/>
+          </>
+        ) : null }
 
-            { failure ? <Alert severity="error">{ failure }</Alert> : null }
-          </Stack>
-        </DialogContent>
-        <DialogActions>
-          <Button onClick={ onClose } disabled={ busy }>Отмена</Button>
-          <Button type="submit" variant="contained" disabled={ busy }>
-            { OPERATION_LABELS[kind] }
-          </Button>
-        </DialogActions>
-      </form>
+        { kind === "WRITE_OFF" ? (
+          <>
+            <Alert severity="warning">
+              Списание необратимо: с прибором больше нельзя будет работать. Журнал сохранится.
+            </Alert>
+            <TextField label="Причина списания" required value={ reason } onChange={ setReason } fullWidth/>
+          </>
+        ) : null }
+
+        { kind === "REPAIR_DONE" ? (
+          <Text>
+            Прибор вернётся на своё место — { directories.locationName(instrument.baseLocationId) }.
+          </Text>
+        ) : null }
+
+        <TextArea label="Примечание" value={ note } onChange={ setNote } rows={ 2 } fullWidth/>
+
+        { instrument.expectedReturnAt !== null && kind === "RETURN" ? (
+          <Text variant="caption" tone="secondary">
+            Ожидался до { formatDate(instrument.expectedReturnAt) }
+          </Text>
+        ) : null }
+
+        { failure ? <Alert severity="error">{ failure }</Alert> : null }
+      </Stack>
     </Dialog>
   )
 }
