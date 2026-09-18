@@ -10,6 +10,7 @@ import { IconButton } from "../ui/Button"
 import { TextField } from "../ui/Field"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
+import { Logo } from "../ui/Logo"
 import { IconMenu, IconMoon, IconSearch, IconSun } from "../ui/icons"
 
 /** Инициалы для значка профиля: аватарок в заводском учёте взять неоткуда. */
@@ -26,7 +27,7 @@ function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
   return (
     <>
       <div className={ styles.brandRow }>
-        <span className={ styles.brand }>IMS&nbsp;Tool</span>
+        <span className={ styles.brand }><Logo height={ 22 }/></span>
       </div>
 
       <nav className={ styles.nav } data-tour="app-nav">
@@ -152,6 +153,11 @@ export function AppShell() {
               <IconButton label="Меню" onClick={ () => setOpen(true) }>
                 <IconMenu/>
               </IconButton>
+            </span>
+            {/* На узком экране боковая панель уезжает за край вместе со знаком,
+                и приложению нечем назваться — тогда знак встаёт в шапку. */}
+            <span className={ [styles.headerBrand, "only-narrow"].join(" ") }>
+              <Logo height={ 18 }/>
             </span>
             <QuickSearch/>
             <Stack row grow/>
