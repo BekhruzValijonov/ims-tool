@@ -96,26 +96,26 @@ function QuickSearch() {
 /**
  * Уехало ли содержимое под шапку.
  *
- * Прокручивается не окно, а ящик страницы, и событие прокрутки не всплывает —
- * его ловят на фазе погружения. Смотрят только на страницу: таблица со своей
- * прокруткой живёт ниже шапки, и заезжать под неё ей нечем.
+ * Прокручивается документ, поэтому смотреть достаточно на окно. Экраны со
+ * списком окно не прокручивают вовсе — они в него ровно помещаются, и шапке
+ * там нечего размывать.
  */
 function useScrolledUnderHeader(): boolean {
   const [offset, setOffset] = useState(false)
   const { pathname } = useLocation()
 
-  // Новый экран открывается с начала, а своего события прокрутки не подаёт.
-  useEffect(() => setOffset(false), [pathname])
+  /* Новый экран открывается с начала. Документ переход между разделами сам не
+     отматывает: без этого страница отчётов открылась бы с той же высоты, на
+     которой бросили дашборд. */
+  useEffect(() => {
+    window.scrollTo({ top: 0 })
+    setOffset(false)
+  }, [pathname])
 
   useEffect(() => {
-    function onScroll(event: Event) {
-      const target = event.target
-      if (!(target instanceof HTMLElement) || target.dataset.pageScroll === undefined) return
-      setOffset(target.scrollTop > 0)
-    }
-
-    document.addEventListener("scroll", onScroll, true)
-    return () => document.removeEventListener("scroll", onScroll, true)
+    const onScroll = () => setOffset(window.scrollY > 0)
+    window.addEventListener("scroll", onScroll, { passive: true })
+    return () => window.removeEventListener("scroll", onScroll)
   }, [])
 
   return offset

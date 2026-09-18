@@ -100,6 +100,13 @@
   /* Размеры оболочки */
   --sidebar-width: 260px;
   --header-height: 72px;
+  /* Нижнее поле рабочей области. Отсюда же его вычитает экран со списком,
+     который занимает окно целиком. */
+  --content-bottom: 24px;
+}
+
+@media (max-width: 899px) {
+  :root { --content-bottom: 16px; }
 }
 
 [data-theme='dark'] {
