@@ -1,4 +1,4 @@
-import { useState, type FormEvent } from "react"
+import { useEffect, useState, type FormEvent } from "react"
 import { Link, Outlet, useLocation, useNavigate } from "react-router-dom"
 import styles from "./AppShell.module.css"
 import { NAVIGATION, activeItem } from "./navigation"
@@ -88,6 +88,34 @@ function QuickSearch() {
 }
 
 /**
+ * Уехало ли содержимое под шапку.
+ *
+ * Прокручивается не окно, а ящик страницы, и событие прокрутки не всплывает —
+ * его ловят на фазе погружения. Смотрят только на страницу: таблица со своей
+ * прокруткой живёт ниже шапки, и заезжать под неё ей нечем.
+ */
+function useScrolledUnderHeader(): boolean {
+  const [offset, setOffset] = useState(false)
+  const { pathname } = useLocation()
+
+  // Новый экран открывается с начала, а своего события прокрутки не подаёт.
+  useEffect(() => setOffset(false), [pathname])
+
+  useEffect(() => {
+    function onScroll(event: Event) {
+      const target = event.target
+      if (!(target instanceof HTMLElement) || target.dataset.pageScroll === undefined) return
+      setOffset(target.scrollTop > 0)
+    }
+
+    document.addEventListener("scroll", onScroll, true)
+    return () => document.removeEventListener("scroll", onScroll, true)
+  }, [])
+
+  return offset
+}
+
+/**
  * Оболочка приложения.
  *
  * Разметка дизайн-системы Minimal: светлая боковая панель с тонкой границей,
@@ -100,6 +128,7 @@ export function AppShell() {
   const [open, setOpen] = useState(false)
   const { mode, toggle } = useThemeMode()
   const dark = mode === "dark"
+  const scrolled = useScrolledUnderHeader()
 
   return (
     <div className={ styles.shell }>
@@ -117,7 +146,7 @@ export function AppShell() {
       ) : null }
 
       <div className={ styles.body }>
-        <header className={ styles.header }>
+        <header className={ [styles.header, scrolled ? styles.offset : null].filter(Boolean).join(" ") }>
           <div style={ { display: "contents" } }>
             <span className="only-narrow">
               <IconButton label="Меню" onClick={ () => setOpen(true) }>

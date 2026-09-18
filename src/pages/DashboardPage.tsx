@@ -55,17 +55,17 @@ export function DashboardPage() {
     return { counters, history, flow, recent, breakdown, departments, locations, instruments }
   }, [repo])
 
-  if (state.error) return <Alert severity="error">{ state.error }</Alert>
+  if (state.error) return <Page><Alert severity="error">{ state.error }</Alert></Page>
 
   if (!state.data || !directories.data) {
     return (
-      <div>
+      <Page>
         <PageHeader title="Дашборд"/>
         <Stack gap={ 2 }>
           <Skeleton height={ 150 }/>
           <Skeleton height={ 320 }/>
         </Stack>
-      </div>
+      </Page>
     )
   }
 
@@ -75,10 +75,10 @@ export function DashboardPage() {
      порядок действий, а не четыре нуля и пустые графики. */
   if (counters.total === 0 && counters.writtenOff === 0) {
     return (
-      <div>
+      <Page>
         <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас" tour="dashboard"/>
         <FirstRun/>
-      </div>
+      </Page>
     )
   }
 

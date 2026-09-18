@@ -17,7 +17,13 @@ interface PageProps {
  */
 export function Page({ children, fill, maxWidth }: PageProps) {
   return (
-    <div className={ fill ? styles.fill : styles.scroll } style={ { maxWidth } }>
+    <div
+      className={ fill ? styles.fill : styles.scroll }
+      /* По этой пометке оболочка узнаёт, что страница прокручена и под шапку
+         заехало содержимое: событие прокрутки приходит от самого ящика. */
+      data-page-scroll={ fill ? undefined : "" }
+      style={ { maxWidth } }
+    >
       { children }
     </div>
   )

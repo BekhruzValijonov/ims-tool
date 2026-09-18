@@ -96,23 +96,63 @@
   min-width: 0;
   height: 100vh;
   overflow: hidden;
+  position: relative;
   display: flex;
   flex-direction: column;
 }
 
+/* Шапка лежит поверх содержимого, а не отнимает у него полосу сверху: иначе
+   под неё ничего не заезжает и размывать нечего. */
 .header {
-  flex-shrink: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
   z-index: 10;
   height: var(--header-height);
   display: flex;
   align-items: center;
   gap: 16px;
   padding: 0 32px;
+}
+
+/* Подложка и тень проявляются, только когда страница прокручена и под шапку
+   действительно заехало содержимое. Пока страница в начале, шапка прозрачна
+   насквозь — заливка поверх ровного фона читалась бы сплошной полосой. */
+.header::before,
+.header::after {
+  content: "";
+  position: absolute;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 200ms ease, visibility 200ms ease;
+}
+
+.header::before {
+  inset: 0;
+  z-index: -1;
   backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
   background-color: rgba(249, 250, 251, 0.8);
 }
 
-[data-theme='dark'] .header { background-color: rgba(20, 26, 33, 0.8); }
+/* Тень эллипсом — приём дизайн-системы: край подложки не должен быть линейкой. */
+.header::after {
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: -2;
+  width: calc(100% - 48px);
+  height: 24px;
+  margin: auto;
+  border-radius: 50%;
+  box-shadow: var(--shadow-header);
+}
+
+.header.offset::before { opacity: 1; visibility: visible; }
+.header.offset::after { opacity: 0.48; visibility: visible; }
+
+[data-theme='dark'] .header::before { background-color: rgba(20, 26, 33, 0.8); }
 
 .search { flex: 1; max-width: 380px; }
 
@@ -121,7 +161,7 @@
   min-height: 0;
   display: flex;
   flex-direction: column;
-  padding: 16px 32px 24px;
+  padding: 0 32px 24px;
   max-width: 1600px;
 }
 

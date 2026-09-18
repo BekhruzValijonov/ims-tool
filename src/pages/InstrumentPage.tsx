@@ -76,9 +76,9 @@ export function InstrumentPage() {
     return { instrument, history, verifications }
   }, [repo, id])
 
-  if (state.loading && !state.data) return <Skeleton height={ 400 }/>
-  if (state.error) return <Alert severity="error">{ state.error }</Alert>
-  if (!state.data) return <Alert severity="warning">Прибор не найден</Alert>
+  if (state.loading && !state.data) return <Page><Skeleton height={ 400 }/></Page>
+  if (state.error) return <Page><Alert severity="error">{ state.error }</Alert></Page>
+  if (!state.data) return <Page><Alert severity="warning">Прибор не найден</Alert></Page>
 
   const { instrument, history, verifications } = state.data
   const dirs = directories.data

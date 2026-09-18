@@ -49,9 +49,9 @@ export function EmployeePage() {
     return { employee, onHands, journal, instruments }
   }, [repo, id])
 
-  if (state.loading && !state.data) return <Skeleton height={ 360 }/>
-  if (state.error) return <Alert severity="error">{ state.error }</Alert>
-  if (!state.data) return <Alert severity="warning">Сотрудник не найден</Alert>
+  if (state.loading && !state.data) return <Page><Skeleton height={ 360 }/></Page>
+  if (state.error) return <Page><Alert severity="error">{ state.error }</Alert></Page>
+  if (!state.data) return <Page><Alert severity="warning">Сотрудник не найден</Alert></Page>
 
   const { employee, onHands, journal, instruments } = state.data
   const dirs = directories.data
