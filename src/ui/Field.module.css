@@ -7,7 +7,7 @@
   color: var(--text-secondary);
 }
 
-.required { color: var(--error-main); }
+.required { color: var(--state-alarm); }
 
 .control {
   display: flex;
@@ -26,12 +26,12 @@
 /* Фокус — одна рамка и мягкое свечение вокруг. Второй контур поверх первого
    читается как двойная обводка и выглядит поломкой. */
 .control:focus-within {
-  border-color: var(--primary-main);
-  box-shadow: 0 0 0 3px rgba(0, 167, 111, 0.16);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
 }
 
-.control.invalid { border-color: var(--error-main); }
-.control.invalid:focus-within { box-shadow: 0 0 0 3px rgba(255, 86, 48, 0.16); }
+.control.invalid { border-color: var(--state-alarm); }
+.control.invalid:focus-within { box-shadow: 0 0 0 3px rgba(192, 58, 43, 0.16); }
 
 .input {
   flex: 1;
@@ -66,8 +66,8 @@
 .textarea:focus,
 .textarea:focus-visible {
   outline: none;
-  border-color: var(--primary-main);
-  box-shadow: 0 0 0 3px rgba(0, 167, 111, 0.16);
+  border-color: var(--accent);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
 }
 
 .select {
@@ -85,4 +85,4 @@
 .adornment { color: var(--text-disabled); display: flex; }
 
 .helper { font-size: 0.75rem; color: var(--text-secondary); }
-.helper.error { color: var(--error-main); }
+.helper.error { color: var(--state-alarm); }

@@ -46,9 +46,25 @@ a {
 }
 
 :focus-visible {
-  outline: 2px solid var(--primary-main);
+  outline: 2px solid var(--focus);
   outline-offset: 2px;
 }
+
+/* Ссылка внутри данных. Строка таблицы целиком не нажимается, поэтому ссылку
+   надо отличать не только начертанием: её держит подчёркивание, тихое в покое
+   и заметное под курсором. Цветом она не отличается — цвет означает состояние
+   прибора, а не то, что сюда можно нажать. */
+.link {
+  color: var(--text-primary);
+  font-weight: 600;
+  text-decoration: underline;
+  text-decoration-color: var(--divider);
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  cursor: pointer;
+}
+
+.link:hover { text-decoration-color: currentColor; }
 
 /* Данные в колонках: цифры одной ширины выстраиваются друг под другом. */
 .data-mono {

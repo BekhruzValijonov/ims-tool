@@ -3,7 +3,7 @@ import { Card } from "../../../ui/Card"
 import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 import { IconCheck } from "../../../ui/icons"
-import { PALETTE } from "../../../app/theme/tokens"
+import { STATE } from "../../../app/theme/tokens"
 import { ROUTES } from "../../../app/routes"
 
 interface Item {
@@ -53,7 +53,7 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
     return (
       <Card padding="tight">
         <Stack row align="center" gap={ 1.5 }>
-          <span style={ { color: PALETTE.primary.main, display: "flex" } }><IconCheck size={ 24 }/></span>
+          <span style={ { color: "var(--state-ok)", display: "flex" } }><IconCheck size={ 24 }/></span>
           <div>
             <Text variant="subtitle1">Всё в срок</Text>
             <Text tone="secondary">
@@ -71,10 +71,11 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
       style={ {
         padding: 24,
         color: "#fff",
-        /* Красный, а не оранжевый: речь о просрочке, а не о предупреждении.
-           Градиент — приём дизайн-системы, здесь он достаётся единственному
-           месту, которое обязано перебивать всё остальное. */
-        background: `linear-gradient(135deg, ${ PALETTE.error.main } 0%, ${ PALETTE.error.dark } 100%)`,
+        /* Единственная сплошная заливка цветом на весь экран — недопустимый
+           сектор шкалы. Заливка плоская: градиент здесь украшал бы тревогу,
+           а она не украшение. Одинаково выглядит в обеих схемах — просрочка
+           от времени суток не зависит. */
+        backgroundColor: STATE.signal,
       } }
     >
       <Stack row gap={ 5 } align="center" wrap>

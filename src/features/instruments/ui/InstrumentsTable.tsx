@@ -37,7 +37,7 @@ export function InstrumentsTable({
         <a
           href={ `#${ ROUTES.instrument(row.id) }` }
           onClick={ (event) => { event.preventDefault(); navigate(ROUTES.instrument(row.id)) } }
-          style={ { color: "var(--primary-main)", fontWeight: 600, textDecoration: "none" } }
+          className="link"
         >
           { row.inventoryNumber }
         </a>

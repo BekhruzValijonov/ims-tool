@@ -6,6 +6,7 @@ import { DirectoryScreen, type FormValues } from "../features/directories/ui/Dir
 import type { Employee } from "../features/directories/domain/types"
 import { ROUTES } from "../app/routes"
 import { Chip } from "../ui/Chip"
+import { Text } from "../ui/Text"
 import type { Column } from "../ui/DataTable"
 
 export function EmployeesPage() {
@@ -33,7 +34,7 @@ export function EmployeesPage() {
         <a
           href={ `#${ ROUTES.employee(row.id) }` }
           onClick={ (event) => { event.preventDefault(); navigate(ROUTES.employee(row.id)) } }
-          style={ { color: "var(--primary-main)", fontWeight: 600, textDecoration: "none" } }
+          className="link"
         >
           { row.fullName }
         </a>
@@ -50,12 +51,14 @@ export function EmployeesPage() {
       key: "onHands", header: "На руках", width: 100, align: "right",
       render: (row) => {
         const count = state.data?.onHands.get(row.id) ?? 0
-        return count === 0 ? "—" : <Chip color="info">{ count }</Chip>
+        return count === 0 ? "—" : <Chip color="work">{ count }</Chip>
       },
     },
     {
       key: "state", header: "Состояние", width: 130,
-      render: (row) => (row.isActive ? <Chip color="primary">Работает</Chip> : <Chip>Уволен</Chip>),
+      render: (row) => (row.isActive
+        ? <Text tone="secondary" as="span">Работает</Text>
+        : <Chip>Уволен</Chip>),
     },
   ]
 

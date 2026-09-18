@@ -26,11 +26,11 @@
 .checkbox { border-radius: 6px; }
 .radio { border-radius: 50%; }
 
-.box:hover { border-color: var(--primary-main); }
+.box:hover { border-color: var(--accent); }
 
 .box:checked {
-  background-color: var(--primary-main);
-  border-color: var(--primary-main);
+  background-color: var(--accent);
+  border-color: var(--accent);
 }
 
 /* Галочка — две стороны рамки, повёрнутые на 45°. */
@@ -56,7 +56,7 @@
 
 .box:focus-visible {
   outline: none;
-  box-shadow: 0 0 0 3px rgba(0, 167, 111, 0.16);
+  box-shadow: 0 0 0 3px rgba(var(--accent-rgb), 0.12);
 }
 
 .label { font-size: 0.875rem; line-height: 1.571; }

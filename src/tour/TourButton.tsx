@@ -38,7 +38,8 @@ export function TourButton({ tour }: { tour: TourId }) {
   }
 
   return (
-    <Button variant="text" startIcon={ <IconHelp size={ 18 }/> } onClick={ start }>
+    /* Подсказка — не действие экрана: она набрана тише кнопок рядом. */
+    <Button variant="text" color="inherit" startIcon={ <IconHelp size={ 18 }/> } onClick={ start }>
       Как это работает
     </Button>
   )

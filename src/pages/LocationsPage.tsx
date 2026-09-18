@@ -4,6 +4,7 @@ import { useDirectories } from "../features/directories/ui/useDirectories"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { StorageLocation } from "../features/directories/domain/types"
 import { Chip } from "../ui/Chip"
+import { Text } from "../ui/Text"
 import type { Column } from "../ui/DataTable"
 
 export function LocationsPage() {
@@ -22,7 +23,7 @@ export function LocationsPage() {
       key: "state", header: "Состояние", width: 150,
       render: (row) => (row.isArchived
         ? <Chip>В архиве</Chip>
-        : <Chip color="primary">Используется</Chip>),
+        : <Text tone="secondary" as="span">Используется</Text>),
     },
   ]
 

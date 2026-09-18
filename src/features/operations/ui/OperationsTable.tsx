@@ -36,7 +36,7 @@ export function OperationsTable({
         <a
           href={ `#${ ROUTES.instrument(row.instrumentId) }` }
           onClick={ (event) => { event.preventDefault(); navigate(ROUTES.instrument(row.instrumentId)) } }
-          style={ { color: "var(--primary-main)", fontWeight: 600, textDecoration: "none" } }
+          className="link"
         >
           { row.inventoryNumber }
         </a>

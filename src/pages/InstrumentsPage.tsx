@@ -159,7 +159,7 @@ export function InstrumentsPage() {
           >
             Фильтры
             { activeFilters > 0 ? (
-              <Chip color="primary">{ activeFilters }</Chip>
+              <Chip color="ink">{ activeFilters }</Chip>
             ) : null }
           </Button>
           <Button

@@ -3,6 +3,7 @@ import { useAsync } from "../shared/useAsync"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { Department } from "../features/directories/domain/types"
 import { Chip } from "../ui/Chip"
+import { Text } from "../ui/Text"
 import type { Column } from "../ui/DataTable"
 
 export function DepartmentsPage() {
@@ -13,10 +14,12 @@ export function DepartmentsPage() {
     { key: "name", header: "Подразделение", minWidth: 200, render: (row) => row.name },
     { key: "code", header: "Код", width: 120, render: (row) => row.code ?? "—" },
     {
+      /* Метку получает архивная запись, а не работающая: помечать норму
+         значит закрасить весь столбец и спрятать в нём исключение. */
       key: "state", header: "Состояние", width: 140,
       render: (row) => (row.isArchived
         ? <Chip>В архиве</Chip>
-        : <Chip color="primary">Работает</Chip>),
+        : <Text tone="secondary" as="span">Работает</Text>),
     },
   ]
 

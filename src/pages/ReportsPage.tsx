@@ -95,7 +95,7 @@ export function ReportsPage() {
                 width: "100%", height: "100%", textAlign: "left", cursor: "pointer",
                 padding: 16, borderRadius: "var(--radius-card)",
                 background: "var(--bg-paper)",
-                border: `1px solid ${ active ? "var(--primary-main)" : "transparent" }`,
+                border: `1px solid ${ active ? "var(--accent)" : "transparent" }`,
                 boxShadow: "var(--shadow-card)",
               } }
             >

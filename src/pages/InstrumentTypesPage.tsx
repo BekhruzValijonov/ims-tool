@@ -3,6 +3,7 @@ import { useAsync } from "../shared/useAsync"
 import { DirectoryScreen, type FormValues } from "../features/directories/ui/DirectoryScreen"
 import type { InstrumentType } from "../features/directories/domain/types"
 import { Chip } from "../ui/Chip"
+import { Text } from "../ui/Text"
 import type { Column } from "../ui/DataTable"
 
 export function InstrumentTypesPage() {
@@ -14,8 +15,8 @@ export function InstrumentTypesPage() {
     {
       key: "verification", header: "Поверка", width: 150,
       render: (row) => (row.requiresVerification
-        ? <Chip color="info">Требуется</Chip>
-        : <Chip>Не требуется</Chip>),
+        ? <Chip>Требуется</Chip>
+        : <Text tone="secondary" as="span">Не требуется</Text>),
     },
     {
       key: "interval", header: "Межповерочный интервал", width: 210, mono: true,
@@ -27,7 +28,7 @@ export function InstrumentTypesPage() {
       key: "state", header: "Состояние", width: 150,
       render: (row) => (row.isArchived
         ? <Chip>В архиве</Chip>
-        : <Chip color="primary">Используется</Chip>),
+        : <Text tone="secondary" as="span">Используется</Text>),
     },
   ]
 

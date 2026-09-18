@@ -1,50 +1,21 @@
 /*
- * Токены дизайн-системы Minimal, перенесённые из проекта dashboard-ui.
+ * Токены приложения.
  *
- * Там они жили как объект темы MUI; здесь это переменные CSS — значения те же,
- * до последней цифры. Схема переключается атрибутом data-theme на <html>.
+ * Палитра приборной шкалы. У манометра белая эмалевая шкала, чёрные деления и
+ * два цветных сектора — зелёный рабочий и красный недопустимый. Здесь так же:
+ * интерфейс набран сталью и графитом, а цвет означает состояние прибора и
+ * больше ничего.
+ *
+ * Раньше фирменный зелёный работал сразу за двоих — за «нажимаемое» и за
+ * «прибор в наличии», — и от этого его было на экране столько, что он перестал
+ * что-либо значить. Кнопки, меню, ссылки, флажки и рамка фокуса цвета больше
+ * не носят.
+ *
+ * Схема переключается атрибутом data-theme на <html>.
  */
 
 :root {
-  /* Фирменный */
-  --primary-lighter: #C8FAD6;
-  --primary-light: #5BE49B;
-  --primary-main: #00A76F;
-  --primary-dark: #007867;
-  --primary-darker: #004B50;
-  --primary-contrast: #FFFFFF;
-
-  --secondary-lighter: #EFD6FF;
-  --secondary-light: #C684FF;
-  --secondary-main: #8E33FF;
-  --secondary-dark: #5119B7;
-  --secondary-darker: #27097A;
-
-  --info-lighter: #CAFDF5;
-  --info-light: #61F3F3;
-  --info-main: #00B8D9;
-  --info-dark: #006C9C;
-  --info-darker: #003768;
-
-  --success-lighter: #D3FCD2;
-  --success-light: #77ED8B;
-  --success-main: #22C55E;
-  --success-dark: #118D57;
-  --success-darker: #065E49;
-
-  --warning-lighter: #FFF5CC;
-  --warning-light: #FFD666;
-  --warning-main: #FFAB00;
-  --warning-dark: #B76E00;
-  --warning-darker: #7A4100;
-
-  --error-lighter: #FFE9D5;
-  --error-light: #FFAC82;
-  --error-main: #FF5630;
-  --error-dark: #B71D18;
-  --error-darker: #7A0916;
-
-  /* Серая шкала */
+  /* Сталь: поверхности, текст, линии */
   --grey-50: #FCFDFD;
   --grey-100: #F9FAFB;
   --grey-200: #F4F6F8;
@@ -56,6 +27,44 @@
   --grey-800: #1C252E;
   --grey-900: #141A21;
   --grey-500-rgb: 145, 158, 171;
+
+  /* Графит: всё, что нажимается. Ровно один цвет на весь интерфейс. */
+  --accent: #1B222B;
+  --accent-hover: #0E141B;
+  --accent-contrast: #FFFFFF;
+  --accent-rgb: 27, 34, 43;
+  --focus: var(--accent);
+
+  /*
+   * Состояния прибора.
+   *
+   * Зелёный — рабочий сектор шкалы, прибор на месте. Синий — чертёжный, за
+   * прибором стоит человек. Латунь — вне строя, ремонт и поверка делят её
+   * намеренно: цвет несёт тяжесть состояния, причину несёт подпись рядом.
+   * Красный — недопустимый сектор, требует действия сегодня.
+   *
+   * У каждого состояния три значения: основное (точка, линия графика),
+   * «чернила» (текст на мягкой заливке) и мягкая заливка (подложка метки).
+   */
+  --state-ok: #2B7A57;
+  --state-ok-ink: #1E5C41;
+  --state-ok-soft: #E1EDE8;
+
+  --state-work: #2C5E9E;
+  --state-work-ink: #204672;
+  --state-work-soft: #DFE8F4;
+
+  --state-wait: #A8730B;
+  --state-wait-ink: #7D5508;
+  --state-wait-soft: #F6EAD1;
+
+  --state-alarm: #C03A2B;
+  --state-alarm-ink: #8E2A1F;
+  --state-alarm-soft: #F8E1DD;
+
+  --state-gone: var(--grey-500);
+  --state-gone-ink: var(--grey-600);
+  --state-gone-soft: rgba(var(--grey-500-rgb), 0.16);
 
   /* Поверхности и текст — светлая схема */
   --bg-default: var(--grey-100);
@@ -97,6 +106,32 @@
   --text-primary: #FFFFFF;
   --text-secondary: var(--grey-500);
   --text-disabled: var(--grey-600);
+
+  /* Графит на тёмном фоне не виден, поэтому переворачивается: залитая кнопка
+     светлая, подпись на ней тёмная. Смысл тот же — самый плотный тон экрана. */
+  --accent: #EEF1F4;
+  --accent-hover: #FFFFFF;
+  --accent-contrast: var(--grey-900);
+  --accent-rgb: 238, 241, 244;
+
+  /* Насыщенные тона на тёмном тускнеют — берутся светлее, подложки глубже. */
+  --state-ok: #5CB98D;
+  --state-ok-ink: #86D2AC;
+  --state-ok-soft: #14382A;
+
+  --state-work: #7FA8DC;
+  --state-work-ink: #A6C5EA;
+  --state-work-soft: #16293F;
+
+  --state-wait: #E0A72E;
+  --state-wait-ink: #EFC665;
+  --state-wait-soft: #3A2B0B;
+
+  --state-alarm: #EE7B6C;
+  --state-alarm-ink: #F4A296;
+  --state-alarm-soft: #3F1712;
+
+  --state-gone-ink: var(--grey-500);
 
   /* На тёмном фоне тени строятся от чёрного, иначе они светлее фона. */
   --shadow-card: 0 0 2px 0 rgba(0, 0, 0, 0.2), 0 12px 24px -4px rgba(0, 0, 0, 0.12);

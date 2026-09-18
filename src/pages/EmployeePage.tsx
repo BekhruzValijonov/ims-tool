@@ -102,10 +102,11 @@ export function EmployeePage() {
                     <Stack key={ instrument.id } gap={ 0.25 }>
                       <button
                         type="button"
+                        className="link"
                         onClick={ () => navigate(ROUTES.instrument(instrument.id)) }
                         style={ {
-                          padding: 0, border: "none", background: "none", cursor: "pointer",
-                          textAlign: "left", font: "inherit", color: "var(--primary-main)", fontWeight: 600,
+                          padding: 0, border: "none", background: "none",
+                          textAlign: "left", font: "inherit",
                         } }
                       >
                         <span className="data-mono" style={ { marginRight: 8 } }>

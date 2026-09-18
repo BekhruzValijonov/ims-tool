@@ -17,38 +17,43 @@
 .medium { padding: 6px 16px; font-size: 0.875rem; min-height: 36px; }
 .large { padding: 8px 22px; font-size: 0.9375rem; min-height: 48px; }
 
-/* Заливка: главное действие экрана. */
-.contained { color: var(--primary-contrast); }
-.contained.primary { background-color: var(--primary-main); }
-.contained.primary:hover:not(:disabled) { background-color: var(--primary-dark); }
-.contained.error { background-color: var(--error-main); }
-.contained.error:hover:not(:disabled) { background-color: var(--error-dark); }
-.contained.inherit { background-color: var(--grey-800); color: #fff; }
-.contained.inherit:hover:not(:disabled) { background-color: var(--grey-700); }
+/* Заливка: главное действие экрана. Графит, а не цвет: цвет на этом экране
+   означает состояние прибора, и кнопка не должна притворяться состоянием. */
+.contained.primary { background-color: var(--accent); color: var(--accent-contrast); }
+.contained.primary:hover:not(:disabled) { background-color: var(--accent-hover); }
+
+/* Красный остаётся только у списания: это действие без возврата. */
+.contained.error { background-color: var(--state-alarm); color: #fff; }
+.contained.error:hover:not(:disabled) { background-color: var(--state-alarm-ink); }
+.contained.inherit { background-color: var(--grey-700); color: #fff; }
+.contained.inherit:hover:not(:disabled) { background-color: var(--grey-600); }
 
 /* Контур: действие рядом с главным. */
 .outlined { background-color: transparent; }
-.outlined.primary { color: var(--primary-main); border-color: rgba(0, 167, 111, 0.48); }
-.outlined.primary:hover:not(:disabled) { background-color: rgba(0, 167, 111, 0.08); border-color: var(--primary-main); }
-.outlined.error { color: var(--error-main); border-color: rgba(255, 86, 48, 0.48); }
-.outlined.error:hover:not(:disabled) { background-color: rgba(255, 86, 48, 0.08); }
+.outlined.primary { color: var(--text-primary); border-color: var(--divider); }
+.outlined.primary:hover:not(:disabled) {
+  background-color: var(--action-hover);
+  border-color: rgba(var(--grey-500-rgb), 0.4);
+}
+.outlined.error { color: var(--state-alarm); border-color: var(--state-alarm-soft); }
+.outlined.error:hover:not(:disabled) { background-color: var(--state-alarm-soft); }
 .outlined.inherit { color: var(--text-primary); border-color: rgba(var(--grey-500-rgb), 0.32); }
 .outlined.inherit:hover:not(:disabled) { background-color: var(--action-hover); }
 
 /* Мягкая заливка — приём дизайн-системы для второстепенных действий. */
-.soft.primary { color: var(--primary-dark); background-color: rgba(0, 167, 111, 0.16); }
-.soft.primary:hover:not(:disabled) { background-color: rgba(0, 167, 111, 0.32); }
-.soft.error { color: var(--error-dark); background-color: rgba(255, 86, 48, 0.16); }
-.soft.error:hover:not(:disabled) { background-color: rgba(255, 86, 48, 0.32); }
+.soft.primary { color: var(--text-primary); background-color: var(--action-selected); }
+.soft.primary:hover:not(:disabled) { background-color: rgba(var(--grey-500-rgb), 0.24); }
+.soft.error { color: var(--state-alarm-ink); background-color: var(--state-alarm-soft); }
+.soft.error:hover:not(:disabled) { background-color: var(--state-alarm-soft); }
 .soft.inherit { color: var(--text-primary); background-color: rgba(var(--grey-500-rgb), 0.12); }
 .soft.inherit:hover:not(:disabled) { background-color: rgba(var(--grey-500-rgb), 0.2); }
 
 .text { background-color: transparent; }
-.text.primary { color: var(--primary-main); }
-.text.primary:hover:not(:disabled) { background-color: rgba(0, 167, 111, 0.08); }
-.text.error { color: var(--error-main); }
-.text.error:hover:not(:disabled) { background-color: rgba(255, 86, 48, 0.08); }
-.text.inherit { color: var(--text-primary); }
+.text.primary { color: var(--text-primary); }
+.text.primary:hover:not(:disabled) { background-color: var(--action-hover); }
+.text.error { color: var(--state-alarm); }
+.text.error:hover:not(:disabled) { background-color: var(--state-alarm-soft); }
+.text.inherit { color: var(--text-secondary); }
 .text.inherit:hover:not(:disabled) { background-color: var(--action-hover); }
 
 /* Кнопка-иконка. */
@@ -63,7 +68,7 @@
 .icon:hover:not(:disabled) { background-color: var(--action-hover); }
 
 /* Погашенная кнопка объявлена последней: у правил вариантов та же весомость,
-   и при обратном порядке они перекрашивали её обратно в фирменный цвет. */
+   и при обратном порядке они перекрашивали её обратно. */
 .button:disabled,
 .button:disabled:hover {
   cursor: default;

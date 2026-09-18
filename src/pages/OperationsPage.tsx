@@ -123,7 +123,7 @@ export function OperationsPage() {
             data-tour="operations-filters"
           >
             Фильтры
-            { activeFilters > 0 ? <Chip color="primary">{ activeFilters }</Chip> : null }
+            { activeFilters > 0 ? <Chip color="ink">{ activeFilters }</Chip> : null }
           </Button>
           <Button
             variant="outlined" startIcon={ <IconDownload size={ 18 }/> }

@@ -1,7 +1,7 @@
 import { lazy, Suspense, useMemo } from "react"
 import type { ApexOptions } from "apexcharts"
 import { useThemeMode } from "../app/ThemeMode"
-import { PALETTE } from "../app/theme/tokens"
+import { COLORS } from "../app/theme/tokens"
 import { Skeleton } from "./Skeleton"
 
 const ApexChart = lazy(() => import("react-apexcharts"))
@@ -15,7 +15,7 @@ const ApexChart = lazy(() => import("react-apexcharts"))
  */
 function baseOptions(dark: boolean): ApexOptions {
   const grid = dark ? "rgba(145, 158, 171, 0.24)" : "rgba(145, 158, 171, 0.2)"
-  const label = dark ? PALETTE.grey[500] : PALETTE.grey[600]
+  const label = dark ? COLORS.grey[500] : COLORS.grey[600]
 
   return {
     chart: {

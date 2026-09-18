@@ -11,13 +11,11 @@
   white-space: nowrap;
 }
 
-.default { color: var(--text-secondary); background-color: rgba(var(--grey-500-rgb), 0.16); }
-.primary { color: var(--primary-dark); background-color: rgba(0, 167, 111, 0.16); }
-.info { color: var(--info-dark); background-color: rgba(0, 184, 217, 0.16); }
-.warning { color: var(--warning-dark); background-color: rgba(255, 171, 0, 0.16); }
-.error { color: var(--error-dark); background-color: rgba(255, 86, 48, 0.16); }
+.neutral { color: var(--state-gone-ink); background-color: var(--state-gone-soft); }
+.ok { color: var(--state-ok-ink); background-color: var(--state-ok-soft); }
+.work { color: var(--state-work-ink); background-color: var(--state-work-soft); }
+.wait { color: var(--state-wait-ink); background-color: var(--state-wait-soft); }
+.alarm { color: var(--state-alarm-ink); background-color: var(--state-alarm-soft); }
 
-[data-theme='dark'] .primary { color: var(--primary-light); }
-[data-theme='dark'] .info { color: var(--info-light); }
-[data-theme='dark'] .warning { color: var(--warning-light); }
-[data-theme='dark'] .error { color: var(--error-light); }
+/* Счётчик — не состояние прибора, поэтому графит, а не цвет шкалы. */
+.ink { color: var(--accent-contrast); background-color: var(--accent); }

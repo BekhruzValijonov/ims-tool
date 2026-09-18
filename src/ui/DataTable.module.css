@@ -78,7 +78,7 @@
 .loading {
   flex-shrink: 0;
   height: 2px;
-  background: linear-gradient(90deg, transparent, var(--primary-main), transparent);
+  background: linear-gradient(90deg, transparent, var(--accent), transparent);
   animation: slide 1.1s linear infinite;
 }
 

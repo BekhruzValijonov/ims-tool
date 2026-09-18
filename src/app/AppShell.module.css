@@ -26,7 +26,7 @@
   font-size: 1.25rem;
   font-weight: 800;
   letter-spacing: -0.01em;
-  color: var(--primary-main);
+  color: var(--text-primary);
 }
 
 .nav { flex: 1; overflow-y: auto; padding: 0 16px; }
@@ -56,13 +56,16 @@
 
 .item:hover { background-color: var(--action-hover); }
 
+/* «Вы здесь» набрано плотностью, а не цветом: цвет на экранах означает
+   состояние прибора, и пункт меню состоянием не является. */
 .item.active {
-  color: var(--primary-main);
-  font-weight: 600;
-  background-color: rgba(0, 167, 111, 0.08);
+  color: var(--text-primary);
+  font-weight: 700;
+  background-color: var(--action-selected);
+  box-shadow: inset 3px 0 0 var(--accent);
 }
 
-.item.active:hover { background-color: rgba(0, 167, 111, 0.16); }
+.item.active:hover { background-color: rgba(var(--grey-500-rgb), 0.24); }
 
 .operator {
   flex-shrink: 0;
@@ -82,8 +85,8 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  background-color: var(--primary-main);
-  color: var(--primary-contrast);
+  background-color: var(--accent);
+  color: var(--accent-contrast);
   font-size: 0.8125rem;
   font-weight: 700;
 }
