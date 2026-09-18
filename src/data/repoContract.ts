@@ -388,6 +388,34 @@ export function describeRepoContract(name: string, createRepo: RepoFactory): voi
         expect(flow[2].returned).toBe(1)
       })
 
+      it("восстанавливает вчерашнее состояние по журналу", async () => {
+        const instrument = await addInstrument()
+        const startedAt = now
+        now += 2 * DAY
+        await execute({
+          kind: "CHECK_OUT", instrumentId: instrument.id, operatorName: OPERATOR,
+          employeeId: ivanId, expectedReturnAt: null,
+        })
+
+        const history = await repo.dashboard.statusHistory(startedAt, now)
+
+        expect(history).toHaveLength(3)
+        expect(history[0]).toMatchObject({ total: 1, available: 1, checkedOut: 0 })
+        expect(history[2]).toMatchObject({ total: 1, available: 0, checkedOut: 1 })
+      })
+
+      it("сводит приборы по местам хранения", async () => {
+        await addInstrument({ inventoryNumber: "PR-001" })
+        await addInstrument({ inventoryNumber: "PR-002" })
+
+        const summary = await repo.directories.locationSummary()
+        const shelf = summary.find((row) => row.locationId === shelfId)
+        const bench = summary.find((row) => row.locationId === repairBenchId)
+
+        expect(shelf?.total).toBe(2)
+        expect(bench?.total).toBe(0)
+      })
+
       it("сводит приборы по подразделениям", async () => {
         await addInstrument({ inventoryNumber: "PR-001" })
         const second = await addInstrument({ inventoryNumber: "PR-002" })

@@ -29,6 +29,7 @@ import type {
   VerificationRecord,
 } from "../features/verification/domain/types"
 import type { Counters, DailyFlow, StatusSlice } from "../features/dashboard/domain/types"
+import { buildStatusHistory } from "../features/dashboard/domain/history"
 import type {
   AppRepo,
   DashboardRepo,
@@ -140,6 +141,16 @@ export class MemoryRepo implements AppRepo {
     },
 
     departmentSummary: async () => this.departmentSummary(),
+    locationSummary: async () => this.locationRows
+      .filter((location) => !location.isArchived)
+      .map((location) => ({
+        locationId: location.id,
+        name: location.name,
+        departmentId: location.departmentId,
+        total: this.instrumentRows.filter(
+          (row) => row.currentLocationId === location.id && row.status !== "WRITTEN_OFF").length,
+      }))
+      .sort(byName),
   }
 
   readonly verification: VerificationRepo = {
@@ -158,6 +169,14 @@ export class MemoryRepo implements AppRepo {
   readonly dashboard: DashboardRepo = {
     counters: async (now) => this.counters(now),
     flow: async (from, to) => this.flow(from, to),
+    statusHistory: async (from, to) => buildStatusHistory(
+      this.instrumentRows.map((row) => ({ id: row.id, status: row.status })),
+      /* Верхней границы нет намеренно: состояние отматывается от нынешнего, и
+         события после запрошенного окна тоже нужно отмотать. */
+      this.eventRows.filter((row) => row.occurredAt >= from),
+      from,
+      to,
+    ),
     recent: async (limit) =>
       [...this.eventRows].sort((a, b) => b.occurredAt - a.occurredAt).slice(0, limit),
     statusBreakdown: async () => this.statusBreakdown(),

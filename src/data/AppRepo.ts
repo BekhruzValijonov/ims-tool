@@ -15,6 +15,7 @@ import type {
   EmployeeQuery,
   InstrumentType,
   InstrumentTypeDraft,
+  LocationSummary,
   StorageLocation,
   StorageLocationDraft,
 } from "../features/directories/domain/types"
@@ -29,6 +30,7 @@ import type {
   VerificationRecord,
 } from "../features/verification/domain/types"
 import type { Counters, DailyFlow, StatusSlice } from "../features/dashboard/domain/types"
+import type { DailyStatus } from "../features/dashboard/domain/history"
 
 /** Какое хранилище обслуживает сессию. Показывается в настройках. */
 export type StorageBackend = "sqlite" | "memory"
@@ -92,6 +94,7 @@ export interface DirectoryRepo {
   archiveInstrumentType(id: string, archived: boolean): Promise<void>
 
   departmentSummary(): Promise<readonly DepartmentSummary[]>
+  locationSummary(): Promise<readonly LocationSummary[]>
 }
 
 export interface VerificationRepo {
@@ -106,6 +109,8 @@ export interface DashboardRepo {
   /** `now` передаётся снаружи: просрочка не должна зависеть от часов внутри слоя данных. */
   counters(now: number): Promise<Counters>
   flow(from: number, to: number): Promise<readonly DailyFlow[]>
+  /** Сколько приборов в каком состоянии было на конец каждого дня — для спарклайнов плиток. */
+  statusHistory(from: number, to: number): Promise<readonly DailyStatus[]>
   recent(limit: number): Promise<readonly InstrumentEvent[]>
   statusBreakdown(): Promise<readonly StatusSlice[]>
 }
