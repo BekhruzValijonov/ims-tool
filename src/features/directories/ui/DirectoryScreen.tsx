@@ -7,9 +7,10 @@ import { Card } from "../../../ui/Card"
 import { Page } from "../../../ui/Page"
 import { DataTable, type Column } from "../../../ui/DataTable"
 import { Dialog } from "../../../ui/Dialog"
-import { Select, TextField, type Option } from "../../../ui/Field"
+import { TextField } from "../../../ui/Field"
+import { Select, type Option } from "../../../ui/Select"
+import { Checkbox } from "../../../ui/Choice"
 import { Stack } from "../../../ui/layout"
-import { Text } from "../../../ui/Text"
 import { IconPlus } from "../../../ui/icons"
 
 export type FieldSpec =
@@ -150,15 +151,14 @@ export function DirectoryScreen<T extends { id: string }>({
           { fields.map((field) => {
             if (field.kind === "switch") {
               return (
-                <label key={ field.key } style={ { display: "flex", gap: 10, alignItems: "center" } }>
-                  <input
-                    type="checkbox"
-                    checked={ Boolean(values[field.key]) }
-                    onChange={ (event) =>
-                      setValues((current) => ({ ...current, [field.key]: event.target.checked })) }
-                  />
-                  <Text>{ field.label }</Text>
-                </label>
+                <Checkbox
+                  key={ field.key }
+                  checked={ Boolean(values[field.key]) }
+                  onChange={ (checked) =>
+                    setValues((current) => ({ ...current, [field.key]: checked })) }
+                >
+                  { field.label }
+                </Checkbox>
               )
             }
 

@@ -24,8 +24,13 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-h1, h2, h3, h4, h5, h6, p, figure {
+h1, h2, h3, h4, h5, h6, p, figure, fieldset {
   margin: 0;
+}
+
+/* Подпись группы переключателей не должна уезжать вправо на отступ légende. */
+legend {
+  padding: 0;
 }
 
 button,

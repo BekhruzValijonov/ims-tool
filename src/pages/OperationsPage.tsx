@@ -20,7 +20,7 @@ import { Page } from "../ui/Page"
 import { Chip } from "../ui/Chip"
 import { DateInput } from "../ui/DateInput"
 import { Drawer } from "../ui/Drawer"
-import { Select } from "../ui/Field"
+import { Select } from "../ui/Select"
 import { Stack } from "../ui/layout"
 import { IconDownload, IconSettings } from "../ui/icons"
 

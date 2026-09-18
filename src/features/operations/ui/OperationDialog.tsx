@@ -10,7 +10,9 @@ import { Alert } from "../../../ui/Alert"
 import { Button } from "../../../ui/Button"
 import { DateInput } from "../../../ui/DateInput"
 import { Dialog } from "../../../ui/Dialog"
-import { Select, TextArea, TextField } from "../../../ui/Field"
+import { TextArea, TextField } from "../../../ui/Field"
+import { Select } from "../../../ui/Select"
+import { Checkbox, Radio } from "../../../ui/Choice"
 import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 
@@ -204,17 +206,16 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
         { kind === "RETURN" ? (
           <fieldset style={ { border: "none", padding: 0, margin: 0 } }>
             <Text variant="subtitle2" as="legend">Состояние прибора</Text>
-            <Stack gap={ 0.5 } style={ { marginTop: 8 } }>
+            <Stack gap={ 1 } style={ { marginTop: 8 } }>
               { (Object.keys(CONDITION_LABELS) as ReturnCondition[]).map((value) => (
-                <label key={ value } style={ { display: "flex", gap: 10, alignItems: "center" } }>
-                  <input
-                    type="radio"
-                    name="condition"
-                    checked={ condition === value }
-                    onChange={ () => setCondition(value) }
-                  />
-                  <Text>{ CONDITION_LABELS[value] }</Text>
-                </label>
+                <Radio
+                  key={ value }
+                  name="condition"
+                  checked={ condition === value }
+                  onChange={ () => setCondition(value) }
+                >
+                  { CONDITION_LABELS[value] }
+                </Radio>
               )) }
             </Stack>
             <Text variant="caption" tone="secondary" style={ { display: "block", marginTop: 8 } }>
@@ -233,14 +234,7 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
               label="Место хранения" value={ locationId } options={ locationOptions }
               emptyLabel="Не менять" onChange={ setLocationId } fullWidth
             />
-            <label style={ { display: "flex", gap: 10, alignItems: "center" } }>
-              <input
-                type="checkbox"
-                checked={ permanent }
-                onChange={ (event) => setPermanent(event.target.checked) }
-              />
-              <Text>Перевести насовсем</Text>
-            </label>
+            <Checkbox checked={ permanent } onChange={ setPermanent }>Перевести насовсем</Checkbox>
             <Text variant="caption" tone="secondary">
               { permanent
                 ? "Сменится и балансовая принадлежность, и место, куда прибор вернётся"

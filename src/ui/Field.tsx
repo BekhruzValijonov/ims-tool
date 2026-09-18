@@ -1,7 +1,6 @@
 import type { CSSProperties, ReactNode } from "react"
 import { useId } from "react"
 import styles from "./Field.module.css"
-import { IconChevronDown } from "./icons"
 
 interface BaseProps {
   readonly label?: string
@@ -77,50 +76,6 @@ export function TextField({
           onChange={ (event) => onChange(event.target.value) }
         />
         { endIcon ? <span className={ styles.adornment }>{ endIcon }</span> : null }
-      </div>
-    </Wrapper>
-  )
-}
-
-export interface Option {
-  readonly value: string
-  readonly label: string
-}
-
-interface SelectProps extends BaseProps {
-  readonly value: string
-  onChange(value: string): void
-  readonly options: readonly Option[]
-  /** Что стоит в списке первым пунктом: «Любой», «Не указано» и подобное. */
-  readonly emptyLabel?: string
-}
-
-/**
- * Выпадающий список.
- *
- * Обычный select браузера: он работает с клавиатуры, знает про экранные
- * читалки и не требует своего меню на два экрана кода.
- */
-export function Select({ value, onChange, options, emptyLabel, ...base }: SelectProps) {
-  const id = useId()
-
-  return (
-    <Wrapper { ...base } id={ id }>
-      <div className={ [styles.control, base.error ? styles.invalid : null].filter(Boolean).join(" ") }>
-        <select
-          id={ id }
-          className={ styles.select }
-          value={ value }
-          disabled={ base.disabled }
-          required={ base.required }
-          onChange={ (event) => onChange(event.target.value) }
-        >
-          { emptyLabel === undefined ? null : <option value="">{ emptyLabel }</option> }
-          { options.map((option) => (
-            <option key={ option.value } value={ option.value }>{ option.label }</option>
-          )) }
-        </select>
-        <span className={ styles.adornment }><IconChevronDown size={ 18 }/></span>
       </div>
     </Wrapper>
   )

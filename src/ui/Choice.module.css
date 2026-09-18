@@ -1,0 +1,62 @@
+.choice {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  user-select: none;
+}
+
+.choice.disabled { cursor: default; opacity: 0.48; }
+
+/* Своя отрисовка вместо системной: системный чекбокс не подчиняется теме и
+   на каждой платформе выглядит по-своему. */
+.box {
+  appearance: none;
+  margin: 0;
+  width: 20px;
+  height: 20px;
+  flex-shrink: 0;
+  position: relative;
+  border: 2px solid rgba(var(--grey-500-rgb), 0.5);
+  background-color: transparent;
+  cursor: inherit;
+  transition: background-color 120ms ease, border-color 120ms ease;
+}
+
+.checkbox { border-radius: 6px; }
+.radio { border-radius: 50%; }
+
+.box:hover { border-color: var(--primary-main); }
+
+.box:checked {
+  background-color: var(--primary-main);
+  border-color: var(--primary-main);
+}
+
+/* Галочка — две стороны рамки, повёрнутые на 45°. */
+.checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid #fff;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.radio:checked::after {
+  content: "";
+  position: absolute;
+  inset: 3px;
+  border-radius: 50%;
+  background-color: #fff;
+}
+
+.box:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 167, 111, 0.16);
+}
+
+.label { font-size: 0.875rem; line-height: 1.571; }
