@@ -27,9 +27,15 @@ export function ReportsPage() {
   const [selected, setSelected] = useState(REPORTS[0].id)
   /* Период начинается пустым: у ведомости приборов и списка на руках он
      ограничивает выборку, и подставленный «последний месяц» прятал бы почти
-     весь реестр, ничего об этом не говоря. */
-  const [from, setFrom] = useState("")
-  const [to, setTo] = useState("")
+     весь реестр, ничего об этом не говоря.
+
+     Набранное и применённое разведены: отчёт строится по второму. Иначе он
+     пересчитывался на каждой введённой границе — сперва по одной дате без
+     второй, и только потом по обеим, — а на большом журнале это лишний долгий
+     проход и мигающая таблица. */
+  const [draft, setDraft] = useState({ from: "", to: "" })
+  const [period, setPeriod] = useState({ from: "", to: "" })
+  const pending = draft.from !== period.from || draft.to !== period.to
   const [horizonDays, setHorizonDays] = useState(30)
   const [instrumentId, setInstrumentId] = useState<string | null>(null)
   const [exporting, setExporting] = useState(false)
@@ -37,12 +43,12 @@ export function ReportsPage() {
   const report = REPORTS.find((item) => item.id === selected) ?? REPORTS[0]
 
   const input = useMemo<ReportInput>(() => ({
-    from: from === "" ? null : new Date(from).getTime(),
+    from: period.from === "" ? null : new Date(period.from).getTime(),
     // Верхняя граница включает весь последний день, а не его первую секунду.
-    to: to === "" ? null : new Date(to).getTime() + DAY_MS - 1,
+    to: period.to === "" ? null : new Date(period.to).getTime() + DAY_MS - 1,
     horizonDays,
     instrumentId,
-  }), [from, to, horizonDays, instrumentId])
+  }), [period, horizonDays, instrumentId])
 
   /* Список приборов нужен единственному отчёту — паспорту движения, — поэтому
      грузится только когда выбран он. */
@@ -128,8 +134,17 @@ export function ReportsPage() {
         <Stack row gap={ 2 } wrap align="end">
           { report.params.includes("period") ? (
             <>
-              <DateInput label={ `${ report.periodLabel ?? "Дата" } с` } value={ from } onChange={ setFrom }/>
-              <DateInput label="по" value={ to } onChange={ setTo }/>
+              <DateInput
+                label={ `${ report.periodLabel ?? "Дата" } с` } value={ draft.from }
+                onChange={ (value) => setDraft((current) => ({ ...current, from: value })) }
+              />
+              <DateInput
+                label="по" value={ draft.to }
+                onChange={ (value) => setDraft((current) => ({ ...current, to: value })) }
+              />
+              <Button variant="outlined" onClick={ () => setPeriod(draft) } disabled={ !pending }>
+                Применить
+              </Button>
             </>
           ) : null }
 
@@ -184,7 +199,15 @@ export function ReportsPage() {
           <Stack row gap={ 2 } wrap align="baseline" style={ { marginTop: 12 } }>
             { state.data ? <Text tone="secondary">{ state.data.summary }</Text> : null }
             { report.params.includes("period") ? (
-              <Text variant="caption" tone="secondary">Пусто — без ограничения по дате</Text>
+              <Text
+                variant="caption"
+                tone={ pending ? "inherit" : "secondary" }
+                style={ pending ? { color: "var(--state-alarm)" } : undefined }
+              >
+                { pending
+                  ? "Период изменён — нажмите «Применить»"
+                  : "Пусто — без ограничения по дате" }
+              </Text>
             ) : null }
           </Stack>
         ) : null }
