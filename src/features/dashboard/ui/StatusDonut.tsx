@@ -4,7 +4,7 @@ import type { StatusSlice } from "../domain/types"
 import type { InstrumentStatus } from "../../instruments/domain/types"
 import { STATUS_LABELS } from "../../instruments/domain/labels"
 import { Card } from "../../../ui/Card"
-import { Chart } from "../../../ui/Chart"
+import { Chart, fillDensity } from "../../../ui/Chart"
 import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 import { useStateColors } from "../../../app/theme/useStateColors"
@@ -17,7 +17,7 @@ import { useStateColors } from "../../../app/theme/useStateColors"
  * одному из двух. Сколько списано — сказано отдельной строкой.
  */
 export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
-  const { series } = useStateColors()
+  const { series, dark } = useStateColors()
 
   const tone: Record<InstrumentStatus, string> = {
     AVAILABLE: series.available,
@@ -35,6 +35,7 @@ export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
     colors: live.map((slice) => tone[slice.status]),
     labels: live.map((slice) => STATUS_LABELS[slice.status]),
     stroke: { width: 0 },
+    fill: fillDensity(dark),
     plotOptions: {
       pie: {
         donut: {
@@ -53,7 +54,7 @@ export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
       },
     },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [live.map((slice) => `${ slice.status }:${ slice.count }`).join("|"), series, total])
+  }), [live.map((slice) => `${ slice.status }:${ slice.count }`).join("|"), series, total, dark])
 
   return (
     <Card>

@@ -3,7 +3,6 @@ import { Card } from "../../../ui/Card"
 import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 import { IconCheck } from "../../../ui/icons"
-import { STATE } from "../../../app/theme/tokens"
 import { ROUTES } from "../../../app/routes"
 
 interface Item {
@@ -70,18 +69,18 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
       padding="none"
       style={ {
         padding: 24,
-        color: "#fff",
-        /* Единственная сплошная заливка цветом на весь экран — недопустимый
-           сектор шкалы. Заливка плоская: градиент здесь украшал бы тревогу,
-           а она не украшение. Одинаково выглядит в обеих схемах — просрочка
-           от времени суток не зависит. */
-        backgroundColor: STATE.signal,
+        /* Мягкая заливка, а не сплошная: красный в полную силу на всю ширину
+           экрана давит на всё вокруг и спорит с графиками, которые рядом
+           показывают те же приборы. Тревогу держат слово и крупные числа, а
+           цвет только помечает её, как в остальных сообщениях приложения. */
+        color: "var(--state-alarm-ink)",
+        backgroundColor: "var(--state-alarm-soft)",
       } }
     >
       <Stack row gap={ 5 } align="center" wrap>
         <Stack grow gap={ 0.5 } style={ { minWidth: 260 } }>
           <Text variant="h5" as="h2">Требует действия сегодня</Text>
-          <Text style={ { opacity: 0.85 } }>
+          <Text>
             Приборы, которые не вернули вовремя, и поверки, которые вот-вот кончатся.
           </Text>
         </Stack>

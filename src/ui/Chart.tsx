@@ -13,13 +13,21 @@ const ApexChart = lazy(() => import("react-apexcharts"))
  * курсором и градиентная заливка под линией — тот же облик, что был утверждён
  * раньше, только теперь на ApexCharts, как в самой дизайн-системе.
  */
+/* Шрифт берётся из переменной: его выбирают в «Брендировании», а подписи осей
+   уходят в атрибуты SVG, где var() не раскрывается. */
+function uiFont(): string {
+  if (typeof document === "undefined") return "sans-serif"
+  const font = getComputedStyle(document.documentElement).getPropertyValue("--font-sans").trim()
+  return font || "sans-serif"
+}
+
 function baseOptions(dark: boolean): ApexOptions {
   const grid = dark ? "rgba(145, 158, 171, 0.24)" : "rgba(145, 158, 171, 0.2)"
   const label = dark ? COLORS.grey[500] : COLORS.grey[600]
 
   return {
     chart: {
-      fontFamily: "'DM Sans Variable', sans-serif",
+      fontFamily: uiFont(),
       foreColor: label,
       toolbar: { show: false },
       zoom: { enabled: false },
@@ -65,7 +73,21 @@ function merge(base: ApexOptions, extra: ApexOptions): ApexOptions {
     tooltip: { ...base.tooltip, ...extra.tooltip },
     stroke: { ...base.stroke, ...extra.stroke },
     legend: { ...base.legend, ...extra.legend },
+    fill: { ...base.fill, ...extra.fill },
   }
+}
+
+/**
+ * Насколько плотно залиты крупные фигуры.
+ *
+ * На светлой схеме цвета состояний тёмные — они подобраны так, чтобы точка в
+ * таблице читалась на белом. Сектор бублика и столбец той же плотности выходят
+ * тяжёлыми: краски на них в сотни раз больше. Поэтому заливка берётся не в
+ * полную силу; тон остаётся тем же, а пятно светлеет. На тёмной схеме тона и
+ * так светлые, и ослаблять их нечем.
+ */
+export function fillDensity(dark: boolean): ApexOptions["fill"] {
+  return { opacity: dark ? 1 : 0.8 }
 }
 
 export function Chart({ type, series, options, height }: ChartProps) {

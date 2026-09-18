@@ -2,7 +2,7 @@ import { useMemo } from "react"
 import type { ApexOptions } from "apexcharts"
 import type { DepartmentSummary } from "../../directories/domain/types"
 import { Card } from "../../../ui/Card"
-import { Chart } from "../../../ui/Chart"
+import { Chart, fillDensity } from "../../../ui/Chart"
 import { Stack } from "../../../ui/layout"
 import { Text } from "../../../ui/Text"
 import { useStateColors } from "../../../app/theme/useStateColors"
@@ -15,7 +15,7 @@ import { useStateColors } from "../../../app/theme/useStateColors"
  * уехавший в лабораторию на неделю, продолжает числиться за своим цехом.
  */
 export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSummary[] }) {
-  const { series } = useStateColors()
+  const { series, dark } = useStateColors()
   const rows = summary.filter((row) => row.total > 0)
 
   const legend = [
@@ -28,11 +28,15 @@ export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSu
   const options = useMemo<ApexOptions>(() => ({
     colors: legend.map((item) => item.color),
     chart: { stacked: true },
+    /* Без обводки: она рисуется цветом столбца и читается как рамка, от которой
+       столбец кажется гуще, чем он есть. */
+    stroke: { width: 0 },
+    fill: fillDensity(dark),
     plotOptions: { bar: { columnWidth: "48%", borderRadius: 4, borderRadiusApplication: "end" } },
     xaxis: { categories: rows.map((row) => row.name) },
     yaxis: { min: 0, forceNiceScale: true, labels: { formatter: (value) => String(Math.round(value)) } },
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }), [rows.map((row) => row.name).join("|"), series])
+  }), [rows.map((row) => row.name).join("|"), series, dark])
 
   return (
     <Card>
