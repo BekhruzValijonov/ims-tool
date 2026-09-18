@@ -80,24 +80,24 @@ describe("чтение настройки", () => {
 
   it("неизвестные значения заменяются исходными по одному", () => {
     const parsed = parseBranding(JSON.stringify({
-      title: "  Завод  ", accent: "0e6f7a", font: "comic", neutral: "неон", radius: "soft",
+      accent: "0e6f7a", font: "comic", neutral: "неон", radius: "soft",
+      density: "tight", stripes: "да",
     }))
 
     expect(parsed).toEqual({
-      title: "Завод",
       accent: "#0E6F7A",
       font: DEFAULT_BRANDING.font,
       neutral: DEFAULT_BRANDING.neutral,
       radius: "soft",
+      density: "tight",
+      stripes: DEFAULT_BRANDING.stripes,
     })
   })
 
-  it("пустое название возвращается к исходному: меню без подписи читать нечем", () => {
-    expect(parseBranding(JSON.stringify({ title: "   " })).title).toBe(DEFAULT_BRANDING.title)
-  })
-
   it("переживает запись и чтение", () => {
-    const branding = { ...DEFAULT_BRANDING, title: "Цех КИПиА", accent: "#3D3B8E", font: "golos" } as const
+    const branding = {
+      ...DEFAULT_BRANDING, accent: "#3D3B8E", font: "golos", density: "tight", stripes: true,
+    } as const
     expect(parseBranding(serializeBranding(branding))).toEqual(branding)
   })
 })
@@ -110,6 +110,12 @@ describe("правила CSS", () => {
     expect(css).toContain("html:root[data-theme='dark'] {")
     expect(css).toContain("--radius-card: 24px;")
     expect(css).toContain(`--grey-500: ${ NEUTRALS[2].scale[500] };`)
+  })
+
+  it("задают высоту строки и чередование таблиц", () => {
+    expect(brandingCss({ ...DEFAULT_BRANDING, density: "tight" })).toContain("--table-cell-y: 7px;")
+    expect(brandingCss({ ...DEFAULT_BRANDING, stripes: false })).toContain("--table-stripe: transparent;")
+    expect(brandingCss({ ...DEFAULT_BRANDING, stripes: true })).toContain("--table-stripe: rgba(")
   })
 
   it("у схем разные значения акцента", () => {

@@ -2,14 +2,13 @@ import { useEffect, useRef, type ReactNode } from "react"
 import { useBranding } from "../features/branding/ui/BrandingProvider"
 import { BrandingPreview } from "../features/branding/ui/BrandingPreview"
 import { AccentPicker } from "../features/branding/ui/AccentPicker"
-import { DEFAULT_BRANDING, FONTS, NEUTRALS, RADII } from "../features/branding/domain/presets"
+import { DEFAULT_BRANDING, DENSITIES, FONTS, NEUTRALS, RADII } from "../features/branding/domain/presets"
 import type { Branding } from "../features/branding/domain/types"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
 import { Page } from "../ui/Page"
-import { TextField } from "../ui/Field"
-import { Radio } from "../ui/Choice"
+import { Checkbox, Radio } from "../ui/Choice"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
 
@@ -90,20 +89,6 @@ export function BrandingPage() {
       <Stack row gap={ 2 } wrap align="stretch">
         <Stack gap={ 2 } style={ { flex: "3 1 460px", minWidth: 0 } }>
           <Section
-            title="Название"
-            hint="Стоит в меню и в заголовке окна. Обычно это название завода или службы"
-            data-tour="branding-title"
-          >
-            <TextField
-              label="Подпись приложения"
-              value={ branding.title }
-              onChange={ (value) => set("title", value.slice(0, 40)) }
-              helper="До сорока знаков — длиннее не поместится в меню"
-              fullWidth
-            />
-          </Section>
-
-          <Section
             title="Акцент"
             hint="Цвет кнопок, активного пункта меню, флажков и рамки фокуса"
             data-tour="branding-accent"
@@ -163,6 +148,43 @@ export function BrandingPage() {
           </Section>
 
           <Section
+            title="Таблицы"
+            hint="Реестр приборов и журнал операций: сколько строк помещается на экран"
+            data-tour="branding-table"
+          >
+            <Stack gap={ 2 }>
+              <Stack gap={ 1.5 }>
+                { DENSITIES.map((item) => (
+                  <Stack key={ item.id } gap={ 0.25 }>
+                    <Radio
+                      name="branding-density"
+                      checked={ branding.density === item.id }
+                      onChange={ () => set("density", item.id) }
+                    >
+                      { item.label }
+                    </Radio>
+                    <Text variant="caption" tone="secondary" style={ { paddingLeft: 32 } }>
+                      { item.hint }
+                    </Text>
+                  </Stack>
+                )) }
+              </Stack>
+
+              <Stack gap={ 0.25 }>
+                <Checkbox
+                  checked={ branding.stripes }
+                  onChange={ (checked) => set("stripes", checked) }
+                >
+                  Чередовать фон строк
+                </Checkbox>
+                <Text variant="caption" tone="secondary" style={ { paddingLeft: 32 } }>
+                  В широкой таблице взгляд не теряет строку по дороге к правым столбцам
+                </Text>
+              </Stack>
+            </Stack>
+          </Section>
+
+          <Section
             title="Скругление"
             hint="Углы кнопок, полей и карточек"
             data-tour="branding-radius"
@@ -190,7 +212,7 @@ export function BrandingPage() {
               Вернуть исходное оформление
             </Button>
             <Text variant="caption" tone="secondary">
-              { standard ? "Сейчас стоит исходное оформление" : "Сбросит все пять настроек разом" }
+              { standard ? "Сейчас стоит исходное оформление" : "Сбросит все настройки разом" }
             </Text>
           </Stack>
         </Stack>

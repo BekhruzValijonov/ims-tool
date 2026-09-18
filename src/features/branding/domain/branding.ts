@@ -1,6 +1,8 @@
 import { contrast, ensureContrast, fromHsl, lighten, normalizeHex, readableOn, toHsl, toRgb } from "./color"
-import { DEFAULT_BRANDING, FONTS, NEUTRALS, RADII, fontOf, neutralOf, radiusOf } from "./presets"
-import type { Branding, FontId, NeutralId, RadiusId } from "./types"
+import {
+  DEFAULT_BRANDING, DENSITIES, FONTS, NEUTRALS, RADII, densityOf, fontOf, neutralOf, radiusOf,
+} from "./presets"
+import type { Branding, DensityId, FontId, NeutralId, RadiusId } from "./types"
 
 /** Насколько цвет должен отличаться от фона, чтобы кнопку было видно. */
 const MIN_AGAINST_BACKGROUND = 3
@@ -66,15 +68,15 @@ export function parseBranding(raw: string | null): Branding {
   if (typeof data !== "object" || data === null) return DEFAULT_BRANDING
 
   const record = data as Record<string, unknown>
-  const title = typeof record.title === "string" ? record.title.trim() : ""
   const accent = typeof record.accent === "string" ? normalizeHex(record.accent) : null
 
   return {
-    title: title === "" ? DEFAULT_BRANDING.title : title.slice(0, 40),
     accent: accent ?? DEFAULT_BRANDING.accent,
     font: pick<FontId>(record.font, FONTS, DEFAULT_BRANDING.font),
     neutral: pick<NeutralId>(record.neutral, NEUTRALS, DEFAULT_BRANDING.neutral),
     radius: pick<RadiusId>(record.radius, RADII, DEFAULT_BRANDING.radius),
+    density: pick<DensityId>(record.density, DENSITIES, DEFAULT_BRANDING.density),
+    stripes: typeof record.stripes === "boolean" ? record.stripes : DEFAULT_BRANDING.stripes,
   }
 }
 
@@ -94,6 +96,7 @@ export function brandingCss(branding: Branding): string {
   const neutral = neutralOf(branding.neutral)
   const radius = radiusOf(branding.radius)
   const font = fontOf(branding.font)
+  const density = densityOf(branding.density)
   const light = accentScale(branding.accent, "light", "#FFFFFF")
   const dark = accentScale(branding.accent, "dark", neutral.scale[800])
 
@@ -113,6 +116,8 @@ export function brandingCss(branding: Branding): string {
     `  --radius-card: ${ radius.card }px;`,
     `  --font-sans: ${ font.stack };`,
     `  --font-display: ${ font.stack };`,
+    `  --table-cell-y: ${ density.cell }px;`,
+    `  --table-stripe: ${ branding.stripes ? "rgba(var(--grey-500-rgb), 0.08)" : "transparent" };`,
     "}",
     "",
     "html:root[data-theme='dark'] {",

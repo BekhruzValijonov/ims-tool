@@ -5,7 +5,6 @@ import { NAVIGATION, activeItem } from "./navigation"
 import { OperatorGate } from "./OperatorGate"
 import { useAppState } from "./AppContext"
 import { useThemeMode } from "./ThemeMode"
-import { useBranding } from "../features/branding/ui/BrandingProvider"
 import { ROUTES } from "./routes"
 import { IconButton } from "../ui/Button"
 import { TextField } from "../ui/Field"
@@ -22,17 +21,12 @@ function initials(name: string): string {
 function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
   const { pathname } = useLocation()
   const { operatorName } = useAppState()
-  const { branding } = useBranding()
   const current = activeItem(pathname)
 
   return (
     <>
       <div className={ styles.brandRow }>
-        {/* Неразрывные пробелы: подпись предприятия не должна разваливаться
-            на две строки в узкой панели. */}
-        <span className={ styles.brand } title={ branding.title }>
-          { branding.title.replace(/ /g, "\u00A0") }
-        </span>
+        <span className={ styles.brand }>IMS&nbsp;Tool</span>
       </div>
 
       <nav className={ styles.nav } data-tour="app-nav">

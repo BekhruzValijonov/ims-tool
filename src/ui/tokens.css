@@ -97,6 +97,10 @@
   --font-display: var(--font-sans);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
+  /* Таблицы. Перекрываются «Брендированием». */
+  --table-cell-y: 12px;
+  --table-stripe: transparent;
+
   /* Размеры оболочки */
   --sidebar-width: 260px;
   --header-height: 72px;

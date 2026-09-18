@@ -60,10 +60,7 @@ export function BrandingProvider({ children }: { children: ReactNode }) {
     return () => { cancelled = true }
   }, [repo])
 
-  useEffect(() => {
-    applyCss(brandingCss(branding))
-    document.title = branding.title
-  }, [branding])
+  useEffect(() => applyCss(brandingCss(branding)), [branding])
 
   const save = useCallback(async (value: Branding) => {
     setBranding(value)

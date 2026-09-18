@@ -1,4 +1,4 @@
-import type { Branding, FontId, NeutralId, Option, RadiusId } from "./types"
+import type { Branding, DensityId, FontId, NeutralId, Option, RadiusId } from "./types"
 
 /**
  * Готовые наборы.
@@ -77,6 +77,14 @@ export const NEUTRALS: readonly (Option<NeutralId> & {
   },
 ]
 
+/* Высота строки задаётся полем сверху и снизу: столько же отводится шапке
+   таблицы, иначе она выбивается из ритма строк. */
+export const DENSITIES: readonly (Option<DensityId> & { cell: number })[] = [
+  { id: "roomy", label: "Просторные", hint: "Строки дышат, на экран помещается меньше", cell: 16 },
+  { id: "normal", label: "Обычные", hint: "Как в дизайн-системе", cell: 12 },
+  { id: "tight", label: "Плотные", hint: "Больше строк на экран — для длинных списков", cell: 7 },
+]
+
 export const RADII: readonly (Option<RadiusId> & { control: number; card: number })[] = [
   { id: "compact", label: "Строгое", hint: "4 и 10 пикселей — почти прямые углы", control: 4, card: 10 },
   { id: "normal", label: "Обычное", hint: "8 и 16 пикселей — как в дизайн-системе", control: 8, card: 16 },
@@ -94,11 +102,12 @@ export const ACCENTS: readonly { readonly value: string; readonly label: string 
 ]
 
 export const DEFAULT_BRANDING: Branding = {
-  title: "IMS Tool",
   accent: "#1B222B",
   font: "plex",
   neutral: "steel",
   radius: "normal",
+  density: "normal",
+  stripes: false,
 }
 
 export function fontOf(id: FontId) {
@@ -111,4 +120,8 @@ export function neutralOf(id: NeutralId) {
 
 export function radiusOf(id: RadiusId) {
   return RADII.find((item) => item.id === id) ?? RADII[1]
+}
+
+export function densityOf(id: DensityId) {
+  return DENSITIES.find((item) => item.id === id) ?? DENSITIES[1]
 }
