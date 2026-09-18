@@ -1,64 +1,65 @@
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Chip from "@mui/material/Chip"
+import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import { useTheme } from "@mui/material/styles"
+import Box from "@mui/material/Box"
 import { BarChart } from "@mui/x-charts/BarChart"
 import type { DepartmentSummary } from "../../directories/domain/types"
+import { useStateColors } from "../../../app/theme/useStateColors"
 
 /**
  * Приборы по подразделениям.
  *
- * Считается по балансовой принадлежности, а не по текущему месту: вопрос здесь
- * «сколько числится за цехом», а не «сколько физически лежит в цехе». Прибор,
+ * Считается по балансовой принадлежности, а не по текущему месту: вопрос
+ * здесь «сколько числится за цехом», а не «сколько физически в цехе». Прибор,
  * уехавший в лабораторию на неделю, продолжает числиться за своим цехом.
  */
 export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSummary[] }) {
-  const theme = useTheme()
+  const { series } = useStateColors()
   const rows = summary.filter((row) => row.total > 0)
-  const total = rows.reduce((sum, row) => sum + row.total, 0)
+  const SERIES = [
+    { id: "available", label: "В наличии", color: series.available },
+    { id: "checkedOut", label: "Выдано", color: series.checkedOut },
+    { id: "inRepair", label: "В ремонте", color: series.inRepair },
+    { id: "inVerification", label: "На поверке", color: series.inVerification },
+  ] as const
 
   return (
-    <Card variant="outlined" sx={ { width: "100%" } }>
-      <CardContent>
-        <Typography component="h2" variant="subtitle2" gutterBottom>Приборы по подразделениям</Typography>
-        <Stack sx={ { justifyContent: "space-between" } }>
-          <Stack direction="row" sx={ { alignItems: "center", gap: 1 } }>
-            <Typography variant="h4" component="p">{ total }</Typography>
-            <Chip size="small" label={ `${ rows.length } подразделений` }/>
+    <Paper sx={ { p: 2 } }>
+      <Typography variant="h6" component="h2">Числится за подразделениями</Typography>
+      <Typography variant="caption" sx={ { color: "text.secondary" } }>
+        Столбец — подразделение, цвет — состояние приборов
+      </Typography>
+
+      <Stack direction="row" sx={ { gap: 2, mt: 1.5, flexWrap: "wrap" } }>
+        { SERIES.map((series) => (
+          <Stack key={ series.id } direction="row" sx={ { alignItems: "center", gap: 0.75 } }>
+            <Box sx={ { width: 9, height: 9, borderRadius: "50%", backgroundColor: series.color } }/>
+            <Typography variant="caption" sx={ { color: "text.secondary" } }>{ series.label }</Typography>
           </Stack>
-          <Typography variant="caption" sx={ { color: "text.secondary" } }>
-            Числится за подразделением, с разбивкой по состоянию
-          </Typography>
-        </Stack>
-        <BarChart
-          borderRadius={ 8 }
-          colors={ [
-            theme.palette.primary.dark,
-            theme.palette.primary.main,
-            theme.palette.primary.light,
-            theme.palette.grey[400],
-          ] }
-          xAxis={ [{
-            scaleType: "band",
-            categoryGapRatio: 0.5,
-            data: rows.map((row) => row.name),
-            height: 24,
-          }] }
-          yAxis={ [{ width: 40 }] }
-          series={ [
-            { id: "available", label: "В наличии", data: rows.map((row) => row.available), stack: "A" },
-            { id: "checkedOut", label: "Выдано", data: rows.map((row) => row.checkedOut), stack: "A" },
-            { id: "inRepair", label: "В ремонте", data: rows.map((row) => row.inRepair), stack: "A" },
-            { id: "inVerification", label: "На поверке", data: rows.map((row) => row.inVerification), stack: "A" },
-          ] }
-          height={ 250 }
-          margin={ { left: 0, right: 0, top: 20, bottom: 0 } }
-          grid={ { horizontal: true } }
-          hideLegend
-        />
-      </CardContent>
-    </Card>
+        )) }
+      </Stack>
+
+      <BarChart
+        borderRadius={ 6 }
+        colors={ SERIES.map((series) => series.color) }
+        xAxis={ [{
+          scaleType: "band",
+          categoryGapRatio: 0.55,
+          data: rows.map((row) => row.name),
+          height: 24,
+        }] }
+        yAxis={ [{ width: 32 }] }
+        series={ SERIES.map((series) => ({
+          id: series.id,
+          label: series.label,
+          data: rows.map((row) => row[series.id]),
+          stack: "A",
+        })) }
+        height={ 232 }
+        margin={ { left: 0, right: 0, top: 16, bottom: 0 } }
+        grid={ { horizontal: true } }
+        hideLegend
+      />
+    </Paper>
   )
 }

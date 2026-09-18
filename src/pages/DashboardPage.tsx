@@ -1,24 +1,26 @@
+import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
 import Grid from "@mui/material/Grid"
+import Paper from "@mui/material/Paper"
+import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import Alert from "@mui/material/Alert"
-import Skeleton from "@mui/material/Skeleton"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
-import { StatCard } from "../features/dashboard/ui/StatCard"
-import { AttentionCard } from "../features/dashboard/ui/AttentionCard"
+import { PageHeader } from "../shared/ui/PageHeader"
+import { GaugeCluster, type Gauge } from "../features/dashboard/ui/GaugeCluster"
+import { AttentionStrip } from "../features/dashboard/ui/AttentionStrip"
 import { FlowChart } from "../features/dashboard/ui/FlowChart"
 import { DepartmentBarChart } from "../features/dashboard/ui/DepartmentBarChart"
 import { StatusDonut } from "../features/dashboard/ui/StatusDonut"
-import { LocationTree } from "../features/dashboard/ui/LocationTree"
+import { PlacementList } from "../features/dashboard/ui/PlacementList"
 import { OperationsGrid } from "../features/operations/ui/OperationsGrid"
 import { toOperationRows } from "../features/operations/ui/operationRows"
 import type { Instrument } from "../features/instruments/domain/types"
 import { DAY_MS } from "../shared/dates"
+import { COLORS } from "../app/theme/tokens"
+import { useStateColors } from "../app/theme/useStateColors"
 
 const WINDOW_DAYS = 30
 const RECENT_LIMIT = 8
@@ -32,6 +34,7 @@ function shortDate(date: string): string {
 export function DashboardPage() {
   const repo = useRepo()
   const directories = useDirectories()
+  const { series, dark } = useStateColors()
 
   const state = useAsync(async () => {
     const now = Date.now()
@@ -61,86 +64,65 @@ export function DashboardPage() {
 
   if (!state.data || !directories.data) {
     return (
-      <Grid container spacing={ 2 } columns={ 12 }>
-        { Array.from({ length: 4 }, (_, index) => (
-          <Grid key={ index } size={ { xs: 12, sm: 6, lg: 3 } }>
-            <Skeleton variant="rounded" height={ 160 }/>
-          </Grid>
-        )) }
-        <Grid size={ 12 }><Skeleton variant="rounded" height={ 320 }/></Grid>
-      </Grid>
+      <Box>
+        <PageHeader title="Дашборд"/>
+        <Skeleton variant="rounded" height={ 148 } sx={ { mb: 2 } }/>
+        <Skeleton variant="rounded" height={ 320 }/>
+      </Box>
     )
   }
 
   const { counters, history, flow, recent, breakdown, departments, locations, instruments } = state.data
   const labels = history.map((day) => shortDate(day.date))
-  const caption = "За последние 30 дней"
+
+  const gauges: Gauge[] = [
+    { key: "total", label: "Всего приборов", value: counters.total, color: dark ? COLORS.steelDark : COLORS.steel, series: history.map((day) => day.total) },
+    { key: "available", label: "В наличии", value: counters.available, color: series.available, series: history.map((day) => day.available) },
+    { key: "checked-out", label: "Выдано", value: counters.checkedOut, color: series.checkedOut, series: history.map((day) => day.checkedOut) },
+    { key: "in-repair", label: "В ремонте", value: counters.inRepair, color: series.inRepair, series: history.map((day) => day.inRepair) },
+  ]
 
   return (
-    <Box sx={ { width: "100%", maxWidth: { sm: "100%", md: "1700px" } } }>
-      <Typography component="h2" variant="h6" sx={ { mb: 2 } }>Обзор</Typography>
+    <Box>
+      <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
 
-      <Grid container spacing={ 2 } columns={ 12 } sx={ { mb: 2 } }>
-        <Grid size={ { xs: 12, sm: 6, lg: 3 } }>
-          <StatCard
-            title="Всего приборов" value={ counters.total } caption={ caption }
-            series={ history.map((day) => day.total) } labels={ labels }
-          />
-        </Grid>
-        <Grid size={ { xs: 12, sm: 6, lg: 3 } }>
-          <StatCard
-            title="В наличии" value={ counters.available } caption={ caption }
-            series={ history.map((day) => day.available) } labels={ labels }
-          />
-        </Grid>
-        <Grid size={ { xs: 12, sm: 6, lg: 3 } }>
-          <StatCard
-            title="Выдано" value={ counters.checkedOut } caption={ caption }
-            series={ history.map((day) => day.checkedOut) } labels={ labels }
-            growthIsGood={ false }
-          />
-        </Grid>
-        <Grid size={ { xs: 12, sm: 6, lg: 3 } }>
-          <StatCard
-            title="В ремонте" value={ counters.inRepair } caption={ caption }
-            series={ history.map((day) => day.inRepair) } labels={ labels }
-            growthIsGood={ false }
-          />
+      <Stack sx={ { gap: 2 } }>
+        <GaugeCluster gauges={ gauges } labels={ labels }/>
+        <AttentionStrip overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
+
+        <Grid container spacing={ 2 } columns={ 12 } sx={ { alignItems: "flex-start" } }>
+          <Grid size={ { xs: 12, lg: 7 } }>
+            <Stack sx={ { gap: 2 } }>
+              <FlowChart flow={ flow }/>
+              <DepartmentBarChart summary={ departments }/>
+            </Stack>
+          </Grid>
+          <Grid size={ { xs: 12, lg: 5 } }>
+            <Stack sx={ { gap: 2 } }>
+              <StatusDonut slices={ breakdown }/>
+              <PlacementList departments={ departments } locations={ locations }/>
+            </Stack>
+          </Grid>
         </Grid>
 
-        <Grid size={ { xs: 12, md: 8 } }>
-          <FlowChart flow={ flow }/>
-        </Grid>
-        <Grid size={ { xs: 12, md: 4 } }>
-          <AttentionCard overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
-        </Grid>
-
-        <Grid size={ { xs: 12, md: 8 } }>
-          <DepartmentBarChart summary={ departments }/>
-        </Grid>
-        <Grid size={ { xs: 12, md: 4 } }>
-          <StatusDonut slices={ breakdown }/>
-        </Grid>
-      </Grid>
-
-      <Typography component="h2" variant="h6" sx={ { mb: 2 } }>Последние операции</Typography>
-      <Grid container spacing={ 2 } columns={ 12 }>
-        <Grid size={ { xs: 12, lg: 9 } }>
-          <Card variant="outlined">
-            <CardContent sx={ { p: 0, "&:last-child": { pb: 0 } } }>
-              <OperationsGrid
-                rows={ toOperationRows(recent, instruments, directories.data) }
-                dense
-              />
-            </CardContent>
-          </Card>
-        </Grid>
-        <Grid size={ { xs: 12, lg: 3 } }>
-          <Stack direction={ { xs: "column", sm: "row", lg: "column" } } sx={ { gap: 2 } }>
-            <LocationTree departments={ departments } locations={ locations }/>
+        <Box>
+          <Stack
+            direction="row"
+            sx={ { alignItems: "baseline", justifyContent: "space-between", mb: 1 } }
+          >
+            <Typography variant="h5" component="h2">Последние операции</Typography>
+            <Typography variant="caption" sx={ { color: "text.secondary" } }>
+              Полный журнал — в разделе «Операции»
+            </Typography>
           </Stack>
-        </Grid>
-      </Grid>
+          <Paper>
+            <OperationsGrid
+              rows={ toOperationRows(recent, instruments, directories.data) }
+              dense
+            />
+          </Paper>
+        </Box>
+      </Stack>
     </Box>
   )
 }

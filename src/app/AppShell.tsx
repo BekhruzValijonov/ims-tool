@@ -9,7 +9,6 @@ import List from "@mui/material/List"
 import ListItemButton from "@mui/material/ListItemButton"
 import ListItemIcon from "@mui/material/ListItemIcon"
 import ListItemText from "@mui/material/ListItemText"
-import ListSubheader from "@mui/material/ListSubheader"
 import Stack from "@mui/material/Stack"
 import Toolbar from "@mui/material/Toolbar"
 import Tooltip from "@mui/material/Tooltip"
@@ -23,7 +22,7 @@ import { NAVIGATION, activeItem } from "./navigation"
 import { OperatorGate } from "./OperatorGate"
 import { useAppState } from "./AppContext"
 
-const DRAWER_WIDTH = 240
+const DRAWER_WIDTH = 228
 
 function ColorModeButton() {
   const { mode, setMode } = useColorScheme()
@@ -45,56 +44,62 @@ function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
 
   return (
     <Stack sx={ { height: "100%" } }>
-      <Toolbar sx={ { px: 2 } }>
-        <Typography variant="h6" component="div" sx={ { fontWeight: 700, letterSpacing: "-0.02em" } }>
-          IMS Tool
+      <Box sx={ { px: 2, py: 2.25 } }>
+        <Typography variant="h6" component="div" sx={ { letterSpacing: "-0.015em" } }>
+          IMS&nbsp;Tool
         </Typography>
-      </Toolbar>
-      <Divider/>
+        <Typography variant="caption" sx={ { color: "text.secondary" } }>
+          Учёт приборов
+        </Typography>
+      </Box>
 
-      <Box sx={ { overflowY: "auto", flexGrow: 1, py: 1 } }>
+      <Box sx={ { overflowY: "auto", flexGrow: 1, px: 1 } }>
         { NAVIGATION.map((section, index) => (
-          <List
-            key={ section.title ?? `section-${ index }` }
-            dense
-            disablePadding
-            sx={ { px: 1, pb: 1 } }
-            subheader={ section.title ? (
-              <ListSubheader
-                disableSticky
-                sx={ { bgcolor: "transparent", lineHeight: "32px", fontSize: 12 } }
+          <Box key={ section.title ?? `section-${ index }` } sx={ { mb: 1 } }>
+            { section.title ? (
+              <Typography
+                variant="caption"
+                component="p"
+                sx={ { color: "text.secondary", px: 1.5, pt: 1, pb: 0.5 } }
               >
                 { section.title }
-              </ListSubheader>
-            ) : undefined }
-          >
-            { section.title === null ? <Divider sx={ { mb: 1, mx: 1 } }/> : null }
-            { section.items.map((item) => (
-              <ListItemButton
-                key={ item.path }
-                component={ RouterLink }
-                to={ item.path }
-                selected={ current?.path === item.path }
-                onClick={ onNavigate }
-                sx={ { borderRadius: 1, mb: 0.25 } }
-              >
-                <ListItemIcon sx={ { minWidth: 36 } }>{ item.icon }</ListItemIcon>
-                <ListItemText primary={ item.title }/>
-              </ListItemButton>
-            )) }
-          </List>
+              </Typography>
+            ) : <Divider sx={ { mx: 1.5, mb: 1 } }/> }
+
+            <List dense disablePadding>
+              { section.items.map((item) => (
+                <ListItemButton
+                  key={ item.path }
+                  component={ RouterLink }
+                  to={ item.path }
+                  selected={ current?.path === item.path }
+                  onClick={ onNavigate }
+                  sx={ { mb: 0.25 } }
+                >
+                  <ListItemIcon sx={ { minWidth: 32, color: "inherit" } }>{ item.icon }</ListItemIcon>
+                  <ListItemText
+                    primary={ item.title }
+                    slotProps={ { primary: { variant: "body2" } } }
+                  />
+                </ListItemButton>
+              )) }
+            </List>
+          </Box>
         )) }
       </Box>
 
       <Divider/>
-      <Box sx={ { p: 2 } }>
-        <Typography variant="caption" sx={ { color: "text.secondary", display: "block" } }>
-          Оператор
-        </Typography>
-        <Typography variant="body2" noWrap title={ operatorName ?? "" }>
-          { operatorName ?? "не указан" }
-        </Typography>
-      </Box>
+      <Stack direction="row" sx={ { alignItems: "center", gap: 1, p: 1.5 } }>
+        <Box sx={ { minWidth: 0, flexGrow: 1 } }>
+          <Typography variant="caption" sx={ { color: "text.secondary", display: "block" } }>
+            Оператор
+          </Typography>
+          <Typography variant="body2" noWrap title={ operatorName ?? "" }>
+            { operatorName ?? "не указан" }
+          </Typography>
+        </Box>
+        <ColorModeButton/>
+      </Stack>
     </Stack>
   )
 }
@@ -102,15 +107,14 @@ function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
 /**
  * Оболочка приложения.
  *
- * Своя, а не из @toolpad/core: Toolpad собран под MUI 7 и в паре с MUI 9
- * протекал системными пропами в DOM. Здесь ровно то, что нужно, — боковая
- * панель, шапка и место под экран, — и никакой чужой версии в середине.
+ * Верхней панели на широком экране нет намеренно: она повторяла бы название
+ * раздела, которое и так подсвечено в меню, и съедала бы полосу высоты у
+ * таблиц. Заголовок несёт сам экран. На узком экране панель возвращается —
+ * там нужна кнопка меню.
  */
 export function AppShell() {
-  const { pathname } = useLocation()
   const [open, setOpen] = useState(false)
   const wide = useMediaQuery(useTheme().breakpoints.up("md"))
-  const current = activeItem(pathname)
 
   return (
     <Box sx={ { display: "flex", minHeight: "100vh" } }>
@@ -119,11 +123,14 @@ export function AppShell() {
         open={ wide || open }
         onClose={ () => setOpen(false) }
         sx={ {
-          width: DRAWER_WIDTH,
+          width: wide ? DRAWER_WIDTH : 0,
           flexShrink: 0,
           [`& .MuiDrawer-paper`]: {
             width: DRAWER_WIDTH,
             boxSizing: "border-box",
+            border: "none",
+            borderRight: 1,
+            borderColor: "divider",
             backgroundColor: "background.paper",
           },
         } }
@@ -132,26 +139,23 @@ export function AppShell() {
       </Drawer>
 
       <Box sx={ { flexGrow: 1, minWidth: 0, display: "flex", flexDirection: "column" } }>
-        <AppBar
-          position="sticky"
-          color="inherit"
-          elevation={ 0 }
-          sx={ { borderBottom: 1, borderColor: "divider", backgroundColor: "background.default" } }
-        >
-          <Toolbar sx={ { gap: 1 } }>
-            { wide ? null : (
+        { wide ? null : (
+          <AppBar
+            position="sticky"
+            color="inherit"
+            elevation={ 0 }
+            sx={ { border: "none", borderBottom: 1, borderColor: "divider" } }
+          >
+            <Toolbar variant="dense">
               <IconButton edge="start" onClick={ () => setOpen(true) }>
                 <MenuIcon/>
               </IconButton>
-            ) }
-            <Typography variant="subtitle1" sx={ { fontWeight: 600, flexGrow: 1 } }>
-              { current?.title ?? "IMS Tool" }
-            </Typography>
-            <ColorModeButton/>
-          </Toolbar>
-        </AppBar>
+              <Typography variant="subtitle1" sx={ { ml: 1 } }>IMS Tool</Typography>
+            </Toolbar>
+          </AppBar>
+        ) }
 
-        <Box component="main" sx={ { p: { xs: 2, md: 3 }, flexGrow: 1 } }>
+        <Box component="main" sx={ { p: { xs: 2, md: 3 }, flexGrow: 1, maxWidth: 1600 } }>
           <OperatorGate/>
           <Outlet/>
         </Box>

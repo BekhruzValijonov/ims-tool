@@ -3,13 +3,10 @@ import { useSearchParams } from "react-router-dom"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Chip from "@mui/material/Chip"
+import Paper from "@mui/material/Paper"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
@@ -23,6 +20,7 @@ import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
 import { DateField } from "../shared/ui/DateField"
+import { PageHeader } from "../shared/ui/PageHeader"
 
 const PAGE_SIZE = 25
 
@@ -98,26 +96,23 @@ export function OperationsPage() {
   const dirs = directories.data
 
   return (
-    <Box sx={ { width: "100%", maxWidth: { sm: "100%", md: "1700px" } } }>
-      <Stack
-        direction="row"
-        sx={ { justifyContent: "space-between", alignItems: "center", mb: 2, gap: 2, flexWrap: "wrap" } }
-      >
-        <Typography component="h2" variant="h6">
-          Операции
-          { state.data ? <Chip size="small" sx={ { ml: 1 } } label={ state.data.journal.total }/> : null }
-        </Typography>
-        <Button
-          variant="outlined" size="small" startIcon={ <FileDownloadIcon/> }
-          onClick={ exportCsv } disabled={ exporting || !dirs }
-        >
-          Экспорт
-        </Button>
-      </Stack>
+    <Box>
+      <PageHeader
+        title="Операции"
+        count={ state.data?.journal.total }
+        hint="Всё, что происходило с приборами: выдачи, возвраты, перемещения, ремонты и поверки"
+        actions={
+          <Button
+            variant="outlined" size="small" startIcon={ <FileDownloadIcon/> }
+            onClick={ exportCsv } disabled={ exporting || !dirs }
+          >
+            Экспорт
+          </Button>
+        }
+      />
 
-      <Card variant="outlined" sx={ { mb: 2 } }>
-        <CardContent>
-          <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
+      <Paper sx={ { p: 2, mb: 2 } }>
+        <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
             <TextField
               size="small" select label="Операция" sx={ { minWidth: 180 } }
               value={ params.get("kind") ?? "" }
@@ -158,26 +153,23 @@ export function OperationsPage() {
               value={ params.get("to") ?? "" }
               onChange={ (value) => setParam("to", value) }
             />
-          </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
+      </Paper>
 
       { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
 
-      <Card variant="outlined">
-        <CardContent sx={ { p: 0, "&:last-child": { pb: 0 } } }>
-          { dirs && state.data ? (
+      <Paper>
+        { dirs && state.data ? (
             <OperationsGrid
               rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }
               loading={ state.loading }
               rowCount={ state.data.journal.total }
               page={ page }
               pageSize={ PAGE_SIZE }
-              onPageChange={ setPage }
-            />
-          ) : null }
-        </CardContent>
-      </Card>
+            onPageChange={ setPage }
+          />
+        ) : null }
+      </Paper>
     </Box>
   )
 }

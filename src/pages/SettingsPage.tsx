@@ -2,13 +2,13 @@ import { useState } from "react"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
+import Paper from "@mui/material/Paper"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
 import Typography from "@mui/material/Typography"
 import { useAppState } from "../app/AppContext"
 import { VERIFICATION_HORIZON_DAYS } from "../data/settingsKeys"
+import { PageHeader } from "../shared/ui/PageHeader"
 
 const BACKEND_LABELS: Record<string, string> = {
   sqlite: "Файл SQLite в каталоге данных приложения",
@@ -26,12 +26,11 @@ export function SettingsPage() {
   }
 
   return (
-    <Box sx={ { width: "100%", maxWidth: 760 } }>
-      <Typography component="h2" variant="h6" sx={ { mb: 2 } }>Настройки</Typography>
+    <Box sx={ { maxWidth: 760 } }>
+      <PageHeader title="Настройки"/>
 
-      <Card variant="outlined" sx={ { mb: 2 } }>
-        <CardContent>
-          <Typography component="h3" variant="subtitle2" gutterBottom>Оператор</Typography>
+      <Paper sx={ { p: 2, mb: 2 } }>
+          <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Оператор</Typography>
           <Typography variant="body2" sx={ { color: "text.secondary", mb: 2 } }>
             Этим именем подписываются новые записи журнала. Уже сделанные записи останутся
             подписанными тем, кто их внёс: смена имени не переписывает прошлое.
@@ -51,18 +50,15 @@ export function SettingsPage() {
             </Button>
           </Stack>
           { saved ? <Alert severity="success" sx={ { mt: 2 } }>Имя оператора сохранено</Alert> : null }
-        </CardContent>
-      </Card>
+      </Paper>
 
-      <Card variant="outlined">
-        <CardContent>
-          <Typography component="h3" variant="subtitle2" gutterBottom>Хранилище</Typography>
+      <Paper sx={ { p: 2 } }>
+          <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Хранилище</Typography>
           <Typography variant="body2">{ BACKEND_LABELS[backend] ?? backend }</Typography>
           <Typography variant="body2" sx={ { color: "text.secondary", mt: 2 } }>
             Прибор попадает в список «истекает поверка» за { VERIFICATION_HORIZON_DAYS } дней до конца срока.
           </Typography>
-        </CardContent>
-      </Card>
+      </Paper>
     </Box>
   )
 }

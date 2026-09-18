@@ -2,9 +2,7 @@ import { useState, type FormEvent } from "react"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Chip from "@mui/material/Chip"
+import Paper from "@mui/material/Paper"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -14,9 +12,9 @@ import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import Switch from "@mui/material/Switch"
 import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import AddIcon from "@mui/icons-material/Add"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
+import { PageHeader } from "../../../shared/ui/PageHeader"
 
 export type FieldSpec =
   | { kind: "text"; key: string; label: string; required?: boolean; helper?: string }
@@ -29,6 +27,8 @@ export type FormValues = Record<string, string | boolean>
 interface DirectoryScreenProps<T extends { id: string }> {
   readonly title: string
   readonly addLabel: string
+  /** Одна строка о том, зачем справочник нужен. */
+  readonly hint?: string
   readonly rows: readonly T[]
   readonly columns: readonly GridColDef<T>[]
   readonly fields: readonly FieldSpec[]
@@ -54,7 +54,7 @@ interface DirectoryScreenProps<T extends { id: string }> {
  * запись перестаёт предлагаться в формах, но прошлое остаётся читаемым.
  */
 export function DirectoryScreen<T extends { id: string }>({
-  title, addLabel, rows, columns, fields, loading, error,
+  title, addLabel, hint, rows, columns, fields, loading, error,
   toForm, onSave, archiveLabel, isArchived, onArchive,
 }: DirectoryScreenProps<T>) {
   const [editing, setEditing] = useState<T | null>(null)
@@ -115,34 +115,33 @@ export function DirectoryScreen<T extends { id: string }>({
   ]
 
   return (
-    <Box sx={ { width: "100%", maxWidth: { sm: "100%", md: "1700px" } } }>
-      <Stack direction="row" sx={ { justifyContent: "space-between", alignItems: "center", mb: 2 } }>
-        <Typography component="h2" variant="h6">
-          { title }
-          <Chip size="small" sx={ { ml: 1 } } label={ rows.length }/>
-        </Typography>
-        <Button variant="contained" size="small" startIcon={ <AddIcon/> } onClick={ openCreate }>
-          { addLabel }
-        </Button>
-      </Stack>
+    <Box>
+      <PageHeader
+        title={ title }
+        count={ rows.length }
+        hint={ hint }
+        actions={
+          <Button variant="contained" size="small" startIcon={ <AddIcon/> } onClick={ openCreate }>
+            { addLabel }
+          </Button>
+        }
+      />
 
       { error ? <Alert severity="error" sx={ { mb: 2 } }>{ error }</Alert> : null }
 
-      <Card variant="outlined">
-        <CardContent sx={ { p: 0, "&:last-child": { pb: 0 } } }>
-          <DataGrid
-            rows={ [...rows] }
-            columns={ gridColumns }
-            loading={ loading }
-            density="compact"
-            disableColumnResize
-            disableRowSelectionOnClick
-            initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
-            pageSizeOptions={ [25, 50] }
-            sx={ { border: 0 } }
-          />
-        </CardContent>
-      </Card>
+      <Paper>
+        <DataGrid
+          rows={ [...rows] }
+          columns={ gridColumns }
+          loading={ loading }
+          rowHeight={ 40 }
+          columnHeaderHeight={ 40 }
+          disableColumnResize
+          disableRowSelectionOnClick
+          initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
+          pageSizeOptions={ [25, 50] }
+        />
+      </Paper>
 
       <Dialog open={ creating } onClose={ busy ? undefined : () => setCreating(false) } maxWidth="xs" fullWidth>
         <form onSubmit={ submit }>

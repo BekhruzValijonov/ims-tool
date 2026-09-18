@@ -1,11 +1,12 @@
 import { useNavigate } from "react-router-dom"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
-import Chip from "@mui/material/Chip"
 import Link from "@mui/material/Link"
-import Tooltip from "@mui/material/Tooltip"
+import Typography from "@mui/material/Typography"
 import type { Instrument } from "../domain/types"
-import { STATUS_COLORS, STATUS_LABELS } from "../domain/labels"
+import { StatusMark } from "./StatusMark"
 import { formatDate } from "../../../shared/dates"
+import { MONO_CELL, monoSx } from "../../../shared/ui/dataText"
+import { useStateColors } from "../../../app/theme/useStateColors"
 import { ROUTES } from "../../../app/routes"
 import type { Directories } from "../../directories/ui/useDirectories"
 
@@ -23,18 +24,20 @@ export function InstrumentsGrid({
   rows, directories, loading, rowCount, page, pageSize, onPageChange,
 }: InstrumentsGridProps) {
   const navigate = useNavigate()
+  const { state } = useStateColors()
   const now = Date.now()
 
   const columns: GridColDef<Instrument>[] = [
     {
       field: "inventoryNumber",
       headerName: "Инв. номер",
-      width: 130,
+      width: 126,
+      cellClassName: MONO_CELL,
       renderCell: (params) => (
         <Link
           component="button"
           type="button"
-          underline="hover"
+          sx={ monoSx }
           onClick={ () => navigate(ROUTES.instrument(params.row.id)) }
         >
           { params.value }
@@ -51,16 +54,9 @@ export function InstrumentsGrid({
     },
     {
       field: "status",
-      headerName: "Статус",
+      headerName: "Состояние",
       width: 130,
-      renderCell: (params) => (
-        <Chip
-          size="small"
-          label={ STATUS_LABELS[params.row.status] }
-          color={ STATUS_COLORS[params.row.status] }
-          variant="outlined"
-        />
-      ),
+      renderCell: (params) => <StatusMark status={ params.row.status }/>,
     },
     {
       field: "currentDepartmentId",
@@ -86,16 +82,21 @@ export function InstrumentsGrid({
     {
       field: "expectedReturnAt",
       headerName: "Вернуть до",
-      width: 120,
+      width: 118,
+      cellClassName: MONO_CELL,
       renderCell: (params) => {
         const due = params.row.expectedReturnAt
         if (due === null) return "—"
+        /* Просрочка помечается цветом самой даты, а не пилюлей: в столбце дат
+           пилюля ломает выравнивание и мешает сравнивать сроки. */
         const overdue = params.row.status === "CHECKED_OUT" && due < now
-        if (!overdue) return formatDate(due)
         return (
-          <Tooltip title="Срок возврата прошёл">
-            <Chip size="small" color="error" label={ formatDate(due) }/>
-          </Tooltip>
+          <Typography
+            component="span"
+            sx={ { ...monoSx, fontSize: "inherit", color: overdue ? state.signal : "inherit", fontWeight: overdue ? 500 : 400 } }
+          >
+            { formatDate(due) }
+          </Typography>
         )
       },
     },
@@ -106,7 +107,8 @@ export function InstrumentsGrid({
       rows={ [...rows] }
       columns={ columns }
       loading={ loading }
-      density="compact"
+      rowHeight={ 40 }
+      columnHeaderHeight={ 40 }
       disableColumnResize
       disableRowSelectionOnClick
       rowCount={ rowCount }
@@ -114,7 +116,6 @@ export function InstrumentsGrid({
       paginationModel={ { page, pageSize } }
       onPaginationModelChange={ (model) => onPageChange(model.page) }
       pageSizeOptions={ [pageSize] }
-      sx={ { border: 0 } }
     />
   )
 }

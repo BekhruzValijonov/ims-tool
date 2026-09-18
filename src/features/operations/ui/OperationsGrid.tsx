@@ -3,6 +3,7 @@ import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import Link from "@mui/material/Link"
 import type { OperationRow } from "./operationRows"
 import { formatDateTime } from "../../../shared/dates"
+import { MONO_CELL, monoSx } from "../../../shared/ui/dataText"
 import { ROUTES } from "../../../app/routes"
 
 interface OperationsGridProps {
@@ -24,18 +25,20 @@ export function OperationsGrid({
     {
       field: "occurredAt",
       headerName: "Когда",
-      width: 150,
+      width: 166,
+      cellClassName: MONO_CELL,
       valueFormatter: (value: number) => formatDateTime(value),
     },
     {
       field: "inventoryNumber",
       headerName: "Инв. номер",
-      width: 130,
+      width: 126,
+      cellClassName: MONO_CELL,
       renderCell: (params) => (
         <Link
           component="button"
           type="button"
-          underline="hover"
+          sx={ monoSx }
           onClick={ () => navigate(ROUTES.instrument(params.row.instrumentId)) }
         >
           { params.value }
@@ -59,7 +62,8 @@ export function OperationsGrid({
       rows={ [...rows] }
       columns={ columns }
       loading={ loading }
-      density="compact"
+      rowHeight={ 40 }
+      columnHeaderHeight={ 40 }
       disableColumnResize
       disableRowSelectionOnClick
       hideFooter={ !serverSide }
@@ -68,7 +72,6 @@ export function OperationsGrid({
       paginationModel={ serverSide ? { page, pageSize } : undefined }
       onPaginationModelChange={ serverSide ? (model) => onPageChange?.(model.page) : undefined }
       pageSizeOptions={ [pageSize] }
-      sx={ { border: 0 } }
     />
   )
 }

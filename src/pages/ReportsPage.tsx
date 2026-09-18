@@ -3,9 +3,8 @@ import Alert from "@mui/material/Alert"
 import Autocomplete from "@mui/material/Autocomplete"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardActionArea from "@mui/material/CardActionArea"
-import CardContent from "@mui/material/CardContent"
+import ButtonBase from "@mui/material/ButtonBase"
+import Paper from "@mui/material/Paper"
 import Grid from "@mui/material/Grid"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
@@ -21,6 +20,7 @@ import { csvFileName, toCsv } from "../shared/csv"
 import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS } from "../shared/dates"
 import { DateField } from "../shared/ui/DateField"
+import { PageHeader } from "../shared/ui/PageHeader"
 
 function toDateInput(timestamp: number): string {
   const date = new Date(timestamp)
@@ -77,28 +77,38 @@ export function ReportsPage() {
   }
 
   return (
-    <Box sx={ { width: "100%", maxWidth: { sm: "100%", md: "1700px" } } }>
-      <Typography component="h2" variant="h6" sx={ { mb: 2 } }>Отчёты</Typography>
+    <Box>
+      <PageHeader title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"/>
 
-      <Grid container spacing={ 2 } columns={ 12 } sx={ { mb: 2 } }>
-        { REPORTS.map((item) => (
-          <Grid key={ item.id } size={ { xs: 12, sm: 6, lg: 4 } }>
-            <Card variant={ item.id === selected ? "elevation" : "outlined" } sx={ { height: "100%" } }>
-              <CardActionArea sx={ { height: "100%" } } onClick={ () => setSelected(item.id) }>
-                <CardContent>
-                  <Typography variant="subtitle2">{ item.title }</Typography>
-                  <Typography variant="caption" sx={ { color: "text.secondary" } }>
-                    { item.description }
-                  </Typography>
-                </CardContent>
-              </CardActionArea>
-            </Card>
-          </Grid>
-        )) }
+      <Grid container spacing={ 1.5 } columns={ 12 } sx={ { mb: 2 } }>
+        { REPORTS.map((item) => {
+          const active = item.id === selected
+          return (
+            <Grid key={ item.id } size={ { xs: 12, sm: 6, lg: 4 } }>
+              <ButtonBase
+                onClick={ () => setSelected(item.id) }
+                sx={ {
+                  width: "100%", height: "100%", textAlign: "left", display: "block",
+                  p: 1.5, borderRadius: 1,
+                  border: 1,
+                  borderColor: active ? "text.primary" : "divider",
+                  backgroundColor: "background.paper",
+                  /* Выбранный отчёт отмечен планкой слева и рамкой потемнее —
+                     тем же приёмом, что и текущий раздел в меню. */
+                  boxShadow: active ? (theme) => `inset 3px 0 0 ${ theme.palette.text.primary }` : "none",
+                } }
+              >
+                <Typography variant="subtitle2">{ item.title }</Typography>
+                <Typography variant="caption" sx={ { color: "text.secondary", display: "block" } }>
+                  { item.description }
+                </Typography>
+              </ButtonBase>
+            </Grid>
+          )
+        }) }
       </Grid>
 
-      <Card variant="outlined" sx={ { mb: 2 } }>
-        <CardContent>
+      <Paper sx={ { p: 2, mb: 2 } }>
           <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap", alignItems: "center" } }>
             <Typography variant="subtitle2" sx={ { minWidth: 220 } }>{ report.title }</Typography>
 
@@ -142,31 +152,29 @@ export function ReportsPage() {
             </Button>
           </Stack>
 
-          { state.data ? (
-            <Typography variant="caption" sx={ { color: "text.secondary", mt: 1, display: "block" } }>
-              { state.data.summary }
-            </Typography>
-          ) : null }
-        </CardContent>
-      </Card>
+        { state.data ? (
+          <Typography variant="body2" sx={ { color: "text.secondary", mt: 1.5 } }>
+            { state.data.summary }
+          </Typography>
+        ) : null }
+      </Paper>
 
       { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
 
-      <Card variant="outlined">
-        <CardContent sx={ { p: 0, "&:last-child": { pb: 0 } } }>
-          <DataGrid
-            rows={ [...(state.data?.rows ?? [])] }
-            columns={ [...(state.data?.columns ?? [])] }
-            loading={ state.loading }
-            density="compact"
-            disableColumnResize
-            disableRowSelectionOnClick
-            initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
-            pageSizeOptions={ [25, 50, 100] }
-            sx={ { border: 0, minHeight: 320 } }
-          />
-        </CardContent>
-      </Card>
+      <Paper>
+        <DataGrid
+          rows={ [...(state.data?.rows ?? [])] }
+          columns={ [...(state.data?.columns ?? [])] }
+          loading={ state.loading }
+          rowHeight={ 40 }
+          columnHeaderHeight={ 40 }
+          disableColumnResize
+          disableRowSelectionOnClick
+          initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
+          pageSizeOptions={ [25, 50, 100] }
+          sx={ { minHeight: 320 } }
+        />
+      </Paper>
     </Box>
   )
 }

@@ -11,6 +11,11 @@ import type { AppRepo } from "../data/AppRepo"
  * в том, что ни один из них не остался с демо-цифрами шаблона и что экран
  * переживает пустую базу — в первый день на заводе она именно такая.
  */
+/** Ячейка приборной панели: слово «Выдано» встречается и в легенде графика. */
+function gauge(key: string): HTMLElement | null {
+  return document.querySelector(`[data-gauge="${ key }"]`)
+}
+
 async function withRepo(fill?: (repo: AppRepo) => Promise<void>) {
   const repo = new MemoryRepo()
   await repo.settings.setOperatorName("Петров Пётр Петрович")
@@ -53,13 +58,11 @@ describe("дашборд", () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByText("Всего приборов")).toBeInTheDocument())
+    await waitFor(() => expect(gauge("total")).not.toBeNull())
 
-    const total = screen.getByText("Всего приборов").closest(".MuiCard-root")
-    expect(total).toHaveTextContent("3")
-
-    const issued = screen.getByText("Выдано").closest(".MuiCard-root")
-    expect(issued).toHaveTextContent("1")
+    expect(gauge("total")).toHaveTextContent("3")
+    expect(gauge("checked-out")).toHaveTextContent("1")
+    expect(gauge("available")).toHaveTextContent("2")
 
     // Журнал последних операций подтянул инвентарные номера, а не идентификаторы.
     await waitFor(() => expect(screen.getAllByText("PR-001").length).toBeGreaterThan(0))
@@ -84,13 +87,12 @@ describe("дашборд", () => {
       }
     })
 
-    await waitFor(() => expect(screen.getByText("Всего приборов")).toBeInTheDocument())
+    await waitFor(() => expect(gauge("total")).not.toBeNull())
 
-    const total = screen.getByText("Всего приборов").closest(".MuiCard-root")
-    expect(total).toHaveTextContent("2")
+    expect(gauge("total")).toHaveTextContent("2")
 
     // Число в центре бублика — то же самое «всего», и расходиться оно не имеет права.
-    const park = screen.getByText("Состояние парка").closest(".MuiCard-root")
+    const park = screen.getByText("Состояние парка").closest(".MuiPaper-root")
     expect(park).toHaveTextContent("2")
     expect(park).toHaveTextContent("Списано за всё время: 1")
   })
@@ -98,11 +100,10 @@ describe("дашборд", () => {
   it("переживает пустую базу и не показывает выдуманных чисел", async () => {
     await withRepo()
 
-    await waitFor(() => expect(screen.getByText("Всего приборов")).toBeInTheDocument())
+    await waitFor(() => expect(gauge("total")).not.toBeNull())
 
-    const total = screen.getByText("Всего приборов").closest(".MuiCard-root")
-    expect(total).toHaveTextContent("0")
-    expect(screen.getByText("Требует внимания")).toBeInTheDocument()
+    expect(gauge("total")).toHaveTextContent("0")
+    expect(screen.getByText("Не вернули в срок")).toBeInTheDocument()
     expect(screen.queryByText("13,277")).not.toBeInTheDocument()
   })
 })

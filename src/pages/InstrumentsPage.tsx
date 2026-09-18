@@ -3,13 +3,10 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Card from "@mui/material/Card"
-import CardContent from "@mui/material/CardContent"
-import Chip from "@mui/material/Chip"
+import Paper from "@mui/material/Paper"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
-import Typography from "@mui/material/Typography"
 import AddIcon from "@mui/icons-material/Add"
 import FileDownloadIcon from "@mui/icons-material/FileDownload"
 import { useRepo } from "../app/AppContext"
@@ -24,6 +21,7 @@ import { formatDate, DAY_MS } from "../shared/dates"
 import { DateField } from "../shared/ui/DateField"
 import { VERIFICATION_HORIZON_MS } from "../data/settingsKeys"
 import { ROUTES } from "../app/routes"
+import { PageHeader } from "../shared/ui/PageHeader"
 
 const PAGE_SIZE = 25
 
@@ -100,16 +98,11 @@ export function InstrumentsPage() {
   const filters = directories.data
 
   return (
-    <Box sx={ { width: "100%", maxWidth: { sm: "100%", md: "1700px" } } }>
-      <Stack
-        direction="row"
-        sx={ { justifyContent: "space-between", alignItems: "center", mb: 2, gap: 2, flexWrap: "wrap" } }
-      >
-        <Typography component="h2" variant="h6">
-          Приборы
-          { state.data ? <Chip size="small" sx={ { ml: 1 } } label={ state.data.total }/> : null }
-        </Typography>
-        <Stack direction="row" sx={ { gap: 1 } }>
+    <Box>
+      <PageHeader
+        title="Приборы"
+        count={ state.data?.total }
+        actions={ <>
           <Button
             variant="outlined"
             size="small"
@@ -127,12 +120,11 @@ export function InstrumentsPage() {
           >
             Добавить прибор
           </Button>
-        </Stack>
-      </Stack>
+        </> }
+      />
 
-      <Card variant="outlined" sx={ { mb: 2 } }>
-        <CardContent>
-          <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
+      <Paper sx={ { p: 2, mb: 2 } }>
+        <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
             <TextField
               size="small" label="Поиск" placeholder="Название, инв. или серийный номер"
               sx={ { minWidth: 260 } }
@@ -216,15 +208,13 @@ export function InstrumentsPage() {
               <MenuItem value="overdue">Не вернули в срок</MenuItem>
               <MenuItem value="verification">Истекает поверка</MenuItem>
             </TextField>
-          </Stack>
-        </CardContent>
-      </Card>
+        </Stack>
+      </Paper>
 
       { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
 
-      <Card variant="outlined">
-        <CardContent sx={ { p: 0, "&:last-child": { pb: 0 } } }>
-          { filters ? (
+      <Paper>
+        { filters ? (
             <InstrumentsGrid
               rows={ state.data?.rows ?? [] }
               directories={ filters }
@@ -232,11 +222,10 @@ export function InstrumentsPage() {
               rowCount={ state.data?.total ?? 0 }
               page={ page }
               pageSize={ PAGE_SIZE }
-              onPageChange={ setPage }
-            />
-          ) : null }
-        </CardContent>
-      </Card>
+            onPageChange={ setPage }
+          />
+        ) : null }
+      </Paper>
     </Box>
   )
 }

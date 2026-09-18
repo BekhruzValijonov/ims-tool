@@ -36,6 +36,7 @@ export function LocationsPage() {
     <DirectoryScreen<StorageLocation>
       title="Места хранения"
       addLabel="Добавить место"
+      hint="Шкафы, стеллажи и верстаки. Сюда прибор возвращается после выдачи"
       rows={ state.data ?? [] }
       columns={ columns }
       loading={ state.loading }

@@ -23,6 +23,7 @@ import type { VerificationKind, VerificationResult } from "../../verification/do
 import { CONDITION_LABELS, OPERATION_LABELS, operationErrorText } from "../domain/labels"
 import { addMonths, formatDate } from "../../../shared/dates"
 import { DateField } from "../../../shared/ui/DateField"
+import { monoSx } from "../../../shared/ui/dataText"
 
 interface OperationDialogProps {
   readonly instrument: Instrument
@@ -165,9 +166,12 @@ export function OperationDialog({ instrument, kind, directories, onClose, onDone
       <form onSubmit={ submit }>
         <DialogTitle>{ OPERATION_LABELS[kind] }</DialogTitle>
         <DialogContent>
-          <Typography variant="body2" sx={ { color: "text.secondary", mb: 2 } }>
-            { instrument.inventoryNumber } · { instrument.name }
-          </Typography>
+          <Stack direction="row" sx={ { gap: 1, alignItems: "baseline", mb: 2 } }>
+            <Typography variant="body2" sx={ { ...monoSx, color: "text.secondary" } }>
+              { instrument.inventoryNumber }
+            </Typography>
+            <Typography variant="body2">{ instrument.name }</Typography>
+          </Stack>
 
           <Stack sx={ { gap: 2 } }>
             { kind === "CHECK_OUT" && (

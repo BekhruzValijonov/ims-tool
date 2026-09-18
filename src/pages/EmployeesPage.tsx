@@ -76,6 +76,7 @@ export function EmployeesPage() {
     <DirectoryScreen<Employee>
       title="Сотрудники"
       addLabel="Добавить сотрудника"
+      hint="Кому можно выдавать приборы. Уволенный остаётся в списке — в журнале есть его выдачи"
       rows={ state.data?.employees ?? [] }
       columns={ columns }
       loading={ state.loading }
