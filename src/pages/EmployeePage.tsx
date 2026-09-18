@@ -75,9 +75,12 @@ export function EmployeePage() {
         <TourButton tour="employee"/>
       </Stack>
 
-      <Stack row gap={ 2 } wrap align="stretch">
-        <Stack gap={ 2 } style={ { flex: "2 1 300px", minWidth: 0 } }>
-          <Card data-tour="employee-card">
+      {/* Сведения о человеке — рядом, история — во всю ширину под ними: в
+          колонке на треть экрана таблица из шести столбцов не помещалась и
+          возила вбок собственной полосой прокрутки, чего нет больше нигде. */}
+      <Stack gap={ 2 }>
+        <Stack row gap={ 2 } wrap align="stretch">
+          <Card data-tour="employee-card" style={ { flex: "1 1 320px", minWidth: 0 } }>
             <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Сотрудник</Text>
             <Stack gap={ 0.75 }>
               <Text>Подразделение: { dirs?.departmentName(employee.departmentId) ?? "—" }</Text>
@@ -87,7 +90,7 @@ export function EmployeePage() {
             </Stack>
           </Card>
 
-          <Card data-tour="employee-on-hands">
+          <Card data-tour="employee-on-hands" style={ { flex: "1 1 320px", minWidth: 0 } }>
             <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>
               Сейчас на руках: { onHands.length }
             </Text>
@@ -142,14 +145,12 @@ export function EmployeePage() {
           </Card>
         </Stack>
 
-        <div style={ { flex: "3 1 420px", minWidth: 0 } }>
-          <Card padding="none" data-tour="employee-history">
-            <Text variant="h6" as="h2" style={ { padding: "20px 20px 8px" } }>История выдач</Text>
-            { dirs ? (
-              <OperationsTable rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
-            ) : null }
-          </Card>
-        </div>
+        <Card padding="none" data-tour="employee-history">
+          <Text variant="h6" as="h2" style={ { padding: "20px 20px 8px" } }>История выдач</Text>
+          { dirs ? (
+            <OperationsTable rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
+          ) : null }
+        </Card>
       </Stack>
     </Page>
   )
