@@ -47,7 +47,7 @@ function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
     <Stack sx={ { height: "100%" } }>
       <Toolbar sx={ { px: 2 } }>
         <Typography variant="h6" component="div" sx={ { fontWeight: 700, letterSpacing: "-0.02em" } }>
-          MAXAM IMS
+          IMS Tool
         </Typography>
       </Toolbar>
       <Divider/>
@@ -145,7 +145,7 @@ export function AppShell() {
               </IconButton>
             ) }
             <Typography variant="subtitle1" sx={ { fontWeight: 600, flexGrow: 1 } }>
-              { current?.title ?? "MAXAM IMS" }
+              { current?.title ?? "IMS Tool" }
             </Typography>
             <ColorModeButton/>
           </Toolbar>

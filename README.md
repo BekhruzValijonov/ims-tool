@@ -1,4 +1,4 @@
-# MAXAM IMS
+# IMS Tool
 
 Настольное приложение для учёта измерительных приборов на заводе: реестр,
 журнал движений и отчёты. Tauri 2 + React 19 + MUI, база — один файл SQLite на
@@ -14,7 +14,7 @@
 Ни на один из них таблица «текущее состояние» без истории ответить не может,
 поэтому журнал операций — центральная сущность, а не побочный лог.
 
-Полный дизайн — [docs/superpowers/specs/2026-09-18-maxam-ims-design.md](docs/superpowers/specs/2026-09-18-maxam-ims-design.md).
+Полный дизайн — [docs/superpowers/specs/2026-09-18-ims-tool-design.md](docs/superpowers/specs/2026-09-18-ims-tool-design.md).
 
 ## Принципы
 
