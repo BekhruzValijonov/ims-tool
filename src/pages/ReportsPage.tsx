@@ -74,14 +74,20 @@ export function ReportsPage() {
   }
 
   return (
-    <Page>
+    <Page fill>
       <PageHeader
         title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его книгой Excel"
         tour="reports"
       />
 
+      {/* Только названия: описание выбранного отчёта стоит ниже, у его
+          параметров. Шесть описаний разом съедали половину экрана, и на таблицу
+          — то, ради чего сюда приходят, — оставалось четыре строки. */}
+      {/* Выбор и параметры не сжимаются: на невысоком окне флексбокс иначе
+          отбирает высоту у них, и поля с кнопками выгрузки просто пропадают. */}
       <Grid
-        cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1.5 } style={ { marginBottom: 16 } }
+        cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1 }
+        style={ { marginBottom: 16, flexShrink: 0 } }
         data-tour="reports-list"
       >
         { REPORTS.map((item) => {
@@ -90,38 +96,41 @@ export function ReportsPage() {
             <button
               key={ item.id }
               type="button"
+              aria-pressed={ active }
               onClick={ () => setSelected(item.id) }
               style={ {
-                width: "100%", height: "100%", textAlign: "left", cursor: "pointer",
-                padding: 16, borderRadius: "var(--radius-card)",
-                background: "var(--bg-paper)",
-                border: `1px solid ${ active ? "var(--accent)" : "transparent" }`,
-                boxShadow: "var(--shadow-card)",
+                width: "100%", textAlign: "left", cursor: "pointer",
+                padding: "10px 16px", borderRadius: "var(--radius)",
+                background: active ? "var(--action-selected)" : "var(--bg-paper)",
+                border: `1px solid ${ active ? "var(--accent)" : "var(--divider)" }`,
+                color: "var(--text-primary)",
               } }
             >
               <Text variant="subtitle2">{ item.title }</Text>
-              <Text variant="caption" tone="secondary" style={ { display: "block", marginTop: 4 } }>
-                { item.description }
-              </Text>
             </button>
           )
         }) }
       </Grid>
 
-      <Card padding="tight" className="mb-2" data-tour="reports-params">
-        <Stack row gap={ 2 } wrap align="end">
-          <Text variant="subtitle2" style={ { minWidth: 200, paddingBottom: 8 } }>{ report.title }</Text>
+      <Card
+        padding="tight" className="mb-2" style={ { flexShrink: 0 } }
+        data-tour="reports-params"
+      >
+        <Text variant="subtitle2">{ report.title }</Text>
+        <Text variant="caption" tone="secondary" style={ { display: "block", marginBottom: 12 } }>
+          { report.description }
+        </Text>
 
+        {/* Название отчёта в этой строке не повторяется: выбранная плитка выше
+            и так обведена, а из-за него поля съезжали вниз на его собственную
+            высоту. Подпись про пустые даты стоит под строкой, а не под вторым
+            полем, — иначе она поднимала бы поле над соседними. */}
+        <Stack row gap={ 2 } wrap align="end">
           { report.params.includes("period") ? (
-            /* Поля даты и подпись под ними — одним блоком: подпись под вторым
-               полем поднимала бы его над первым, они выравниваются по низу. */
-            <Stack gap={ 0.5 }>
-              <Stack row gap={ 2 } align="end">
-                <DateInput label={ `${ report.periodLabel ?? "Дата" } с` } value={ from } onChange={ setFrom }/>
-                <DateInput label="по" value={ to } onChange={ setTo }/>
-              </Stack>
-              <Text variant="caption" tone="secondary">Пусто — без ограничения по дате</Text>
-            </Stack>
+            <>
+              <DateInput label={ `${ report.periodLabel ?? "Дата" } с` } value={ from } onChange={ setFrom }/>
+              <DateInput label="по" value={ to } onChange={ setTo }/>
+            </>
           ) : null }
 
           { report.params.includes("horizon") ? (
@@ -171,14 +180,26 @@ export function ReportsPage() {
           </Stack>
         </Stack>
 
-        { state.data ? (
-          <Text tone="secondary" style={ { marginTop: 12 } }>{ state.data.summary }</Text>
+        { state.data || report.params.includes("period") ? (
+          <Stack row gap={ 2 } wrap align="baseline" style={ { marginTop: 12 } }>
+            { state.data ? <Text tone="secondary">{ state.data.summary }</Text> : null }
+            { report.params.includes("period") ? (
+              <Text variant="caption" tone="secondary">Пусто — без ограничения по дате</Text>
+            ) : null }
+          </Stack>
         ) : null }
       </Card>
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none" data-tour="reports-table">
+      {/* Нижний предел высоты: над таблицей стоят выбор отчёта и параметры, и
+          на невысоком окне они выдавливали её в ноль — экран оставался без
+          того, ради чего его открывают. Дальше страница просто прокручивается. */}
+      <Card
+        padding="none"
+        style={ { flex: 1, minHeight: 240, display: "flex", flexDirection: "column" } }
+        data-tour="reports-table"
+      >
         <DataTable
           columns={ state.data?.columns ?? [] }
           rows={ state.data?.rows ?? [] }
