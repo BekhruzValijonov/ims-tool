@@ -1,3 +1,4 @@
+import { useState } from "react"
 import { useNavigate, useParams } from "react-router-dom"
 import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
@@ -24,6 +25,9 @@ import { IconArrowLeft } from "../ui/icons"
  * Отвечает на вопрос, ради которого её открывают: что сейчас у него на руках и
  * не просрочен ли возврат.
  */
+/** Сколько записей истории на странице. */
+const HISTORY_PAGE = 25
+
 export function EmployeePage() {
   const { id = "" } = useParams()
   const repo = useRepo()
@@ -31,27 +35,33 @@ export function EmployeePage() {
   const directories = useDirectories()
   const { state: tone } = useStateColors()
 
-  const state = useAsync(async () => {
-    const employees = await repo.directories.employees({ includeInactive: true })
-    const employee = employees.find((row) => row.id === id) ?? null
-    if (!employee) return null
+  const [page, setPage] = useState(0)
 
+  /* Сам сотрудник берётся из справочников, которые страница и так грузит:
+     отдельным запросом за ним поднимался весь список — и работающие, и
+     уволенные, — чтобы взять оттуда одну строку. */
+  const dirs = directories.data
+  const employee = dirs?.employeeById(id) ?? null
+
+  const state = useAsync(async () => {
     const [onHands, journal] = await Promise.all([
       repo.directories.instrumentsOf(id),
-      repo.operations.journal({ employeeId: id, pageSize: 50 }),
+      repo.operations.journal({ employeeId: id, page, pageSize: HISTORY_PAGE }),
     ])
     const instruments = await repo.instruments.byIds(
       journal.rows.map((event) => event.instrumentId))
 
-    return { employee, onHands, journal, instruments }
-  }, [repo, id])
+    return { onHands, journal, instruments }
+  }, [repo, id, page])
 
-  if (state.loading && !state.data) return <Page><Skeleton height={ 360 }/></Page>
+  if (directories.loading || (state.loading && !state.data)) {
+    return <Page><Skeleton height={ 360 }/></Page>
+  }
   if (state.error) return <Page><Alert severity="error">{ state.error }</Alert></Page>
-  if (!state.data) return <Page><Alert severity="warning">Сотрудник не найден</Alert></Page>
+  if (!employee) return <Page><Alert severity="warning">Сотрудник не найден</Alert></Page>
+  if (!state.data) return <Page><Skeleton height={ 360 }/></Page>
 
-  const { employee, onHands, journal, instruments } = state.data
-  const dirs = directories.data
+  const { onHands, journal, instruments } = state.data
   const now = Date.now()
 
   return (
@@ -109,8 +119,7 @@ export function EmployeePage() {
                             `.link` — кнопка выходила бы светлее таких же
                             ссылок в таблицах. */
                         style={ {
-                          padding: 0, border: "none", background: "none",
-                          textAlign: "left",
+                          padding: 0, border: "none", background: "none", textAlign: "left",
                           fontFamily: "inherit", fontSize: "inherit", lineHeight: "inherit",
                         } }
                       >
@@ -144,8 +153,18 @@ export function EmployeePage() {
 
         <Card padding="none" data-tour="employee-history">
           <Text variant="h6" as="h2" style={ { padding: "20px 20px 8px" } }>История выдач</Text>
+          {/* С постраничностью, а не первыми пятьюдесятью записями молча:
+              у слесаря с большим стажем история длиннее, и обрезанная выглядела
+              бы полной. */}
           { dirs ? (
-            <OperationsTable rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
+            <OperationsTable
+              rows={ toOperationRows(journal.rows, instruments, dirs) }
+              rowCount={ journal.total }
+              page={ page }
+              pageSize={ HISTORY_PAGE }
+              onPageChange={ setPage }
+              dense
+            />
           ) : null }
         </Card>
       </Stack>

@@ -18,6 +18,7 @@ export interface Directories {
   employeeName(id: string | null): string
   typeName(id: string | null): string
   typeById(id: string | null): InstrumentType | null
+  employeeById(id: string | null): Employee | null
 }
 
 const EMPTY = "—"
@@ -60,6 +61,7 @@ export function useDirectories() {
       employeeName: (id) => (id && employeeMap.get(id)?.fullName) || EMPTY,
       typeName: (id) => (id && typeMap.get(id)?.name) || EMPTY,
       typeById: (id) => (id ? typeMap.get(id) ?? null : null),
+      employeeById: (id) => (id ? employeeMap.get(id) ?? null : null),
     }
   }, [state.data])
 
