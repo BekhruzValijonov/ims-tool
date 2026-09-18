@@ -1,0 +1,31 @@
+.full { width: 100%; }
+
+/* Значок календаря нажимается, поэтому это кнопка, а не украшение поля. */
+.trigger {
+  display: flex;
+  padding: 0;
+  border: none;
+  background: none;
+  color: var(--text-secondary);
+  cursor: pointer;
+  border-radius: var(--radius);
+}
+
+.trigger:hover { color: var(--text-primary); }
+
+.trigger:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
+
+/* Панель всплывает над остальным: координаты считаются от поля, поэтому её не
+   режут прокручиваемые предки и не прячет модальное окно. */
+.panel {
+  position: fixed;
+  z-index: 1300;
+  padding: 8px;
+  border: 1px solid var(--divider);
+  border-radius: var(--radius-card);
+  background-color: var(--bg-paper);
+  box-shadow: var(--shadow-dropdown);
+}

@@ -112,6 +112,11 @@
   resolved "https://registry.yarnpkg.com/@csstools/css-tokenizer/-/css-tokenizer-4.0.1.tgz#e07075c22009bfa71ac6d6d1b090cf713d6d835c"
   integrity sha512-bPlN9S9O1A0euCpEWE4qnvB5YDuyYVsUTrxSgmAM1Is0j4tICHoVyOVAXfWMP/kS9ZrjvyIXWV2PmomiAXXqOw==
 
+"@date-fns/tz@^1.4.1":
+  version "1.5.0"
+  resolved "https://registry.yarnpkg.com/@date-fns/tz/-/tz-1.5.0.tgz#e9e79b7583f0b1322c53db884a0112551095e3f3"
+  integrity sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==
+
 "@exodus/bytes@^1.11.0", "@exodus/bytes@^1.15.1", "@exodus/bytes@^1.6.0":
   version "1.15.1"
   resolved "https://registry.yarnpkg.com/@exodus/bytes/-/bytes-1.15.1.tgz#b13bc464ca162c17abf0837fb3a11aeab79e45d1"
@@ -564,6 +569,11 @@ data-urls@^7.0.0:
     whatwg-mimetype "^5.0.0"
     whatwg-url "^16.0.0"
 
+date-fns@^4.1.0, date-fns@^4.4.0:
+  version "4.4.0"
+  resolved "https://registry.yarnpkg.com/date-fns/-/date-fns-4.4.0.tgz#806539edf45c616b2b76b5f78b88c56ed3c7e036"
+  integrity sha512-+1UMbeh68lH1SegH83CGWwpb6OHHbpSgr3+s5Eww5M4CAgswBpoWS0AjTOfEJ33HiYKz1hdj/KTFprzXHmq/6w==
+
 decimal.js@^10.6.0:
   version "10.6.0"
   resolved "https://registry.yarnpkg.com/decimal.js/-/decimal.js-10.6.0.tgz#e649a43e3ab953a72192ff5983865e509f37ed9a"
@@ -866,6 +876,14 @@ react-apexcharts@^2.1.1:
   integrity sha512-aV25n+1ZdAzRG0KhODVC48K8WbhMKBAr3yWSeaaBqM1ySn22kSSKblsNCUvlwegsT+cdMLuOrK9xGZb+IK+OkQ==
   dependencies:
     prop-types "^15.8.1"
+
+react-day-picker@^10.0.1:
+  version "10.0.1"
+  resolved "https://registry.yarnpkg.com/react-day-picker/-/react-day-picker-10.0.1.tgz#8498e3f0ace2e9d03c209a5458c451a377c2d85c"
+  integrity sha512-eNh6BlwcYInWaJtRv18mXQ06Ys/H6rdTZAnTaSdOYJuTpwP1JMCHNd1FDRadA+gbeinq+psdULN5Xnowy9mV8w==
+  dependencies:
+    "@date-fns/tz" "^1.4.1"
+    date-fns "^4.1.0"
 
 react-dom@^19.1.0:
   version "19.3.0"

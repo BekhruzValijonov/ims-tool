@@ -1,0 +1,77 @@
+/*
+ * Календарь в токенах приложения.
+ *
+ * Подключается из Calendar.tsx сразу после таблицы стилей react-day-picker,
+ * поэтому эти правила выигрывают. Собственные переменные библиотеки заданы
+ * нашими значениями — так и размеры, и цвета едут за брендированием, а не
+ * живут отдельной жизнью.
+ */
+
+.app-calendar {
+  --rdp-accent-color: var(--accent);
+  --rdp-accent-background-color: var(--action-selected);
+  --rdp-today-color: var(--state-alarm);
+  --rdp-day-height: 36px;
+  --rdp-day-width: 36px;
+  --rdp-weekday-opacity: 1;
+  --rdp-weekday-text-transform: none;
+  --rdp-outside-opacity: 0.4;
+  --rdp-disabled-opacity: 0.32;
+
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: 0.875rem;
+  color: var(--text-primary);
+}
+
+.app-calendar .rdp-month_caption {
+  font-size: 0.9375rem;
+  font-weight: 600;
+  /* Месяц с большой буквы: date-fns отдаёт его строчной, а это заголовок. */
+  text-transform: capitalize;
+}
+
+.app-calendar .rdp-weekday {
+  color: var(--text-secondary);
+  font-size: 0.75rem;
+  font-weight: 600;
+  text-transform: capitalize;
+}
+
+.app-calendar .rdp-button_next,
+.app-calendar .rdp-button_previous {
+  color: var(--text-secondary);
+  border-radius: var(--radius);
+}
+
+.app-calendar .rdp-button_next:hover,
+.app-calendar .rdp-button_previous:hover {
+  background-color: var(--action-hover);
+  color: var(--text-primary);
+}
+
+.app-calendar .rdp-day_button {
+  border-radius: var(--radius);
+  border: none;
+  font: inherit;
+  cursor: pointer;
+}
+
+.app-calendar .rdp-day_button:hover { background-color: var(--action-hover); }
+
+.app-calendar .rdp-selected .rdp-day_button {
+  background-color: var(--accent);
+  color: var(--accent-contrast);
+  font-weight: 700;
+}
+
+/* Сегодняшний день помечен цветом, а не заливкой: заливка означает выбор. */
+.app-calendar .rdp-today:not(.rdp-selected) .rdp-day_button {
+  color: var(--state-alarm);
+  font-weight: 700;
+}
+
+.app-calendar .rdp-day_button:focus-visible {
+  outline: 2px solid var(--focus);
+  outline-offset: 2px;
+}
