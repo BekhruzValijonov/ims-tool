@@ -45,6 +45,17 @@
 
 .input::placeholder { color: var(--text-disabled); }
 
+/*
+ * Числовое поле без стрелок-крутилки. Браузер рисует их у правого края, и в
+ * узком поле они выглядят полосой прокрутки: их пытаются тянуть, а они
+ * добавляют по единице. Стоимость набирают с клавиатуры, шаг в один сум
+ * бессмыслен.
+ */
+.input[type="number"] { appearance: textfield; -moz-appearance: textfield; }
+
+.input[type="number"]::-webkit-outer-spin-button,
+.input[type="number"]::-webkit-inner-spin-button { appearance: none; margin: 0; }
+
 /* Само поле фокус не рисует: его показывает обёртка. */
 .input:focus,
 .input:focus-visible,

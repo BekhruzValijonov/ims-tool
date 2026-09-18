@@ -1,5 +1,5 @@
 import type { CSSProperties, ReactNode } from "react"
-import { useId } from "react"
+import { useEffect, useId, useRef } from "react"
 import styles from "./Field.module.css"
 
 interface BaseProps {
@@ -58,6 +58,30 @@ export function TextField({
   value, onChange, placeholder, type = "text", startIcon, endIcon, autoFocus, onBlur, ...base
 }: TextFieldProps) {
   const id = useId()
+  const inputRef = useRef<HTMLInputElement>(null)
+
+  /* Колесо мыши над числовым полем меняет его значение — так устроен нативный
+     `<input type="number">`. Человек прокручивает форму, курсор проходит над
+     стоимостью, и цена молча становится другой; замечают это уже после
+     сохранения.
+
+     Первый оборот колеса над полем в фокусе уходит на то, чтобы снять фокус:
+     дальше поле обычное, и форма прокручивается как везде. Слушатель вешается
+     вручную, а не через `onWheel`: React объявляет `wheel` пассивным, и
+     `preventDefault` оттуда браузер не слышит. */
+  useEffect(() => {
+    const input = inputRef.current
+    if (!input || type !== "number") return
+
+    const keepValue = (event: WheelEvent) => {
+      if (document.activeElement !== input) return
+      event.preventDefault()
+      input.blur()
+    }
+
+    input.addEventListener("wheel", keepValue, { passive: false })
+    return () => input.removeEventListener("wheel", keepValue)
+  }, [type])
 
   return (
     <Wrapper { ...base } id={ id }>
@@ -65,6 +89,7 @@ export function TextField({
         { startIcon ? <span className={ styles.adornment }>{ startIcon }</span> : null }
         <input
           id={ id }
+          ref={ inputRef }
           className={ styles.input }
           type={ type }
           value={ value }
