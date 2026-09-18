@@ -18,12 +18,22 @@ export interface NavItem {
 
 export interface NavSection {
   readonly title: string | null
+  /**
+   * Тон значков раздела.
+   *
+   * В Corona каждый пункт меню своего цвета просто так. Здесь цвет значка
+   * говорит, как часто в раздел заходят: фиолетовый — ежедневная работа,
+   * бирюзовый — справочники, которые заполняют один раз, серый — всё
+   * остальное.
+   */
+  readonly tone: "brand" | "muted" | "neutral"
   readonly items: readonly NavItem[]
 }
 
 export const NAVIGATION: readonly NavSection[] = [
   {
     title: "Учёт",
+    tone: "brand",
     items: [
       { path: ROUTES.dashboard, title: "Дашборд", icon: <DashboardIcon/> },
       { path: ROUTES.instruments, title: "Приборы", icon: <StraightenIcon/> },
@@ -32,6 +42,7 @@ export const NAVIGATION: readonly NavSection[] = [
   },
   {
     title: "Справочники",
+    tone: "muted",
     items: [
       { path: ROUTES.employees, title: "Сотрудники", icon: <BadgeIcon/> },
       { path: ROUTES.departments, title: "Подразделения", icon: <ApartmentIcon/> },
@@ -41,6 +52,7 @@ export const NAVIGATION: readonly NavSection[] = [
   },
   {
     title: null,
+    tone: "neutral",
     items: [
       { path: ROUTES.reports, title: "Отчёты", icon: <BarChartIcon/> },
       { path: ROUTES.settings, title: "Настройки", icon: <SettingsIcon/> },

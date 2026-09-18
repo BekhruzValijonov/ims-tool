@@ -2,15 +2,14 @@ import type { Components, Theme } from "@mui/material/styles"
 import { alpha } from "@mui/material/styles"
 import type {} from "@mui/x-data-grid/themeAugmentation"
 import type {} from "@mui/x-date-pickers/themeAugmentation"
-import { MONO, RADIUS, SIZE, TABULAR } from "./tokens"
+import { BADGE_RADIUS, BRAND, COLORS, MONO, RADIUS, SIZE, TABULAR } from "./tokens"
 
 /**
  * Оформление компонентов.
  *
- * Общее правило: разделяем линиями и воздухом, а не тенями и карточками.
- * Тень остаётся только у того, что действительно всплывает над страницей —
- * у диалогов и меню. Скругление одно на всё и небольшое: инженерно, а не
- * «дружелюбно».
+ * Геометрия Corona: панель с тонкой границей вместо тени, скругление 4,
+ * приподнятая поверхность у полей ввода и наведения. Тень остаётся только у
+ * того, что действительно всплывает над страницей, — у диалогов и меню.
  */
 export const components: Components<Theme> = {
   MuiCssBaseline: {
@@ -19,17 +18,18 @@ export const components: Components<Theme> = {
         backgroundColor: (theme.vars || theme).palette.background.default,
         WebkitFontSmoothing: "antialiased",
       },
-      /* Цифры в колонках обязаны быть одной ширины — иначе столбец
-         инвентарных номеров приходится читать посимвольно. */
+      /* Коды и даты в колонках: цифры одной ширины выстраиваются друг под
+         другом, и столбец читается взглядом, а не посимвольно. */
       ".data-mono": {
         fontFamily: MONO,
         fontSize: SIZE.small,
         ...TABULAR,
       },
       "*:focus-visible": {
-        outline: `2px solid ${ (theme.vars || theme).palette.text.primary }`,
+        outline: `2px solid ${ BRAND.main }`,
         outlineOffset: 2,
       },
+      "::selection": { backgroundColor: BRAND.soft },
     }),
   },
 
@@ -55,9 +55,7 @@ export const components: Components<Theme> = {
   },
 
   MuiCardContent: {
-    styleOverrides: {
-      root: { padding: 16, "&:last-child": { paddingBottom: 16 } },
-    },
+    styleOverrides: { root: { padding: 20, "&:last-child": { paddingBottom: 20 } } },
   },
 
   MuiButton: {
@@ -67,19 +65,18 @@ export const components: Components<Theme> = {
         borderRadius: RADIUS,
         textTransform: "none",
         fontWeight: 500,
-        paddingInline: 12,
+        paddingInline: 14,
       },
     },
     variants: [
       {
-        /* Главное действие — графитовое, а не синее: синий на этом экране
-           означает «выдан», и кнопка не должна спорить со статусом. */
+        // Фиолетовый Corona закреплён за действием и нигде больше не появляется.
         props: { variant: "contained", color: "primary" },
-        style: ({ theme }) => ({
-          backgroundColor: (theme.vars || theme).palette.text.primary,
-          color: (theme.vars || theme).palette.background.paper,
-          "&:hover": { backgroundColor: alpha(theme.palette.text.primary, 0.85) },
-        }),
+        style: {
+          backgroundColor: BRAND.main,
+          color: "#ffffff",
+          "&:hover": { backgroundColor: BRAND.hover },
+        },
       },
       {
         props: { variant: "outlined" },
@@ -87,10 +84,14 @@ export const components: Components<Theme> = {
           borderColor: (theme.vars || theme).palette.divider,
           color: (theme.vars || theme).palette.text.primary,
           "&:hover": {
-            borderColor: (theme.vars || theme).palette.text.secondary,
-            backgroundColor: alpha(theme.palette.text.primary, 0.04),
+            borderColor: BRAND.main,
+            backgroundColor: BRAND.soft,
           },
         }),
+      },
+      {
+        props: { variant: "text" },
+        style: { "&:hover": { backgroundColor: BRAND.soft } },
       },
     ],
   },
@@ -98,15 +99,13 @@ export const components: Components<Theme> = {
   MuiLink: {
     defaultProps: { underline: "hover" },
     styleOverrides: {
-      /* Ссылка опознаётся подчёркиванием, а не цветом: цвет здесь занят
-         состояниями приборов. */
       root: ({ theme }) => ({
         color: "inherit",
         textDecorationColor: (theme.vars || theme).palette.text.secondary,
         textUnderlineOffset: 3,
         fontWeight: 500,
         cursor: "pointer",
-        "&:hover": { textDecorationColor: (theme.vars || theme).palette.text.primary },
+        "&:hover": { color: BRAND.main, textDecorationColor: BRAND.main },
       }),
     },
   },
@@ -115,7 +114,7 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         borderRadius: RADIUS,
-        backgroundColor: (theme.vars || theme).palette.background.paper,
+        backgroundColor: COLORS.raisedDark,
         "& .MuiOutlinedInput-notchedOutline": {
           borderColor: (theme.vars || theme).palette.divider,
         },
@@ -124,8 +123,9 @@ export const components: Components<Theme> = {
         },
         "&.Mui-focused .MuiOutlinedInput-notchedOutline": {
           borderWidth: 1,
-          borderColor: (theme.vars || theme).palette.text.primary,
+          borderColor: BRAND.main,
         },
+        ...theme.applyStyles("light", { backgroundColor: COLORS.raisedLight }),
       }),
     },
   },
@@ -134,9 +134,11 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         borderRadius: RADIUS,
+        backgroundColor: COLORS.raisedDark,
         "& .MuiPickersOutlinedInput-notchedOutline": {
           borderColor: (theme.vars || theme).palette.divider,
         },
+        ...theme.applyStyles("light", { backgroundColor: COLORS.raisedLight }),
       }),
     },
   },
@@ -156,28 +158,26 @@ export const components: Components<Theme> = {
 
   MuiDialog: {
     styleOverrides: {
-      paper: ({ theme }) => ({
-        borderRadius: RADIUS,
-        // Всплывающее над страницей — единственное, чему тень положена.
-        boxShadow: `0 16px 40px ${ alpha(theme.palette.common.black, 0.18) }`,
-      }),
+      paper: { borderRadius: RADIUS, boxShadow: "0 24px 60px rgba(0, 0, 0, 0.5)" },
     },
   },
 
   MuiMenu: {
-    styleOverrides: {
-      paper: ({ theme }) => ({
-        boxShadow: `0 8px 24px ${ alpha(theme.palette.common.black, 0.14) }`,
-      }),
-    },
+    styleOverrides: { paper: { boxShadow: "0 12px 32px rgba(0, 0, 0, 0.4)" } },
   },
 
   MuiTooltip: {
     styleOverrides: {
       tooltip: ({ theme }) => ({
-        backgroundColor: (theme.vars || theme).palette.text.primary,
+        backgroundColor: COLORS.raisedDark,
+        color: COLORS.textDark,
+        border: `1px solid ${ (theme.vars || theme).palette.divider }`,
         fontSize: SIZE.caption,
         borderRadius: RADIUS,
+        ...theme.applyStyles("light", {
+          backgroundColor: COLORS.textLight,
+          color: COLORS.surfaceLight,
+        }),
       }),
     },
   },
@@ -186,22 +186,34 @@ export const components: Components<Theme> = {
     styleOverrides: {
       root: ({ theme }) => ({
         borderRadius: RADIUS,
-        paddingBlock: 6,
-        /* Текущий раздел отмечен вертикальной планкой, как указатель на
-           панели прибора: работает и при выключенном цвете. */
+        paddingBlock: 9,
+        gap: 12,
+        "&:hover": { backgroundColor: COLORS.raisedDark },
+        /* Текущий раздел: подложка и планка слева, как в Corona. Работает и
+           при выключенном цвете — форма отличается, а не только оттенок. */
         "&.Mui-selected": {
-          backgroundColor: alpha(theme.palette.text.primary, 0.06),
-          boxShadow: `inset 3px 0 0 ${ (theme.vars || theme).palette.text.primary }`,
-          "&:hover": { backgroundColor: alpha(theme.palette.text.primary, 0.09) },
+          backgroundColor: COLORS.raisedDark,
+          boxShadow: `inset 3px 0 0 ${ BRAND.main }`,
+          "&:hover": { backgroundColor: COLORS.raisedDark },
         },
+        ...theme.applyStyles("light", {
+          "&:hover": { backgroundColor: COLORS.raisedLight },
+          "&.Mui-selected": {
+            backgroundColor: BRAND.soft,
+            boxShadow: `inset 3px 0 0 ${ BRAND.main }`,
+            "&:hover": { backgroundColor: BRAND.soft },
+          },
+        }),
       }),
     },
   },
 
   MuiAlert: {
-    styleOverrides: {
-      root: { borderRadius: RADIUS, fontSize: SIZE.small },
-    },
+    styleOverrides: { root: { borderRadius: RADIUS, fontSize: SIZE.small } },
+  },
+
+  MuiAvatar: {
+    styleOverrides: { rounded: { borderRadius: BADGE_RADIUS } },
   },
 
   MuiDataGrid: {
@@ -212,7 +224,7 @@ export const components: Components<Theme> = {
         "--DataGrid-rowBorderColor": (theme.vars || theme).palette.divider,
         "--DataGrid-overlayHeight": "232px",
         "& .MuiDataGrid-columnHeaders": {
-          borderBottom: `1px solid ${ (theme.vars || theme).palette.text.primary }`,
+          borderBottom: `1px solid ${ (theme.vars || theme).palette.divider }`,
         },
         "& .MuiDataGrid-columnHeaderTitle": {
           fontWeight: 500,
@@ -221,11 +233,11 @@ export const components: Components<Theme> = {
         },
         "& .MuiDataGrid-cell": { borderTop: "none" },
         "& .MuiDataGrid-row:hover": {
-          backgroundColor: alpha(theme.palette.text.primary, 0.035),
+          backgroundColor: alpha(BRAND.main, 0.07),
         },
         "& .MuiDataGrid-footerContainer": {
           borderTop: `1px solid ${ (theme.vars || theme).palette.divider }`,
-          minHeight: 44,
+          minHeight: 46,
         },
         "& .MuiTablePagination-root": { fontSize: SIZE.caption },
       }),

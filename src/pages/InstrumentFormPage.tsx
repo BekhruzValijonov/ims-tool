@@ -16,6 +16,7 @@ import { useDirectories } from "../features/directories/ui/useDirectories"
 import { useAsync } from "../shared/useAsync"
 import type { WriteError } from "../data/AppRepo"
 import { ROUTES } from "../app/routes"
+import { PageHeader } from "../shared/ui/PageHeader"
 import { DateField } from "../shared/ui/DateField"
 
 interface FormState {
@@ -189,12 +190,15 @@ export function InstrumentFormPage() {
 
   return (
     <Box sx={ { width: "100%", maxWidth: 900 } }>
-      <Button size="small" startIcon={ <ArrowBackIcon/> } sx={ { mb: 1 } } onClick={ () => navigate(-1) }>
+      <Button size="small" startIcon={ <ArrowBackIcon/> } sx={ { mb: 1, ml: -1 } } onClick={ () => navigate(-1) }>
         Назад
       </Button>
-      <Typography variant="h6" component="h2" sx={ { mb: 2 } }>
-        { editing ? "Редактирование прибора" : "Новый прибор" }
-      </Typography>
+      <PageHeader
+        title={ editing ? "Редактирование прибора" : "Новый прибор" }
+        hint={ editing
+          ? "Правка паспорта. Состояние и держатель меняются операциями из карточки."
+          : "Заполните паспорт. Статус «в наличии» и место прибор получит сам." }
+      />
 
       <form onSubmit={ submit }>
         <Stack sx={ { gap: 2 } }>

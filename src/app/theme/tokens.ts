@@ -1,124 +1,124 @@
 /**
  * Токены темы.
  *
- * Правило, из которого выведено всё остальное: **цвет означает состояние
- * прибора и ничего больше**. Хром интерфейса — графит и бумага; насыщенный
- * цвет на экране появляется там, где есть состояние или требуется действие.
- * Поэтому у кнопок и ссылок своего цвета нет: они читаются формой, весом и
- * подчёркиванием, а не синевой.
+ * Облик взят с админ-шаблона Corona: тёмный холст, панели с тонкой границей,
+ * фирменный фиолетовый и живая палитра акцентов. Одно отличие сознательное —
+ * в Corona цвет рассыпан по интерфейсу как украшение, у каждого пункта меню
+ * свой оттенок просто так. Здесь фиолетовый закреплён за интерактивом, а
+ * остальные цвета означают **состояние прибора**: человек учит один язык и
+ * читает список по цвету, а не по подписям.
  */
 
 export const COLORS = {
-  /** Фон страницы: алюминиевая панель, холодный серый с зелёным подтоном. */
-  panel: "#E9EBE9",
-  panelDark: "#121614",
-  /** Листы с содержимым. */
-  paper: "#FFFFFF",
-  paperDark: "#1B211E",
-  /** Текст: графит, а не «почти чёрный». */
-  ink: "#1B2220",
-  inkDark: "#E7EDEA",
-  /** Вторичный текст и волосяные линии. */
-  steel: "#6F7773",
-  steelDark: "#9AA39F",
-  line: "#CFD5D2",
-  lineDark: "#2C3531",
+  /** Холст: почти чёрный, как в Corona. */
+  canvasDark: "#0c0d11",
+  /** Панели и боковое меню. */
+  surfaceDark: "#191c24",
+  /** Приподнятая поверхность: поля ввода, наведение. */
+  raisedDark: "#1f232d",
+  borderDark: "#2c2e33",
+  textDark: "#ffffff",
+  mutedDark: "#8b90a8",
+
+  /** Светлая схема — та же геометрия на бумаге. */
+  canvasLight: "#f2f0f7",
+  surfaceLight: "#ffffff",
+  raisedLight: "#f7f6fb",
+  borderLight: "#e3e1ec",
+  textLight: "#1c1b28",
+  mutedLight: "#6c7293",
+} as const
+
+/** Фирменный фиолетовый Corona. Занят интерактивом и ничем больше. */
+export const BRAND = {
+  main: "#5E50F9",
+  hover: "#4c3ef7",
+  soft: "rgba(94, 80, 249, 0.16)",
 } as const
 
 /**
- * Состояния прибора.
+ * Состояния прибора в палитре Corona.
  *
- * Четыре цвета, а не шесть: цвет несёт тяжесть состояния, причину несёт
- * подпись рядом. Ремонт и поверка выглядят одинаково не по недосмотру — для
- * работы важно, что прибор вне строя, а чем именно он занят, сказано словом.
+ * Ремонт и поверка делят оранжевый: цвет несёт тяжесть («прибор вне строя»),
+ * причину несёт подпись рядом.
  */
 export const STATE = {
-  /** В наличии — можно выдавать. */
-  ok: "#2E6B4F",
-  okSoft: "#E4EFE9",
-  /** Выдан — прибор у человека. */
-  work: "#2D5AA0",
-  workSoft: "#E3EAF5",
-  /** Вне строя: ремонт или поверка. */
-  wait: "#8F6410",
-  waitSoft: "#F5ECD9",
-  /** Требует действия: не вернули в срок, поверка истекла. */
-  signal: "#BC3227",
-  signalSoft: "#F8E3E1",
-  /** Списан — вне учёта. */
-  gone: "#6F7773",
-  goneSoft: "#E7EAE8",
+  ok: "#46c35f",
+  okSoft: "rgba(70, 195, 95, 0.16)",
+  work: "#57c7d4",
+  workSoft: "rgba(87, 199, 212, 0.16)",
+  wait: "#f2a654",
+  waitSoft: "rgba(242, 166, 84, 0.16)",
+  signal: "#f96868",
+  signalSoft: "rgba(249, 104, 104, 0.16)",
+  gone: "#8b90a8",
+  goneSoft: "rgba(139, 144, 168, 0.16)",
 } as const
 
 /**
- * Цвета рядов на графиках — те же, что у состояний.
+ * Те же состояния для светлой схемы.
  *
- * Выдачи синие, возвраты зелёные, столбцы подразделений разложены по
- * состояниям. Человек учит один цветовой язык, а не отдельный для таблиц и
- * отдельный для диаграмм.
+ * Оттенки Corona рассчитаны на тёмный фон: на белом они выцветают, поэтому
+ * светлота опущена, а тон сохранён.
  */
-/**
- * Те же состояния для тёмной схемы.
- *
- * Тёмные насыщенные цвета на тёмном фоне почти не читаются: сигнальный
- * красный на графитовом фоне перестаёт быть сигналом. Оттенок сохранён,
- * светлота поднята.
- */
-export const STATE_DARK = {
-  ok: "#5BA383",
-  okSoft: "#1F3A2E",
-  work: "#6D9BE0",
-  workSoft: "#1D2C43",
-  wait: "#D2A248",
-  waitSoft: "#3A2F17",
-  signal: "#E8756A",
-  signalSoft: "#3D211E",
-  gone: "#9AA39F",
-  goneSoft: "#272E2B",
+export const STATE_LIGHT = {
+  ok: "#2f9b48",
+  okSoft: "rgba(47, 155, 72, 0.12)",
+  work: "#1f97a6",
+  workSoft: "rgba(31, 151, 166, 0.12)",
+  wait: "#c07a1d",
+  waitSoft: "rgba(192, 122, 29, 0.12)",
+  signal: "#df4a4a",
+  signalSoft: "rgba(223, 74, 74, 0.12)",
+  gone: "#6c7293",
+  goneSoft: "rgba(108, 114, 147, 0.12)",
 } as const
 
+/** Ряды на графиках — те же состояния: цветовой язык один на всё приложение. */
 export const CHART_SERIES = {
   issued: STATE.work,
   returned: STATE.ok,
   available: STATE.ok,
   checkedOut: STATE.work,
   inRepair: STATE.wait,
-  inVerification: "#C9A45B",
+  inVerification: "#f6cf6a",
   writtenOff: STATE.gone,
 } as const
 
-export const CHART_SERIES_DARK = {
-  issued: STATE_DARK.work,
-  returned: STATE_DARK.ok,
-  available: STATE_DARK.ok,
-  checkedOut: STATE_DARK.work,
-  inRepair: STATE_DARK.wait,
-  inVerification: "#E3C489",
-  writtenOff: STATE_DARK.gone,
+export const CHART_SERIES_LIGHT = {
+  issued: STATE_LIGHT.work,
+  returned: STATE_LIGHT.ok,
+  available: STATE_LIGHT.ok,
+  checkedOut: STATE_LIGHT.work,
+  inRepair: STATE_LIGHT.wait,
+  inVerification: "#d9a83a",
+  writtenOff: STATE_LIGHT.gone,
 } as const
 
-export const SANS = "'IBM Plex Sans', 'Segoe UI', system-ui, sans-serif"
+export const SANS = "'Rubik', 'Segoe UI', system-ui, sans-serif"
 
 /**
- * Моноширинный — для данных, а не для подписей.
+ * Моноширинный — только для кодов и дат в колонках.
  *
- * Инвентарные номера, серийники, даты и числа в колонках сравниваются глазом
- * только при равной ширине знаков: столбец из PR-001023 и PR-001037 при
- * пропорциональных цифрах приходится читать посимвольно.
+ * Столбец из PR-001023 и PR-001037 сравнивается глазом лишь при равной ширине
+ * знаков. Для подписей и заголовков он не используется: там от него один шум.
  */
 export const MONO = "'IBM Plex Mono', ui-monospace, monospace"
 
-/** Ровные цифры — обязательны везде, где числа стоят колонкой. */
 export const TABULAR = { fontVariantNumeric: "tabular-nums" } as const
 
-/** Шкала: 12 / 13 / 15 / 18 / 22 / 32. Базовый кегль 15 — на заводском мониторе 14 мелковат. */
+/** Шкала Corona: базовый кегль 14, заголовки весом 500. */
 export const SIZE = {
   caption: "0.75rem",
   small: "0.8125rem",
-  body: "0.9375rem",
-  section: "1.125rem",
+  body: "0.875rem",
+  section: "1.0625rem",
   page: "1.375rem",
-  readout: "2rem",
+  readout: "1.875rem",
 } as const
 
 export const RADIUS = 4
+/** Квадратный значок у пункта меню и карточки показаний. */
+export const BADGE_RADIUS = 9
+export const SIDEBAR_WIDTH = 244
+export const NAVBAR_HEIGHT = 68

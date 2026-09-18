@@ -36,9 +36,8 @@ export function PageHeader({ title, count, hint, actions }: PageHeaderProps) {
         { actions ? <Stack direction="row" sx={ { gap: 1 } }>{ actions }</Stack> : null }
       </Stack>
       { hint ? (
-        <Typography variant="body2" sx={ { color: "text.secondary", mb: 1 } }>{ hint }</Typography>
+        <Typography variant="body2" sx={ { color: "text.secondary" } }>{ hint }</Typography>
       ) : null }
-      <Box sx={ { borderBottom: 1, borderColor: "text.primary" } }/>
     </Box>
   )
 }

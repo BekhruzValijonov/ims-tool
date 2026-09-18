@@ -24,7 +24,7 @@ export function StatusMark({ status, bold }: { status: InstrumentStatus; bold?: 
   const hollow = status === "WRITTEN_OFF"
 
   return (
-    <Stack direction="row" sx={ { alignItems: "center", gap: 1, minWidth: 0 } }>
+    <Stack direction="row" sx={ { alignItems: "center", gap: 1, minWidth: 0, height: "100%" } }>
       <Box
         sx={ {
           width: 9,

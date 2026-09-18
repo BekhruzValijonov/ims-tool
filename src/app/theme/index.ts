@@ -1,7 +1,7 @@
 import { createTheme, type Theme, type ThemeOptions } from "@mui/material/styles"
 import { ruRU as coreRu } from "@mui/material/locale"
 import { ruRU as dataGridRu } from "@mui/x-data-grid/locales"
-import { COLORS, RADIUS, SANS, SIZE, STATE } from "./tokens"
+import { BRAND, COLORS, RADIUS, SANS, SIZE, STATE, STATE_LIGHT } from "./tokens"
 import { components } from "./components"
 import { chartsCustomizations } from "./customizations/charts"
 
@@ -29,60 +29,63 @@ const dataGridRuPatch = {
 const shadows = [
   "none",
   ...Array.from({ length: 7 }, () => "none"),
-  "0 8px 24px rgba(16, 24, 20, 0.14)",
-  ...Array.from({ length: 15 }, () => "0 16px 40px rgba(16, 24, 20, 0.18)"),
-  "0 16px 40px rgba(16, 24, 20, 0.18)",
+  "0 12px 32px rgba(0, 0, 0, 0.4)",
+  ...Array.from({ length: 16 }, () => "0 24px 60px rgba(0, 0, 0, 0.5)"),
 ]
 
 const typography = {
   fontFamily: SANS,
-  h4: { fontSize: SIZE.page, fontWeight: 600, letterSpacing: "-0.01em", lineHeight: 1.25 },
-  h5: { fontSize: SIZE.section, fontWeight: 600, letterSpacing: "-0.005em", lineHeight: 1.3 },
-  h6: { fontSize: SIZE.body, fontWeight: 600, lineHeight: 1.4 },
+  h4: { fontSize: SIZE.page, fontWeight: 500, letterSpacing: "-0.01em", lineHeight: 1.3 },
+  h5: { fontSize: SIZE.section, fontWeight: 500, lineHeight: 1.35 },
+  h6: { fontSize: SIZE.body, fontWeight: 500, lineHeight: 1.45 },
   subtitle1: { fontSize: SIZE.body, fontWeight: 500, lineHeight: 1.45 },
   subtitle2: { fontSize: SIZE.small, fontWeight: 500, lineHeight: 1.45 },
   body1: { fontSize: SIZE.body, lineHeight: 1.55 },
-  body2: { fontSize: SIZE.small, lineHeight: 1.5 },
-  caption: { fontSize: SIZE.caption, lineHeight: 1.4 },
+  body2: { fontSize: SIZE.small, lineHeight: 1.55 },
+  caption: { fontSize: SIZE.caption, lineHeight: 1.45 },
   button: { fontSize: SIZE.small, fontWeight: 500, textTransform: "none" as const },
 }
 
-const statusColors = {
-  success: { main: STATE.ok, light: STATE.okSoft, contrastText: "#FFFFFF" },
-  info: { main: STATE.work, light: STATE.workSoft, contrastText: "#FFFFFF" },
-  warning: { main: STATE.wait, light: STATE.waitSoft, contrastText: "#FFFFFF" },
-  error: { main: STATE.signal, light: STATE.signalSoft, contrastText: "#FFFFFF" },
+function statusColors(state: typeof STATE | typeof STATE_LIGHT) {
+  return {
+    success: { main: state.ok, light: state.okSoft, contrastText: "#ffffff" },
+    info: { main: state.work, light: state.workSoft, contrastText: "#ffffff" },
+    warning: { main: state.wait, light: state.waitSoft, contrastText: "#ffffff" },
+    error: { main: state.signal, light: state.signalSoft, contrastText: "#ffffff" },
+  }
 }
 
 /**
  * Тема приложения.
  *
- * Собрана своя, а не перенесена из шаблона: из шаблона MUI Dashboard взято
- * только оформление графиков — об этом и просили. Всё остальное подчинено
- * одному правилу: цвет означает состояние прибора, хром остаётся графитовым.
+ * Облик admin-шаблона Corona: тёмный холст по умолчанию, панели с тонкой
+ * границей, фирменный фиолетовый у действий. Светлая схема — не огрызок, а
+ * равноправная альтернатива: заводской монитор под лампами дневного света
+ * бывает удобнее читать по светлому.
  */
 export function createAppTheme(): Theme {
   return createTheme({
     cssVariables: { colorSchemeSelector: "data-mui-color-scheme" },
+    defaultColorScheme: "dark",
     colorSchemes: {
-      light: {
-        palette: {
-          mode: "light",
-          background: { default: COLORS.panel, paper: COLORS.paper },
-          text: { primary: COLORS.ink, secondary: COLORS.steel, disabled: COLORS.steel },
-          divider: COLORS.line,
-          primary: { main: COLORS.ink, contrastText: COLORS.paper },
-          ...statusColors,
-        },
-      },
       dark: {
         palette: {
           mode: "dark",
-          background: { default: COLORS.panelDark, paper: COLORS.paperDark },
-          text: { primary: COLORS.inkDark, secondary: COLORS.steelDark, disabled: COLORS.steelDark },
-          divider: COLORS.lineDark,
-          primary: { main: COLORS.inkDark, contrastText: COLORS.panelDark },
-          ...statusColors,
+          background: { default: COLORS.canvasDark, paper: COLORS.surfaceDark },
+          text: { primary: COLORS.textDark, secondary: COLORS.mutedDark, disabled: COLORS.mutedDark },
+          divider: COLORS.borderDark,
+          primary: { main: BRAND.main, contrastText: "#ffffff" },
+          ...statusColors(STATE),
+        },
+      },
+      light: {
+        palette: {
+          mode: "light",
+          background: { default: COLORS.canvasLight, paper: COLORS.surfaceLight },
+          text: { primary: COLORS.textLight, secondary: COLORS.mutedLight, disabled: COLORS.mutedLight },
+          divider: COLORS.borderLight,
+          primary: { main: BRAND.main, contrastText: "#ffffff" },
+          ...statusColors(STATE_LIGHT),
         },
       },
     },

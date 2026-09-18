@@ -1,5 +1,10 @@
 import { useColorScheme } from "@mui/material/styles"
-import { CHART_SERIES, CHART_SERIES_DARK, STATE, STATE_DARK } from "./tokens"
+import {
+  CHART_SERIES,
+  CHART_SERIES_LIGHT,
+  STATE,
+  STATE_LIGHT,
+} from "./tokens"
 
 /**
  * Цвета состояний под текущую схему.
@@ -7,15 +12,15 @@ import { CHART_SERIES, CHART_SERIES_DARK, STATE, STATE_DARK } from "./tokens"
  * Нужен хук, а не константа: цвет уходит в атрибуты SVG, где переменные CSS
  * не раскрываются, поэтому графики обязаны получить готовое значение. Схема
  * берётся у MUI: «системная» разворачивается в ту, что применилась на самом
- * деле.
+ * деле, а умолчание здесь тёмное.
  */
 export function useStateColors() {
   const { mode, systemMode } = useColorScheme()
-  const dark = (systemMode ?? mode) === "dark"
+  const light = (systemMode ?? mode) === "light"
 
   return {
-    dark,
-    state: dark ? STATE_DARK : STATE,
-    series: dark ? CHART_SERIES_DARK : CHART_SERIES,
+    dark: !light,
+    state: light ? STATE_LIGHT : STATE,
+    series: light ? CHART_SERIES_LIGHT : CHART_SERIES,
   }
 }

@@ -9,8 +9,12 @@ import { useRepo } from "../app/AppContext"
 import { useAsync } from "../shared/useAsync"
 import { useDirectories } from "../features/directories/ui/useDirectories"
 import { PageHeader } from "../shared/ui/PageHeader"
-import { GaugeCluster, type Gauge } from "../features/dashboard/ui/GaugeCluster"
-import { AttentionStrip } from "../features/dashboard/ui/AttentionStrip"
+import { StatCards, type Gauge } from "../features/dashboard/ui/StatCards"
+import { AttentionBanner } from "../features/dashboard/ui/AttentionBanner"
+import StraightenIcon from "@mui/icons-material/Straighten"
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined"
+import PersonOutlinedIcon from "@mui/icons-material/PersonOutlined"
+import BuildOutlinedIcon from "@mui/icons-material/BuildOutlined"
 import { FirstRun } from "../features/dashboard/ui/FirstRun"
 import { FlowChart } from "../features/dashboard/ui/FlowChart"
 import { DepartmentBarChart } from "../features/dashboard/ui/DepartmentBarChart"
@@ -35,7 +39,7 @@ function shortDate(date: string): string {
 export function DashboardPage() {
   const repo = useRepo()
   const directories = useDirectories()
-  const { series, dark } = useStateColors()
+  const { series, state: tone, dark } = useStateColors()
 
   const state = useAsync(async () => {
     const now = Date.now()
@@ -88,11 +92,28 @@ export function DashboardPage() {
 
   const labels = history.map((day) => shortDate(day.date))
 
+  const neutral = dark ? COLORS.mutedDark : COLORS.mutedLight
   const gauges: Gauge[] = [
-    { key: "total", label: "Всего приборов", value: counters.total, color: dark ? COLORS.steelDark : COLORS.steel, series: history.map((day) => day.total) },
-    { key: "available", label: "В наличии", value: counters.available, color: series.available, series: history.map((day) => day.available) },
-    { key: "checked-out", label: "Выдано", value: counters.checkedOut, color: series.checkedOut, series: history.map((day) => day.checkedOut) },
-    { key: "in-repair", label: "В ремонте", value: counters.inRepair, color: series.inRepair, series: history.map((day) => day.inRepair) },
+    {
+      key: "total", label: "Всего приборов", value: counters.total,
+      color: neutral, soft: tone.goneSoft, icon: <StraightenIcon/>,
+      series: history.map((day) => day.total),
+    },
+    {
+      key: "available", label: "В наличии", value: counters.available,
+      color: series.available, soft: tone.okSoft, icon: <CheckCircleOutlinedIcon/>,
+      series: history.map((day) => day.available),
+    },
+    {
+      key: "checked-out", label: "Выдано", value: counters.checkedOut,
+      color: series.checkedOut, soft: tone.workSoft, icon: <PersonOutlinedIcon/>,
+      series: history.map((day) => day.checkedOut),
+    },
+    {
+      key: "in-repair", label: "В ремонте", value: counters.inRepair,
+      color: series.inRepair, soft: tone.waitSoft, icon: <BuildOutlinedIcon/>,
+      series: history.map((day) => day.inRepair),
+    },
   ]
 
   return (
@@ -100,8 +121,8 @@ export function DashboardPage() {
       <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
 
       <Stack sx={ { gap: 2 } }>
-        <GaugeCluster gauges={ gauges } labels={ labels }/>
-        <AttentionStrip overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
+        <StatCards gauges={ gauges } labels={ labels }/>
+        <AttentionBanner overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
 
         <Grid container spacing={ 2 } columns={ 12 } sx={ { alignItems: "flex-start" } }>
           <Grid size={ { xs: 12, lg: 7 } }>
