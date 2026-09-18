@@ -91,8 +91,10 @@
   --radius-pill: 999px;
 
   /* Шрифты */
-  --font-sans: 'DM Sans Variable', 'DM Sans', system-ui, sans-serif;
-  --font-display: 'Barlow', var(--font-sans);
+  /* Исходные значения: до того как из базы прочитано брендирование, экран
+     рисуется ими. Дальше их перекрывают правила из «Брендирования». */
+  --font-sans: 'IBM Plex Sans Variable', system-ui, sans-serif;
+  --font-display: var(--font-sans);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Размеры оболочки */

@@ -24,7 +24,9 @@
 .brand {
   font-family: var(--font-display);
   font-size: 1.25rem;
-  font-weight: 800;
+  /* 700, а не 800: у IBM Plex Sans переменная ось веса кончается на семистах,
+     и восьмисотое браузер подделал бы утолщением. */
+  font-weight: 700;
   letter-spacing: -0.01em;
   color: var(--text-primary);
 }
