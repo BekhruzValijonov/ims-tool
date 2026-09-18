@@ -1,12 +1,28 @@
 <!doctype html>
 <!-- lang="ru": от него зависит формат в полях с датой. С английской локалью
      поле ввода показывает mm/dd/yyyy, чего кладовщик не ждёт. -->
-<html lang="ru">
+<!-- data-theme проставлен заранее: иначе первый кадр рисуется одной схемой, а
+     после запуска скрипта перекрашивается в другую. Значение здесь — исходное,
+     выбор человека подставляет строчка ниже. -->
+<html lang="ru" data-theme="dark">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>IMS Tool — учёт приборов</title>
+
+    <!-- Выбранная схема применяется до первой отрисовки. В React это делается
+         эффектом, то есть уже после кадра, и тот, кто выбрал светлую, каждый
+         раз видел бы вспышку тёмной. Ключ тот же, что у ThemeMode. -->
+    <script>
+      try {
+        if (localStorage.getItem("ims-theme") === "light") {
+          document.documentElement.dataset.theme = "light"
+        }
+      } catch (error) {
+        // Приватный режим или запрет хранилища: остаётся исходная схема.
+      }
+    </script>
   </head>
 
   <body>

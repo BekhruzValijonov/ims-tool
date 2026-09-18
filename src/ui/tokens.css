@@ -12,27 +12,32 @@
  * не носят.
  *
  * Схема переключается атрибутом data-theme на <html>.
+ *
+ * Значения здесь — те же, что выдаёт `brandingCss` для исходного оформления:
+ * до того как из базы прочитано брендирование, экран рисуется ими, и разойтись
+ * им нельзя — иначе приложение открывается одним, а через мгновение
+ * перекрашивается в другое. Совпадение проверяется тестом.
  */
 
 :root {
   /* Сталь: поверхности, текст, линии */
-  --grey-50: #FCFDFD;
-  --grey-100: #F9FAFB;
-  --grey-200: #F4F6F8;
-  --grey-300: #DFE3E8;
-  --grey-400: #C4CDD5;
-  --grey-500: #919EAB;
-  --grey-600: #637381;
-  --grey-700: #454F5B;
-  --grey-800: #1C252E;
-  --grey-900: #141A21;
-  --grey-500-rgb: 145, 158, 171;
+  --grey-50: #FCFCFD;
+  --grey-100: #FAFAFA;
+  --grey-200: #F6F6F6;
+  --grey-300: #E2E3E5;
+  --grey-400: #CACCCF;
+  --grey-500: #999CA3;
+  --grey-600: #6C7078;
+  --grey-700: #4C4F54;
+  --grey-800: #232427;
+  --grey-900: #191A1C;
+  --grey-500-rgb: 153, 156, 163;
 
   /* Графит: всё, что нажимается. Ровно один цвет на весь интерфейс. */
-  --accent: #1B222B;
-  --accent-hover: #0E141B;
+  --accent: #1F4E79;
+  --accent-hover: #28669E;
   --accent-contrast: #FFFFFF;
-  --accent-rgb: 27, 34, 43;
+  --accent-rgb: 31, 78, 121;
   --focus: var(--accent);
 
   /*
@@ -100,20 +105,20 @@
   --shadow-header: 0 8px 16px 0 rgba(var(--grey-500-rgb), 0.16);
 
   /* Геометрия */
-  --radius: 8px;
-  --radius-card: 16px;
+  --radius: 12px;
+  --radius-card: 24px;
   --radius-pill: 999px;
 
   /* Шрифты */
   /* Исходные значения: до того как из базы прочитано брендирование, экран
      рисуется ими. Дальше их перекрывают правила из «Брендирования». */
-  --font-sans: 'IBM Plex Sans Variable', system-ui, sans-serif;
+  --font-sans: 'Inter Variable', system-ui, sans-serif;
   --font-display: var(--font-sans);
   --font-mono: 'IBM Plex Mono', ui-monospace, monospace;
 
   /* Таблицы. Перекрываются «Брендированием». */
-  --table-cell-y: 12px;
-  --table-stripe: transparent;
+  --table-cell-y: 16px;
+  --table-stripe: rgba(var(--grey-500-rgb), 0.08);
 
   /* Размеры оболочки */
   --sidebar-width: 260px;
@@ -130,17 +135,17 @@
 [data-theme='dark'] {
   --bg-default: var(--grey-900);
   --bg-paper: var(--grey-800);
-  --bg-neutral: #28323D;
+  --bg-neutral: #323337;
   --text-primary: #FFFFFF;
   --text-secondary: var(--grey-500);
   --text-disabled: var(--grey-600);
 
   /* Графит на тёмном фоне не виден, поэтому переворачивается: залитая кнопка
      светлая, подпись на ней тёмная. Смысл тот же — самый плотный тон экрана. */
-  --accent: #EEF1F4;
-  --accent-hover: #FFFFFF;
-  --accent-contrast: var(--grey-900);
-  --accent-rgb: 238, 241, 244;
+  --accent: #8DB9E2;
+  --accent-hover: #71A8DB;
+  --accent-contrast: #141A21;
+  --accent-rgb: 141, 185, 226;
 
   /* Насыщенные тона на тёмном тускнеют — берутся светлее, подложки глубже. */
   --state-ok: #5CB98D;

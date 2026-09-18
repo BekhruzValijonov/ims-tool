@@ -11,9 +11,12 @@ interface ThemeModeState {
 
 const Context = createContext<ThemeModeState | null>(null)
 
+/* Тёмная схема по умолчанию: приложение открыто весь день на заводском ПК, и
+   светлое полотно во всю высоту утомляет сильнее. Светлая остаётся выбором, и
+   выбранное однажды не переспрашивается. */
 function readStored(): ThemeMode {
-  if (typeof localStorage === "undefined") return "light"
-  return localStorage.getItem(STORAGE_KEY) === "dark" ? "dark" : "light"
+  if (typeof localStorage === "undefined") return "dark"
+  return localStorage.getItem(STORAGE_KEY) === "light" ? "light" : "dark"
 }
 
 /**
@@ -22,6 +25,9 @@ function readStored(): ThemeMode {
  * Заменяет useColorScheme из MUI: схема живёт атрибутом data-theme на <html>,
  * а переменные CSS переключаются сами. Выбор запоминается — оператор не должен
  * переключать тему каждую смену.
+ *
+ * Тот же атрибут проставлен в самой разметке: без него первый кадр рисуется
+ * светлым и приложение открывается вспышкой.
  */
 export function ThemeModeProvider({ children }: { children: ReactNode }) {
   const [mode, setMode] = useState<ThemeMode>(readStored)

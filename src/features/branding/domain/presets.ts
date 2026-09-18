@@ -102,12 +102,12 @@ export const ACCENTS: readonly { readonly value: string; readonly label: string 
 ]
 
 export const DEFAULT_BRANDING: Branding = {
-  accent: "#1B222B",
-  font: "plex",
-  neutral: "steel",
-  radius: "normal",
-  density: "normal",
-  stripes: false,
+  accent: "#1F4E79",
+  font: "inter",
+  neutral: "graphite",
+  radius: "soft",
+  density: "roomy",
+  stripes: true,
 }
 
 export function fontOf(id: FontId) {
