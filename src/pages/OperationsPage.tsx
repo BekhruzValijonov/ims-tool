@@ -113,7 +113,6 @@ export function OperationsPage() {
     <Page fill>
       <PageHeader
         title="Операции"
-        count={ state.data?.journal.total }
         hint="Всё, что происходило с приборами: выдачи, возвраты, перемещения, ремонты и поверки"
         tour="operations"
         actions={ <>

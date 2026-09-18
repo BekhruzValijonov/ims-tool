@@ -149,7 +149,6 @@ export function InstrumentsPage() {
     <Page fill>
       <PageHeader
         title="Приборы"
-        count={ state.data?.total }
         tour="instruments"
         actions={ <>
           <Button

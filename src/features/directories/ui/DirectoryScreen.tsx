@@ -123,7 +123,7 @@ export function DirectoryScreen<T extends { id: string }>({
   return (
     <Page fill>
       <PageHeader
-        title={ title } count={ rows.length } hint={ hint } tour={ tour }
+        title={ title } hint={ hint } tour={ tour }
         /* Та же кнопка стоит и в пустом состоянии, а якорь обхода достаётся
            заголовочной: два элемента с одним `data-tour` — подсветка наугад. */
         actions={ <span data-tour="directory-add">{ addButton }</span> }
