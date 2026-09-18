@@ -4,7 +4,7 @@ import Autocomplete from "@mui/material/Autocomplete"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import ButtonBase from "@mui/material/ButtonBase"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Grid from "@mui/material/Grid"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
@@ -109,7 +109,7 @@ export function ReportsPage() {
         }) }
       </Grid>
 
-      <Paper sx={ { p: 2, mb: 2 } }>
+      <Card sx={ { p: 2, mb: 2 } }>
           <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap", alignItems: "center" } }>
             <Typography variant="subtitle2" sx={ { minWidth: 220 } }>{ report.title }</Typography>
 
@@ -158,11 +158,11 @@ export function ReportsPage() {
             { state.data.summary }
           </Typography>
         ) : null }
-      </Paper>
+      </Card>
 
       { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
 
-      <Paper>
+      <Card>
         <DataGrid
           rows={ [...(state.data?.rows ?? [])] }
           columns={ [...(state.data?.columns ?? [])] }
@@ -190,7 +190,7 @@ export function ReportsPage() {
             ),
           } }
         />
-      </Paper>
+      </Card>
     </Box>
   )
 }

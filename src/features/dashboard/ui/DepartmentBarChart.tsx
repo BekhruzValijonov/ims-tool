@@ -1,4 +1,4 @@
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import Box from "@mui/material/Box"
@@ -24,7 +24,7 @@ export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSu
   ] as const
 
   return (
-    <Paper sx={ { p: 2 } }>
+    <Card sx={ { p: 2 } }>
       <Typography variant="h6" component="h2">Числится за подразделениями</Typography>
       <Typography variant="caption" sx={ { color: "text.secondary" } }>
         Столбец — подразделение, цвет — состояние приборов
@@ -60,6 +60,6 @@ export function DepartmentBarChart({ summary }: { summary: readonly DepartmentSu
         grid={ { horizontal: true } }
         hideLegend
       />
-    </Paper>
+    </Card>
   )
 }

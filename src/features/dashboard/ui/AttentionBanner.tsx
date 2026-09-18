@@ -1,11 +1,11 @@
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
-import CheckCircleOutlineIcon from "@mui/icons-material/CheckCircleOutlined"
+import CheckCircleOutlinedIcon from "@mui/icons-material/CheckCircleOutlined"
 import { useNavigate } from "react-router-dom"
-import { MONO, STATE, TABULAR } from "../../../app/theme/tokens"
+import { MONO, TABULAR } from "../../../app/theme/tokens"
 import { ROUTES } from "../../../app/routes"
 
 interface Item {
@@ -59,9 +59,9 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
 
   if (calm) {
     return (
-      <Paper sx={ { p: 2.5 } }>
+      <Card sx={ { p: 2.5 } }>
         <Stack direction="row" sx={ { alignItems: "center", gap: 1.5 } }>
-          <CheckCircleOutlineIcon sx={ { color: STATE.ok } }/>
+          <CheckCircleOutlinedIcon sx={ { color: "primary.main" } }/>
           <Box>
             <Typography variant="subtitle1">Всё в срок</Typography>
             <Typography variant="body2" sx={ { color: "text.secondary" } }>
@@ -69,18 +69,21 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
             </Typography>
           </Box>
         </Stack>
-      </Paper>
+      </Card>
     )
   }
 
   return (
-    <Paper
-      sx={ {
+    <Card
+      sx={ (theme) => ({
         p: 3,
         border: "none",
-        color: "#ffffff",
-        background: `linear-gradient(105deg, ${ STATE.signal } 0%, ${ STATE.wait } 100%)`,
-      } }
+        color: theme.vars.palette.error.contrastText,
+        /* Красный, а не оранжевый: речь о просрочке, а не о предупреждении.
+           Градиент — приём самой дизайн-системы, здесь он достаётся
+           единственному месту, которое обязано перебивать всё остальное. */
+        background: `linear-gradient(135deg, ${ theme.vars.palette.error.main } 0%, ${ theme.vars.palette.error.dark } 100%)`,
+      }) }
     >
       <Stack
         direction={ { xs: "column", md: "row" } }
@@ -114,6 +117,6 @@ export function AttentionBanner({ overdue, verificationDue }: { overdue: number;
           ) : null }
         </Stack>
       </Stack>
-    </Paper>
+    </Card>
   )
 }

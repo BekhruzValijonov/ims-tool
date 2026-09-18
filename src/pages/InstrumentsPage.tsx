@@ -3,7 +3,7 @@ import { useNavigate, useSearchParams } from "react-router-dom"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import MenuItem from "@mui/material/MenuItem"
 import Stack from "@mui/material/Stack"
 import TextField from "@mui/material/TextField"
@@ -127,7 +127,7 @@ export function InstrumentsPage() {
         </> }
       />
 
-      <Paper sx={ { p: 2, mb: 2 } }>
+      <Card sx={ { p: 2, mb: 2 } }>
         <Stack direction="row" sx={ { gap: 2, flexWrap: "wrap" } }>
             <TextField
               size="small" label="Поиск" placeholder="Название, инв. или серийный номер"
@@ -213,11 +213,11 @@ export function InstrumentsPage() {
               <MenuItem value="verification">Истекает поверка</MenuItem>
             </TextField>
         </Stack>
-      </Paper>
+      </Card>
 
       { state.error ? <Alert severity="error" sx={ { mb: 2 } }>{ state.error }</Alert> : null }
 
-      <Paper>
+      <Card>
         { filters ? (
           <InstrumentsGrid
             rows={ state.data?.rows ?? [] }
@@ -260,7 +260,7 @@ export function InstrumentsPage() {
             ) }
           />
         ) : null }
-      </Paper>
+      </Card>
     </Box>
   )
 }

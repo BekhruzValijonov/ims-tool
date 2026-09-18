@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import type { DepartmentSummary, LocationSummary } from "../../directories/domain/types"
@@ -72,7 +72,7 @@ export function PlacementList({ departments, locations }: PlacementListProps) {
   }
 
   return (
-    <Paper sx={ { p: 2 } }>
+    <Card sx={ { p: 2 } }>
       <Typography variant="h6" component="h2">Где приборы сейчас</Typography>
       <Typography variant="caption" sx={ { color: "text.secondary" } }>
         Подразделение и места хранения в нём
@@ -88,6 +88,6 @@ export function PlacementList({ departments, locations }: PlacementListProps) {
           </Box>
         )) }
       </Box>
-    </Paper>
+    </Card>
   )
 }

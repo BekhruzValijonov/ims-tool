@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { LineChart } from "@mui/x-charts/LineChart"
@@ -46,7 +46,7 @@ export function FlowChart({ flow }: { flow: readonly DailyFlow[] }) {
   const totalReturned = returned.reduce((sum, value) => sum + value, 0)
 
   return (
-    <Paper sx={ { p: 2 } }>
+    <Card sx={ { p: 2 } }>
       <Typography variant="h6" component="h2">Движение приборов</Typography>
       <Typography variant="caption" sx={ { color: "text.secondary" } }>
         Выдачи и возвраты по дням за последний месяц
@@ -88,6 +88,6 @@ export function FlowChart({ flow }: { flow: readonly DailyFlow[] }) {
         <AreaGradient color={ series.issued } id="flow-issued"/>
         <AreaGradient color={ series.returned } id="flow-returned"/>
       </LineChart>
-    </Paper>
+    </Card>
   )
 }

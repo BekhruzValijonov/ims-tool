@@ -1,7 +1,7 @@
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -92,7 +92,7 @@ export function DashboardPage() {
 
   const labels = history.map((day) => shortDate(day.date))
 
-  const neutral = dark ? COLORS.mutedDark : COLORS.mutedLight
+  const neutral = dark ? COLORS.grey["500"] : COLORS.grey["600"]
   const gauges: Gauge[] = [
     {
       key: "total", label: "Всего приборов", value: counters.total,
@@ -149,12 +149,12 @@ export function DashboardPage() {
               Полный журнал — в разделе «Операции»
             </Typography>
           </Stack>
-          <Paper>
+          <Card>
             <OperationsGrid
               rows={ toOperationRows(recent, instruments, directories.data) }
               dense
             />
-          </Paper>
+          </Card>
         </Box>
       </Stack>
     </Box>

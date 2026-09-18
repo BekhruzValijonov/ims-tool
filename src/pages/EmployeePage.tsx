@@ -3,7 +3,7 @@ import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Chip from "@mui/material/Chip"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Grid from "@mui/material/Grid"
 import Link from "@mui/material/Link"
 import Skeleton from "@mui/material/Skeleton"
@@ -76,7 +76,7 @@ export function EmployeePage() {
 
       <Grid container spacing={ 2 } columns={ 12 }>
         <Grid size={ { xs: 12, md: 4 } }>
-          <Paper sx={ { p: 2 } }>
+          <Card sx={ { p: 2 } }>
               <Typography variant="h6" component="h2" sx={ { mb: 1 } }>Сотрудник</Typography>
               <Stack sx={ { gap: 0.75 } }>
                 <Typography variant="body2">
@@ -86,9 +86,9 @@ export function EmployeePage() {
                 <Typography variant="body2">Табельный: { employee.personnelNumber ?? "—" }</Typography>
                 <Typography variant="body2">Телефон: { employee.phone ?? "—" }</Typography>
               </Stack>
-          </Paper>
+          </Card>
 
-          <Paper sx={ { p: 2, mt: 2 } }>
+          <Card sx={ { p: 2, mt: 2 } }>
               <Typography variant="h6" component="h2" sx={ { mb: 1 } }>
                 Сейчас на руках: { onHands.length }
               </Typography>
@@ -131,16 +131,16 @@ export function EmployeePage() {
                   }) }
                 </Stack>
               ) }
-          </Paper>
+          </Card>
         </Grid>
 
         <Grid size={ { xs: 12, md: 8 } }>
-          <Paper>
+          <Card>
             <Typography variant="h6" component="h2" sx={ { p: 2, pb: 1 } }>История выдач</Typography>
             { dirs ? (
               <OperationsGrid rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>
             ) : null }
-          </Paper>
+          </Card>
         </Grid>
       </Grid>
     </Box>

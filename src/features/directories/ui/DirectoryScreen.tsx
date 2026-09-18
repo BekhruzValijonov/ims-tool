@@ -2,7 +2,7 @@ import { useState, type FormEvent } from "react"
 import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Dialog from "@mui/material/Dialog"
 import DialogActions from "@mui/material/DialogActions"
 import DialogContent from "@mui/material/DialogContent"
@@ -132,7 +132,7 @@ export function DirectoryScreen<T extends { id: string }>({
 
       { error ? <Alert severity="error" sx={ { mb: 2 } }>{ error }</Alert> : null }
 
-      <Paper>
+      <Card>
         <DataGrid
           rows={ [...rows] }
           columns={ gridColumns }
@@ -158,7 +158,7 @@ export function DirectoryScreen<T extends { id: string }>({
             ),
           } }
         />
-      </Paper>
+      </Card>
 
       <Dialog open={ creating } onClose={ busy ? undefined : () => setCreating(false) } maxWidth="xs" fullWidth>
         <form onSubmit={ submit }>

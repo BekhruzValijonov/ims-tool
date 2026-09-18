@@ -20,7 +20,7 @@ const theme = createAppTheme()
  */
 export default function App() {
   return (
-    <ThemeProvider theme={ theme } defaultMode="dark" disableTransitionOnChange>
+    <ThemeProvider theme={ theme } defaultMode="light" disableTransitionOnChange>
       <CssBaseline enableColorScheme/>
       <LocalizationProvider
         dateAdapter={ AdapterDayjs }

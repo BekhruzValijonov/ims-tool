@@ -1,77 +1,68 @@
+import { themeConfig } from "./minimal/theme-config"
+
 /**
- * Токены темы.
+ * Токены приложения поверх дизайн-системы Minimal.
  *
- * Облик взят с админ-шаблона Corona: тёмный холст, панели с тонкой границей,
- * фирменный фиолетовый и живая палитра акцентов. Одно отличие сознательное —
- * в Corona цвет рассыпан по интерфейсу как украшение, у каждого пункта меню
- * свой оттенок просто так. Здесь фиолетовый закреплён за интерактивом, а
- * остальные цвета означают **состояние прибора**: человек учит один язык и
- * читает список по цвету, а не по подписям.
+ * Палитра, типографика и тени взяты из `dashboard-ui` целиком — здесь только
+ * то, чего в ней нет: привязка цветов к состояниям приборов и размеры, на
+ * которые опирается наша вёрстка.
+ *
+ * Правило прежнее: цвет означает состояние прибора. Оно ложится на палитру
+ * Minimal без натяжек — фирменный зелёный достаётся исправному прибору,
+ * бирюзовый «информационный» тому, что на руках, жёлтый предупреждающий тому,
+ * что вне строя, красный тому, что требует действия.
  */
+
+const P = themeConfig.palette
 
 export const COLORS = {
-  /** Холст: почти чёрный, как в Corona. */
-  canvasDark: "#0c0d11",
-  /** Панели и боковое меню. */
-  surfaceDark: "#191c24",
-  /** Приподнятая поверхность: поля ввода, наведение. */
-  raisedDark: "#1f232d",
-  borderDark: "#2c2e33",
-  textDark: "#ffffff",
-  mutedDark: "#8b90a8",
-
-  /** Светлая схема — та же геометрия на бумаге. */
-  canvasLight: "#f2f0f7",
-  surfaceLight: "#ffffff",
-  raisedLight: "#f7f6fb",
-  borderLight: "#e3e1ec",
-  textLight: "#1c1b28",
-  mutedLight: "#6c7293",
+  grey: P.grey,
+  white: P.common.white,
+  black: P.common.black,
 } as const
 
-/** Фирменный фиолетовый Corona. Занят интерактивом и ничем больше. */
 export const BRAND = {
-  main: "#5E50F9",
-  hover: "#4c3ef7",
-  soft: "rgba(94, 80, 249, 0.16)",
+  main: P.primary.main,
+  hover: P.primary.dark,
+  soft: P.primary.lighter,
 } as const
 
-/**
- * Состояния прибора в палитре Corona.
- *
- * Ремонт и поверка делят оранжевый: цвет несёт тяжесть («прибор вне строя»),
- * причину несёт подпись рядом.
- */
 export const STATE = {
-  ok: "#46c35f",
-  okSoft: "rgba(70, 195, 95, 0.16)",
-  work: "#57c7d4",
-  workSoft: "rgba(87, 199, 212, 0.16)",
-  wait: "#f2a654",
-  waitSoft: "rgba(242, 166, 84, 0.16)",
-  signal: "#f96868",
-  signalSoft: "rgba(249, 104, 104, 0.16)",
-  gone: "#8b90a8",
-  goneSoft: "rgba(139, 144, 168, 0.16)",
+  /** В наличии — прибором можно пользоваться. */
+  ok: P.primary.main,
+  okSoft: P.primary.lighter,
+  /** Выдан — он у человека. */
+  work: P.info.main,
+  workSoft: P.info.lighter,
+  /** Вне строя: ремонт или поверка. Причину несёт подпись рядом. */
+  wait: P.warning.main,
+  waitSoft: P.warning.lighter,
+  /** Требует действия: не вернули в срок, истекла поверка. */
+  signal: P.error.main,
+  signalSoft: P.error.lighter,
+  /** Списан — вне учёта. */
+  gone: P.grey["500"],
+  goneSoft: P.grey["200"],
 } as const
 
 /**
- * Те же состояния для светлой схемы.
+ * Те же состояния для тёмной схемы.
  *
- * Оттенки Corona рассчитаны на тёмный фон: на белом они выцветают, поэтому
- * светлота опущена, а тон сохранён.
+ * На тёмном фоне насыщенные цвета Minimal тускнеют, а мягкие подложки
+ * становятся ярче текста, поэтому берутся светлые тона палитры, а подложки —
+ * тёмные.
  */
-export const STATE_LIGHT = {
-  ok: "#2f9b48",
-  okSoft: "rgba(47, 155, 72, 0.12)",
-  work: "#1f97a6",
-  workSoft: "rgba(31, 151, 166, 0.12)",
-  wait: "#c07a1d",
-  waitSoft: "rgba(192, 122, 29, 0.12)",
-  signal: "#df4a4a",
-  signalSoft: "rgba(223, 74, 74, 0.12)",
-  gone: "#6c7293",
-  goneSoft: "rgba(108, 114, 147, 0.12)",
+export const STATE_DARK = {
+  ok: P.primary.light,
+  okSoft: P.primary.darker,
+  work: P.info.light,
+  workSoft: P.info.darker,
+  wait: P.warning.light,
+  waitSoft: P.warning.darker,
+  signal: P.error.light,
+  signalSoft: P.error.darker,
+  gone: P.grey["500"],
+  goneSoft: P.grey["800"],
 } as const
 
 /** Ряды на графиках — те же состояния: цветовой язык один на всё приложение. */
@@ -81,44 +72,42 @@ export const CHART_SERIES = {
   available: STATE.ok,
   checkedOut: STATE.work,
   inRepair: STATE.wait,
-  inVerification: "#f6cf6a",
+  inVerification: P.warning.light,
   writtenOff: STATE.gone,
 } as const
 
-export const CHART_SERIES_LIGHT = {
-  issued: STATE_LIGHT.work,
-  returned: STATE_LIGHT.ok,
-  available: STATE_LIGHT.ok,
-  checkedOut: STATE_LIGHT.work,
-  inRepair: STATE_LIGHT.wait,
-  inVerification: "#d9a83a",
-  writtenOff: STATE_LIGHT.gone,
+export const CHART_SERIES_DARK = {
+  issued: STATE_DARK.work,
+  returned: STATE_DARK.ok,
+  available: STATE_DARK.ok,
+  checkedOut: STATE_DARK.work,
+  inRepair: STATE_DARK.wait,
+  inVerification: P.warning.lighter,
+  writtenOff: STATE_DARK.gone,
 } as const
-
-export const SANS = "'Rubik', 'Segoe UI', system-ui, sans-serif"
 
 /**
  * Моноширинный — только для кодов и дат в колонках.
  *
- * Столбец из PR-001023 и PR-001037 сравнивается глазом лишь при равной ширине
- * знаков. Для подписей и заголовков он не используется: там от него один шум.
+ * В Minimal его нет: там нет таблиц с инвентарными номерами. Столбец из
+ * PR-001023 и PR-001037 сравнивается глазом лишь при равной ширине знаков,
+ * поэтому он остаётся — но только в ячейках с данными.
  */
 export const MONO = "'IBM Plex Mono', ui-monospace, monospace"
-
 export const TABULAR = { fontVariantNumeric: "tabular-nums" } as const
 
-/** Шкала Corona: базовый кегль 14, заголовки весом 500. */
 export const SIZE = {
   caption: "0.75rem",
-  small: "0.8125rem",
+  small: "0.875rem",
   body: "0.875rem",
-  section: "1.0625rem",
-  page: "1.375rem",
-  readout: "1.875rem",
+  section: "1.125rem",
+  page: "1.5rem",
+  readout: "2rem",
 } as const
 
-export const RADIUS = 4
-/** Квадратный значок у пункта меню и карточки показаний. */
-export const BADGE_RADIUS = 9
-export const SIDEBAR_WIDTH = 244
-export const NAVBAR_HEIGHT = 68
+/** Скругление Minimal: базовое 8, у карточек вдвое больше. */
+export const RADIUS = 8
+export const CARD_RADIUS = 16
+export const BADGE_RADIUS = 12
+export const SIDEBAR_WIDTH = 260
+export const NAVBAR_HEIGHT = 72

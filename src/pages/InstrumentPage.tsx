@@ -4,7 +4,7 @@ import Alert from "@mui/material/Alert"
 import Box from "@mui/material/Box"
 import Button from "@mui/material/Button"
 import Grid from "@mui/material/Grid"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Skeleton from "@mui/material/Skeleton"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
@@ -46,10 +46,10 @@ function Field({ label, value, mono }: { label: string; value: string; mono?: bo
 
 function Block({ title, children }: { title: string; children: React.ReactNode }) {
   return (
-    <Paper sx={ { p: 2 } }>
+    <Card sx={ { p: 2 } }>
       <Typography variant="h6" component="h2" sx={ { mb: 1 } }>{ title }</Typography>
       { children }
-    </Paper>
+    </Card>
   )
 }
 

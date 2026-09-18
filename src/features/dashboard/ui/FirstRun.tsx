@@ -1,5 +1,5 @@
 import Button from "@mui/material/Button"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { useNavigate } from "react-router-dom"
@@ -44,7 +44,7 @@ export function FirstRun() {
   const navigate = useNavigate()
 
   return (
-    <Paper sx={ { p: 3 } }>
+    <Card sx={ { p: 3 } }>
       <Typography variant="h5" component="h2">В базе пока нет ни одного прибора</Typography>
       <Typography variant="body2" sx={ { color: "text.secondary", mt: 0.5, maxWidth: 620 } }>
         Дашборд заполнится сам, как только появятся приборы и первые операции.
@@ -84,6 +84,6 @@ export function FirstRun() {
           </Stack>
         )) }
       </Stack>
-    </Paper>
+    </Card>
   )
 }

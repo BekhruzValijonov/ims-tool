@@ -1,70 +1,60 @@
 import type { Theme } from "@mui/material/styles"
+import { varAlpha } from "minimal-shared/utils"
 import { axisClasses, chartsGridClasses, legendClasses } from "@mui/x-charts"
 import type { ChartsComponents } from "@mui/x-charts/themeAugmentation"
-import { COLORS, RADIUS } from "../tokens"
 
 /**
  * Оформление графиков.
  *
- * Механика взята из шаблона MUI Dashboard и оставлена как есть — тонкие оси
- * без засечек, пунктирная сетка, скруглённые метки, градиентные заливки.
- * Цвета подставлены свои: графики говорят тем же языком состояний, что и
- * остальной интерфейс.
+ * Тонкие оси, пунктирная сетка и градиентные заливки утверждены отдельно и
+ * остаются. Цвета берутся из темы Minimal, поэтому графики говорят тем же
+ * языком, что и остальной интерфейс, и переключаются вместе со схемой.
  */
 export const chartsCustomizations: ChartsComponents<Theme> = {
   MuiChartsAxis: {
     styleOverrides: {
       root: ({ theme }) => ({
-        [`& .${ axisClasses.line }`]: { stroke: COLORS.borderLight },
-        [`& .${ axisClasses.tick }`]: { stroke: COLORS.borderLight },
-        [`& .${ axisClasses.tickLabel }`]: {
-          fill: COLORS.mutedLight,
-          fontWeight: 400,
-          fontSize: 11,
+        [`& .${ axisClasses.line }`]: {
+          stroke: varAlpha(theme.vars.palette.grey["500Channel"], 0.2),
         },
-        ...theme.applyStyles("dark", {
-          [`& .${ axisClasses.line }`]: { stroke: COLORS.borderDark },
-          [`& .${ axisClasses.tick }`]: { stroke: COLORS.borderDark },
-          [`& .${ axisClasses.tickLabel }`]: { fill: COLORS.mutedDark, fontWeight: 400 },
-        }),
+        [`& .${ axisClasses.tick }`]: {
+          stroke: varAlpha(theme.vars.palette.grey["500Channel"], 0.2),
+        },
+        [`& .${ axisClasses.tickLabel }`]: {
+          fill: theme.vars.palette.text.secondary,
+          fontWeight: 500,
+          fontSize: 12,
+        },
       }),
     },
   },
   MuiChartsTooltip: {
     styleOverrides: {
       mark: ({ theme }) => ({
-        ry: 3,
+        ry: 4,
         boxShadow: "none",
-        border: `1px solid ${ (theme.vars || theme).palette.divider }`,
+        border: `1px solid ${ varAlpha(theme.vars.palette.grey["500Channel"], 0.16) }`,
       }),
       table: ({ theme }) => ({
-        border: `1px solid ${ (theme.vars || theme).palette.divider }`,
-        borderRadius: RADIUS,
-        background: COLORS.surfaceLight,
-        ...theme.applyStyles("dark", { background: COLORS.raisedDark }),
+        border: `1px solid ${ varAlpha(theme.vars.palette.grey["500Channel"], 0.16) }`,
+        borderRadius: 8,
+        background: theme.vars.palette.background.paper,
       }),
     },
   },
   MuiChartsLegend: {
     styleOverrides: {
-      root: { [`& .${ legendClasses.mark }`]: { ry: 3 } },
+      root: { [`& .${ legendClasses.mark }`]: { ry: 4 } },
     },
   },
   MuiChartsGrid: {
     styleOverrides: {
       root: ({ theme }) => ({
         [`& .${ chartsGridClasses.line }`]: {
-          stroke: COLORS.borderLight,
+          stroke: varAlpha(theme.vars.palette.grey["500Channel"], 0.2),
           strokeDasharray: "3 3",
           strokeWidth: 0.8,
         },
-        ...theme.applyStyles("dark", {
-          [`& .${ chartsGridClasses.line }`]: {
-            stroke: COLORS.borderDark,
-            strokeDasharray: "3 3",
-            strokeWidth: 0.8,
-          },
-        }),
       }),
     },
   },

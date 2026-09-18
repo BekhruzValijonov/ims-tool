@@ -1,5 +1,5 @@
 import Box from "@mui/material/Box"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { styled } from "@mui/material/styles"
@@ -65,7 +65,7 @@ export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
   const total = live.reduce((sum, slice) => sum + slice.count, 0)
 
   return (
-    <Paper sx={ { p: 2 } }>
+    <Card sx={ { p: 2 } }>
       <Typography variant="h6" component="h2">Состояние парка</Typography>
       <Typography variant="caption" sx={ { color: "text.secondary" } }>
         Все приборы, кроме списанных
@@ -123,6 +123,6 @@ export function StatusDonut({ slices }: { slices: readonly StatusSlice[] }) {
           Списано за всё время: { writtenOff }
         </Typography>
       ) : null }
-    </Paper>
+    </Card>
   )
 }

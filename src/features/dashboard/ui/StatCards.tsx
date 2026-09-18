@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import Box from "@mui/material/Box"
 import Grid from "@mui/material/Grid"
-import Paper from "@mui/material/Paper"
+import Card from "@mui/material/Card"
 import Stack from "@mui/material/Stack"
 import Typography from "@mui/material/Typography"
 import { SparkLineChart } from "@mui/x-charts/SparkLineChart"
@@ -60,7 +60,7 @@ export function StatCards({ gauges, labels }: { gauges: readonly Gauge[]; labels
 
         return (
           <Grid key={ gauge.key } size={ { xs: 12, sm: 6, md: 3 } }>
-            <Paper data-gauge={ gauge.key } sx={ { p: 2.5, height: "100%" } }>
+            <Card data-gauge={ gauge.key } sx={ { p: 2.5, height: "100%" } }>
               <Stack direction="row" sx={ { alignItems: "flex-start", gap: 2 } }>
                 <Box sx={ { flexGrow: 1, minWidth: 0 } }>
                   <Stack direction="row" sx={ { alignItems: "baseline", gap: 1.5, flexWrap: "wrap" } }>
@@ -116,7 +116,7 @@ export function StatCards({ gauges, labels }: { gauges: readonly Gauge[]; labels
                   <AreaGradient color={ gauge.color } id={ `stat-${ gauge.key }` }/>
                 </SparkLineChart>
               </Box>
-            </Paper>
+            </Card>
           </Grid>
         )
       }) }
