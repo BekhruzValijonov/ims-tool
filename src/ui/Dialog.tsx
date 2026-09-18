@@ -10,6 +10,8 @@ interface DialogProps {
   /** Не задан — окно нельзя закрыть: так работает окно «Представьтесь». */
   onClose?(): void
   onSubmit?(event: FormEvent): void
+  /** Широкое окно — для форм в несколько блоков. */
+  readonly wide?: boolean
 }
 
 /**
@@ -19,7 +21,7 @@ interface DialogProps {
  * закрывается по Esc и рисует затемнение — всё то, ради чего обычно тянут
  * библиотеку.
  */
-export function Dialog({ open, title, children, actions, onClose, onSubmit }: DialogProps) {
+export function Dialog({ open, title, children, actions, onClose, onSubmit, wide }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
 
   useEffect(() => {
@@ -54,7 +56,7 @@ export function Dialog({ open, title, children, actions, onClose, onSubmit }: Di
   )
 
   return (
-    <dialog ref={ ref } className={ styles.dialog }>
+    <dialog ref={ ref } className={ [styles.dialog, wide ? styles.wide : null].filter(Boolean).join(" ") }>
       { onSubmit ? <form onSubmit={ onSubmit }>{ content }</form> : content }
     </dialog>
   )

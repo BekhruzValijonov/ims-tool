@@ -16,12 +16,17 @@ import { EmptyState } from "../shared/ui/EmptyState"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Chip } from "../ui/Chip"
 import { DateInput } from "../ui/DateInput"
+import { Drawer } from "../ui/Drawer"
 import { Select } from "../ui/Field"
 import { Stack } from "../ui/layout"
-import { IconDownload } from "../ui/icons"
+import { IconDownload, IconSettings } from "../ui/icons"
 
 const PAGE_SIZE = 25
+
+/** Ключи, которые задают фильтр журнала. */
+const FILTER_KEYS = ["kind", "employee", "department", "from", "to"]
 
 function readQuery(params: URLSearchParams): JournalQuery {
   const kind = params.get("kind")
@@ -46,9 +51,11 @@ export function OperationsPage() {
   const [params, setParams] = useSearchParams()
   const [page, setPage] = useState(0)
   const [exporting, setExporting] = useState(false)
+  const [filtersOpen, setFiltersOpen] = useState(false)
 
   const query = readQuery(params)
-  const filtered = [...params.keys()].length > 0
+  const activeFilters = FILTER_KEYS.filter((key) => params.get(key)).length
+  const filtered = activeFilters > 0
 
   const state = useAsync(async () => {
     const journal = await repo.operations.journal({ ...query, page, pageSize: PAGE_SIZE })
@@ -64,6 +71,11 @@ export function OperationsPage() {
     if (value === "") next.delete(key)
     else next.set(key, value)
     setParams(next, { replace: true })
+    setPage(0)
+  }
+
+  function resetFilters() {
+    setParams({}, { replace: true })
     setPage(0)
   }
 
@@ -102,7 +114,14 @@ export function OperationsPage() {
         title="Операции"
         count={ state.data?.journal.total }
         hint="Всё, что происходило с приборами: выдачи, возвраты, перемещения, ремонты и поверки"
-        actions={
+        actions={ <>
+          <Button
+            variant="outlined" startIcon={ <IconSettings size={ 18 }/> }
+            onClick={ () => setFiltersOpen(true) }
+          >
+            Фильтры
+            { activeFilters > 0 ? <Chip color="primary">{ activeFilters }</Chip> : null }
+          </Button>
           <Button
             variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
             onClick={ exportCsv }
@@ -110,34 +129,8 @@ export function OperationsPage() {
           >
             Экспорт
           </Button>
-        }
+        </> }
       />
-
-      <Card padding="tight" className="mb-2">
-        <Stack row gap={ 2 } wrap>
-          <Select
-            label="Операция" value={ params.get("kind") ?? "" } emptyLabel="Любая"
-            options={ (Object.keys(EVENT_LABELS) as EventKind[])
-              .map((kind) => ({ value: kind, label: EVENT_LABELS[kind] })) }
-            onChange={ (value) => setParam("kind", value) }
-            style={ { minWidth: 180 } }
-          />
-          <Select
-            label="Сотрудник" value={ params.get("employee") ?? "" } emptyLabel="Любой"
-            options={ (dirs?.employees ?? []).map((row) => ({ value: row.id, label: row.fullName })) }
-            onChange={ (value) => setParam("employee", value) }
-            style={ { minWidth: 220 } }
-          />
-          <Select
-            label="Подразделение" value={ params.get("department") ?? "" } emptyLabel="Любое"
-            options={ (dirs?.departments ?? []).map((row) => ({ value: row.id, label: row.name })) }
-            onChange={ (value) => setParam("department", value) }
-            style={ { minWidth: 200 } }
-          />
-          <DateInput label="С" value={ params.get("from") ?? "" } onChange={ (value) => setParam("from", value) }/>
-          <DateInput label="По" value={ params.get("to") ?? "" } onChange={ (value) => setParam("to", value) }/>
-        </Stack>
-      </Card>
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
@@ -154,12 +147,7 @@ export function OperationsPage() {
               <EmptyState
                 title="Операций не найдено"
                 action={
-                  <Button
-                    variant="outlined"
-                    onClick={ () => { setParams({}, { replace: true }); setPage(0) } }
-                  >
-                    Сбросить фильтры
-                  </Button>
+                  <Button variant="outlined" onClick={ resetFilters }>Сбросить фильтры</Button>
                 }
               >
                 За выбранный период и по выбранным условиям операций не было.
@@ -173,6 +161,51 @@ export function OperationsPage() {
           />
         ) : null }
       </Card>
+
+      <Drawer
+        open={ filtersOpen }
+        title="Фильтры"
+        onClose={ () => setFiltersOpen(false) }
+        footer={ <>
+          <Button variant="outlined" onClick={ resetFilters } disabled={ activeFilters === 0 }>
+            Сбросить
+          </Button>
+          <Stack row grow/>
+          <Button variant="contained" onClick={ () => setFiltersOpen(false) }>
+            Показать { state.data?.journal.total ?? 0 }
+          </Button>
+        </> }
+      >
+        <Stack gap={ 2 }>
+          <Select
+            label="Операция" value={ params.get("kind") ?? "" } emptyLabel="Любая"
+            options={ (Object.keys(EVENT_LABELS) as EventKind[])
+              .map((kind) => ({ value: kind, label: EVENT_LABELS[kind] })) }
+            onChange={ (value) => setParam("kind", value) }
+            fullWidth
+          />
+          <Select
+            label="Сотрудник" value={ params.get("employee") ?? "" } emptyLabel="Любой"
+            options={ (dirs?.employees ?? []).map((row) => ({ value: row.id, label: row.fullName })) }
+            onChange={ (value) => setParam("employee", value) }
+            fullWidth
+          />
+          <Select
+            label="Подразделение" value={ params.get("department") ?? "" } emptyLabel="Любое"
+            options={ (dirs?.departments ?? []).map((row) => ({ value: row.id, label: row.name })) }
+            onChange={ (value) => setParam("department", value) }
+            fullWidth
+          />
+          <DateInput
+            label="С" value={ params.get("from") ?? "" }
+            onChange={ (value) => setParam("from", value) } fullWidth
+          />
+          <DateInput
+            label="По" value={ params.get("to") ?? "" }
+            onChange={ (value) => setParam("to", value) } fullWidth
+          />
+        </Stack>
+      </Drawer>
     </div>
   )
 }

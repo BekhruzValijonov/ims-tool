@@ -13,14 +13,6 @@
   transition: background-color 120ms ease, border-color 120ms ease, color 120ms ease;
 }
 
-.button:disabled {
-  cursor: default;
-  color: var(--text-disabled);
-  background-color: rgba(var(--grey-500-rgb), 0.24);
-  border-color: transparent;
-  box-shadow: none;
-}
-
 .small { padding: 4px 12px; font-size: 0.8125rem; min-height: 30px; }
 .medium { padding: 6px 16px; font-size: 0.875rem; min-height: 36px; }
 .large { padding: 8px 22px; font-size: 0.9375rem; min-height: 48px; }
@@ -69,3 +61,22 @@
 }
 
 .icon:hover:not(:disabled) { background-color: var(--action-hover); }
+
+/* Погашенная кнопка объявлена последней: у правил вариантов та же весомость,
+   и при обратном порядке они перекрашивали её обратно в фирменный цвет. */
+.button:disabled,
+.button:disabled:hover {
+  cursor: default;
+  color: var(--text-disabled);
+  background-color: rgba(var(--grey-500-rgb), 0.24);
+  border-color: transparent;
+  box-shadow: none;
+}
+
+/* Кнопка-иконка в погашенном виде остаётся прозрачной: подложка у неё
+   означала бы нажатие. */
+.icon:disabled,
+.icon:disabled:hover {
+  background-color: transparent;
+  color: var(--text-disabled);
+}

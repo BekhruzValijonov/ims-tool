@@ -10,6 +10,8 @@ html,
 body,
 #root {
   height: 100%;
+  /* Прокрутку ведёт область содержимого, а не документ. */
+  overflow: hidden;
 }
 
 body {

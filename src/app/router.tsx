@@ -1,4 +1,4 @@
-import { createHashRouter } from "react-router-dom"
+import { createHashRouter, Navigate } from "react-router-dom"
 import { AppShell } from "./AppShell"
 import { DashboardPage } from "../pages/DashboardPage"
 import { InstrumentsPage } from "../pages/InstrumentsPage"
@@ -24,8 +24,10 @@ export const router = createHashRouter([
     children: [
       { index: true, element: <DashboardPage/> },
       { path: "instruments", element: <InstrumentsPage/> },
-      // Раньше :id — иначе «new» будет опознан как идентификатор прибора.
-      { path: "instruments/new", element: <InstrumentFormPage/> },
+      /* Заведение прибора переехало в окно на списке; прежний адрес ведёт
+         туда же, чтобы сохранённые ссылки не ломались. Правило «раньше :id»
+         остаётся: иначе «new» опознаётся как идентификатор прибора. */
+      { path: "instruments/new", element: <Navigate to="/instruments?new=1" replace/> },
       { path: "instruments/:id", element: <InstrumentPage/> },
       { path: "instruments/:id/edit", element: <InstrumentFormPage/> },
       { path: "operations", element: <OperationsPage/> },

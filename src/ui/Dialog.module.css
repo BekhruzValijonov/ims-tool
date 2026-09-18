@@ -29,3 +29,5 @@
   gap: 8px;
   padding: 16px 24px 24px;
 }
+
+.wide { width: min(880px, calc(100vw - 32px)); }

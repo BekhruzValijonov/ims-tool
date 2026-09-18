@@ -28,7 +28,7 @@ const STEPS: readonly { title: string; text: string; label: string; to: string }
     title: "Приборы",
     text: "Дальше заводите приборы — журнал и отчёты начнут заполняться сами.",
     label: "Добавить прибор",
-    to: `${ ROUTES.instruments }/new`,
+    to: `${ ROUTES.instruments }?new=1`,
   },
 ]
 
