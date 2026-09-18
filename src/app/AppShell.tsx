@@ -29,7 +29,7 @@ function SideMenu({ onNavigate }: { onNavigate?: () => void }) {
         <span className={ styles.brand }>IMS&nbsp;Tool</span>
       </div>
 
-      <nav className={ styles.nav }>
+      <nav className={ styles.nav } data-tour="app-nav">
         { NAVIGATION.map((section) => (
           <div key={ section.title }>
             <p className={ styles.groupLabel }>{ section.title }</p>
@@ -75,7 +75,7 @@ function QuickSearch() {
   }
 
   return (
-    <form onSubmit={ submit } className={ styles.search }>
+    <form onSubmit={ submit } className={ styles.search } data-tour="app-search">
       <TextField
         value={ text }
         onChange={ setText }

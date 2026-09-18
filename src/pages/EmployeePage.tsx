@@ -5,6 +5,7 @@ import { useDirectories } from "../features/directories/ui/useDirectories"
 import { OperationsTable } from "../features/operations/ui/OperationsTable"
 import { toOperationRows } from "../features/operations/ui/operationRows"
 import type { Instrument } from "../features/instruments/domain/types"
+import { TourButton } from "../tour/TourButton"
 import { formatDate } from "../shared/dates"
 import { useStateColors } from "../app/theme/useStateColors"
 import { ROUTES } from "../app/routes"
@@ -66,14 +67,17 @@ export function EmployeePage() {
         К списку сотрудников
       </Button>
 
-      <Stack row align="center" gap={ 1.5 } wrap style={ { marginBottom: 24 } }>
-        <Text variant="h4" as="h1">{ employee.fullName }</Text>
-        { employee.isActive ? null : <Chip>Уволен</Chip> }
+      <Stack row align="center" justify="between" gap={ 2 } wrap style={ { marginBottom: 24 } }>
+        <Stack row align="center" gap={ 1.5 } wrap>
+          <Text variant="h4" as="h1">{ employee.fullName }</Text>
+          { employee.isActive ? null : <Chip>Уволен</Chip> }
+        </Stack>
+        <TourButton tour="employee"/>
       </Stack>
 
       <Stack row gap={ 2 } wrap align="stretch">
         <Stack gap={ 2 } style={ { flex: "2 1 300px", minWidth: 0 } }>
-          <Card>
+          <Card data-tour="employee-card">
             <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Сотрудник</Text>
             <Stack gap={ 0.75 }>
               <Text>Подразделение: { dirs?.departmentName(employee.departmentId) ?? "—" }</Text>
@@ -83,7 +87,7 @@ export function EmployeePage() {
             </Stack>
           </Card>
 
-          <Card>
+          <Card data-tour="employee-on-hands">
             <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>
               Сейчас на руках: { onHands.length }
             </Text>
@@ -133,7 +137,7 @@ export function EmployeePage() {
         </Stack>
 
         <div style={ { flex: "3 1 420px", minWidth: 0 } }>
-          <Card padding="none">
+          <Card padding="none" data-tour="employee-history">
             <Text variant="h6" as="h2" style={ { padding: "20px 20px 8px" } }>История выдач</Text>
             { dirs ? (
               <OperationsTable rows={ toOperationRows(journal.rows, instruments, dirs) } dense/>

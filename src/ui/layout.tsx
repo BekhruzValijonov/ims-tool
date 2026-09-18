@@ -33,6 +33,8 @@ interface StackProps {
   readonly className?: string
   readonly style?: CSSProperties
   readonly as?: "div" | "section" | "header" | "aside" | "nav" | "li" | "form"
+  /** Якорь обхода «Как это работает». */
+  readonly "data-tour"?: string
 }
 
 /**
@@ -43,9 +45,11 @@ interface StackProps {
  */
 export function Stack({
   children, row, gap = 0, align, justify, wrap, grow, className, style, as: Tag = "div",
+  "data-tour": tour,
 }: StackProps) {
   return (
     <Tag
+      data-tour={ tour }
       className={ [styles.stack, className].filter(Boolean).join(" ") }
       style={ {
         flexDirection: row ? "row" : "column",
@@ -69,9 +73,11 @@ interface GridProps {
   readonly gap?: number
   readonly className?: string
   readonly style?: CSSProperties
+  /** Якорь обхода «Как это работает». */
+  readonly "data-tour"?: string
 }
 
-export function Grid({ children, cols = {}, gap = 2, className, style }: GridProps) {
+export function Grid({ children, cols = {}, gap = 2, className, style, "data-tour": tour }: GridProps) {
   const xs = cols.xs ?? 1
   const sm = cols.sm ?? xs
   const md = cols.md ?? sm
@@ -79,6 +85,7 @@ export function Grid({ children, cols = {}, gap = 2, className, style }: GridPro
 
   return (
     <div
+      data-tour={ tour }
       className={ [styles.grid, className].filter(Boolean).join(" ") }
       style={ {
         gap: gap * STEP,

@@ -150,10 +150,12 @@ export function InstrumentsPage() {
       <PageHeader
         title="Приборы"
         count={ state.data?.total }
+        tour="instruments"
         actions={ <>
           <Button
             variant="outlined" startIcon={ <IconSettings size={ 18 }/> }
             onClick={ () => setFiltersOpen(true) }
+            data-tour="instruments-filters"
           >
             Фильтры
             { activeFilters > 0 ? (
@@ -164,10 +166,14 @@ export function InstrumentsPage() {
             variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
             onClick={ exportCsv }
             disabled={ exporting || !filters || (state.data?.total ?? 0) === 0 }
+            data-tour="instruments-export"
           >
             Экспорт
           </Button>
-          <Button variant="contained" startIcon={ <IconPlus size={ 18 }/> } onClick={ openCreate }>
+          <Button
+            variant="contained" startIcon={ <IconPlus size={ 18 }/> } onClick={ openCreate }
+            data-tour="instruments-create"
+          >
             Добавить прибор
           </Button>
         </> }
@@ -175,7 +181,11 @@ export function InstrumentsPage() {
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
+      <Card
+        padding="none"
+        style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }
+        data-tour="instruments-table"
+      >
         { filters ? (
           <InstrumentsTable
             rows={ state.data?.rows ?? [] }

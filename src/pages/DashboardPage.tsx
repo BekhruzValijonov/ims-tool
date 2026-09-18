@@ -76,7 +76,7 @@ export function DashboardPage() {
   if (counters.total === 0 && counters.writtenOff === 0) {
     return (
       <div>
-        <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
+        <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас" tour="dashboard"/>
         <FirstRun/>
       </div>
     )
@@ -108,24 +108,32 @@ export function DashboardPage() {
 
   return (
     <Page>
-      <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
+      <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас" tour="dashboard"/>
 
       <Stack gap={ 2 }>
-        <StatCards gauges={ gauges }/>
-        <AttentionBanner overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
+        {/* Обёртки несут якоря обхода: сами блоки рисуют свою карточку внутри
+            и о существовании подсказок не знают. */}
+        <div data-tour="dashboard-gauges">
+          <StatCards gauges={ gauges }/>
+        </div>
+        <div data-tour="dashboard-attention">
+          <AttentionBanner overdue={ counters.overdue } verificationDue={ counters.verificationDue }/>
+        </div>
 
         <Stack row gap={ 2 } wrap align="stretch">
           <Stack gap={ 2 } style={ { flex: "3 1 520px", minWidth: 0 } }>
-            <FlowChart flow={ flow }/>
-            <DepartmentBarChart summary={ departments }/>
+            <div data-tour="dashboard-flow"><FlowChart flow={ flow }/></div>
+            <div data-tour="dashboard-departments"><DepartmentBarChart summary={ departments }/></div>
           </Stack>
           <Stack gap={ 2 } style={ { flex: "2 1 320px", minWidth: 0 } }>
-            <StatusDonut slices={ breakdown }/>
-            <PlacementList departments={ departments } locations={ locations }/>
+            <div data-tour="dashboard-status"><StatusDonut slices={ breakdown }/></div>
+            <div data-tour="dashboard-placement">
+              <PlacementList departments={ departments } locations={ locations }/>
+            </div>
           </Stack>
         </Stack>
 
-        <div>
+        <div data-tour="dashboard-recent">
           <Stack row align="baseline" justify="between" style={ { marginBottom: 12 } }>
             <Text variant="h5" as="h2">Последние операции</Text>
             <Text variant="caption" tone="secondary">Полный журнал — в разделе «Операции»</Text>

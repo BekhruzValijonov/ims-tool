@@ -27,10 +27,10 @@ export function SettingsPage() {
 
   return (
     <Page maxWidth={ 760 }>
-      <PageHeader title="Настройки"/>
+      <PageHeader title="Настройки" tour="settings"/>
 
       <Stack gap={ 2 }>
-        <Card>
+        <Card data-tour="settings-operator">
           <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Оператор</Text>
           <Text tone="secondary" style={ { marginBottom: 16 } }>
             Этим именем подписываются новые записи журнала. Уже сделанные записи останутся
@@ -54,7 +54,7 @@ export function SettingsPage() {
           { saved ? <Alert severity="success" className="mb-2">Имя оператора сохранено</Alert> : null }
         </Card>
 
-        <Card>
+        <Card data-tour="settings-storage">
           <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>Хранилище</Text>
           <Text>{ BACKEND_LABELS[backend] ?? backend }</Text>
           <Text tone="secondary" style={ { marginTop: 16 } }>

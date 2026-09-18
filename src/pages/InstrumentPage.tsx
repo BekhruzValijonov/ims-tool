@@ -8,6 +8,7 @@ import { isOperationAllowed } from "../features/operations/domain/transitions"
 import { EVENT_LABELS, OPERATION_LABELS, CONDITION_LABELS } from "../features/operations/domain/labels"
 import type { OperationKind } from "../features/operations/domain/types"
 import { StatusMark } from "../features/instruments/ui/StatusMark"
+import { TourButton } from "../tour/TourButton"
 import { formatPrice } from "../features/instruments/domain/labels"
 import { formatDate, formatDateTime } from "../shared/dates"
 import { useStateColors } from "../app/theme/useStateColors"
@@ -36,9 +37,11 @@ function Field({ label, value, mono }: { label: string; value: string; mono?: bo
   )
 }
 
-function Block({ title, children }: { title: string; children: ReactNode }) {
+function Block({
+  title, "data-tour": tour, children,
+}: { title: string; "data-tour"?: string; children: ReactNode }) {
   return (
-    <Card>
+    <Card data-tour={ tour }>
       <Text variant="h6" as="h2" style={ { marginBottom: 8 } }>{ title }</Text>
       { children }
     </Card>
@@ -109,22 +112,30 @@ export function InstrumentPage() {
           </Stack>
         </div>
 
-        <Stack row gap={ 1 } wrap>
-          { OPERATION_ORDER
-            .filter((kind) => isOperationAllowed(instrument.status, kind))
-            /* Недоступная операция не гасится, а отсутствует: серая кнопка
-               заставляет гадать, почему она не нажимается. */
-            .map((kind) => (
-              <Button
-                key={ kind }
-                size="small"
-                variant={ kind === "CHECK_OUT" || kind === "RETURN" ? "contained" : "outlined" }
-                color={ kind === "WRITE_OFF" ? "error" : "primary" }
-                onClick={ () => setOperation(kind) }
-              >
-                { OPERATION_LABELS[kind] }
-              </Button>
-            )) }
+        <Stack row gap={ 1 } wrap align="center">
+          <TourButton tour="instrument"/>
+
+          {/* Операции стоят своим блоком: обход подсвечивает их одной рамкой,
+              а «Редактировать» к операциям не относится — паспорт правится
+              без записи в журнал. */}
+          <Stack row gap={ 1 } wrap data-tour="instrument-operations">
+            { OPERATION_ORDER
+              .filter((kind) => isOperationAllowed(instrument.status, kind))
+              /* Недоступная операция не гасится, а отсутствует: серая кнопка
+                 заставляет гадать, почему она не нажимается. */
+              .map((kind) => (
+                <Button
+                  key={ kind }
+                  size="small"
+                  variant={ kind === "CHECK_OUT" || kind === "RETURN" ? "contained" : "outlined" }
+                  color={ kind === "WRITE_OFF" ? "error" : "primary" }
+                  onClick={ () => setOperation(kind) }
+                >
+                  { OPERATION_LABELS[kind] }
+                </Button>
+              )) }
+          </Stack>
+
           <Button
             size="small" startIcon={ <IconEdit size={ 16 }/> }
             onClick={ () => navigate(`${ ROUTES.instrument(instrument.id) }/edit`) }
@@ -136,7 +147,7 @@ export function InstrumentPage() {
 
       <Stack row gap={ 2 } wrap align="stretch">
         <Stack gap={ 2 } style={ { flex: "2 1 340px", minWidth: 0 } }>
-          <Block title="Паспорт">
+          <Block title="Паспорт" data-tour="instrument-passport">
             <Field label="Серийный номер" value={ instrument.serialNumber ?? "—" } mono/>
             <Field label="Тип" value={ dirs?.typeName(instrument.typeId) ?? "—" }/>
             <Field label="Производитель" value={ instrument.manufacturer ?? "—" }/>
@@ -145,7 +156,7 @@ export function InstrumentPage() {
             <Field label="Стоимость" value={ formatPrice(instrument.priceMinor, instrument.currency) } mono/>
           </Block>
 
-          <Block title="Учёт">
+          <Block title="Учёт" data-tour="instrument-account">
             <Field label="Числится за" value={ dirs?.departmentName(instrument.ownerDepartmentId) ?? "—" }/>
             <Field label="Возвращается в" value={ dirs?.locationName(instrument.baseLocationId) ?? "—" }/>
             <Field label="Сейчас в" value={ dirs?.departmentName(instrument.currentDepartmentId) ?? "—" }/>
@@ -165,7 +176,7 @@ export function InstrumentPage() {
             ) : null }
           </Block>
 
-          <Block title="Метрология">
+          <Block title="Метрология" data-tour="instrument-metrology">
             <Field label="Поверка действительна до" value={ formatDate(instrument.nextVerificationAt) } mono/>
             <Field label="Калибровка действительна до" value={ formatDate(instrument.nextCalibrationAt) } mono/>
 
@@ -199,7 +210,7 @@ export function InstrumentPage() {
         </Stack>
 
         <div style={ { flex: "3 1 420px", minWidth: 0 } }>
-          <Block title="История">
+          <Block title="История" data-tour="instrument-history">
             <Stack gap={ 1.5 } style={ { marginTop: 8 } }>
               { history.map((event) => (
                 <Stack

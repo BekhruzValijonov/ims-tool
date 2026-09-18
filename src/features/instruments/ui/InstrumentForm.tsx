@@ -67,9 +67,11 @@ function fromDateInput(value: string): number | null {
   return new Date(year, month - 1, day).getTime()
 }
 
-function Section({ title, hint, children }: { title: string; hint?: string; children: ReactNode }) {
+function Section({
+  title, hint, "data-tour": tour, children,
+}: { title: string; hint?: string; "data-tour"?: string; children: ReactNode }) {
   return (
-    <Stack gap={ 1.5 }>
+    <Stack gap={ 1.5 } data-tour={ tour }>
       <div>
         <Text variant="subtitle1" as="h3">{ title }</Text>
         { hint ? <Text variant="caption" tone="secondary">{ hint }</Text> : null }
@@ -204,7 +206,7 @@ export function InstrumentForm({ instrumentId, onSaved, renderActions, formId }:
   return (
     <form id={ formId } onSubmit={ submit }>
       <Stack gap={ 3 }>
-        <Section title="Основное">
+        <Section title="Основное" data-tour="instrument-form-main">
           <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 }>
             <TextField label="Наименование" required value={ form.name } onChange={ set("name") } fullWidth/>
             <Select
@@ -225,7 +227,7 @@ export function InstrumentForm({ instrumentId, onSaved, renderActions, formId }:
           </Grid>
         </Section>
 
-        <Section title="Учёт">
+        <Section title="Учёт" data-tour="instrument-form-account">
           <Grid cols={ { xs: 1, sm: 2 } } gap={ 2 }>
             <Select
               label="Подразделение" value={ form.ownerDepartmentId }
@@ -297,7 +299,7 @@ export function FormPageActions({
   busy, submitLabel, onCancel,
 }: { busy: boolean; submitLabel: string; onCancel(): void }) {
   return (
-    <Stack row gap={ 1 }>
+    <Stack row gap={ 1 } data-tour="instrument-form-actions">
       <Button type="submit" variant="contained" disabled={ busy }>{ submitLabel }</Button>
       <Button onClick={ onCancel } disabled={ busy }>Отмена</Button>
     </Stack>

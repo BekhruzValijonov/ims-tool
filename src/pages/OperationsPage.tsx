@@ -115,10 +115,12 @@ export function OperationsPage() {
         title="Операции"
         count={ state.data?.journal.total }
         hint="Всё, что происходило с приборами: выдачи, возвраты, перемещения, ремонты и поверки"
+        tour="operations"
         actions={ <>
           <Button
             variant="outlined" startIcon={ <IconSettings size={ 18 }/> }
             onClick={ () => setFiltersOpen(true) }
+            data-tour="operations-filters"
           >
             Фильтры
             { activeFilters > 0 ? <Chip color="primary">{ activeFilters }</Chip> : null }
@@ -127,6 +129,7 @@ export function OperationsPage() {
             variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
             onClick={ exportCsv }
             disabled={ exporting || !dirs || (state.data?.journal.total ?? 0) === 0 }
+            data-tour="operations-export"
           >
             Экспорт
           </Button>
@@ -135,7 +138,11 @@ export function OperationsPage() {
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
+      <Card
+        padding="none"
+        style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }
+        data-tour="operations-table"
+      >
         { dirs && state.data ? (
           <OperationsTable
             rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }

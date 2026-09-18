@@ -1,6 +1,7 @@
 import { useState, type FormEvent, type ReactNode } from "react"
 import { PageHeader } from "../../../shared/ui/PageHeader"
 import { EmptyState } from "../../../shared/ui/EmptyState"
+import type { TourId } from "../../../tour/steps"
 import { Alert } from "../../../ui/Alert"
 import { Button } from "../../../ui/Button"
 import { Card } from "../../../ui/Card"
@@ -24,6 +25,8 @@ export type FormValues = Record<string, string | boolean>
 interface DirectoryScreenProps<T extends { id: string }> {
   readonly title: string
   readonly addLabel: string
+  /** Обход экрана: у четырёх справочников он свой, хотя разметка общая. */
+  readonly tour: TourId
   /** Одна строка о том, зачем справочник нужен. */
   readonly hint?: string
   /** Что написать, когда справочник ещё пуст. */
@@ -53,7 +56,7 @@ interface DirectoryScreenProps<T extends { id: string }> {
  * запись перестаёт предлагаться в формах, но прошлое остаётся читаемым.
  */
 export function DirectoryScreen<T extends { id: string }>({
-  title, addLabel, hint, emptyText, rows, columns, fields, loading, error,
+  title, addLabel, tour, hint, emptyText, rows, columns, fields, loading, error,
   toForm, onSave, archiveLabel, isArchived, onArchive,
 }: DirectoryScreenProps<T>) {
   const [editing, setEditing] = useState<T | null>(null)
@@ -119,11 +122,20 @@ export function DirectoryScreen<T extends { id: string }>({
 
   return (
     <Page fill>
-      <PageHeader title={ title } count={ rows.length } hint={ hint } actions={ addButton }/>
+      <PageHeader
+        title={ title } count={ rows.length } hint={ hint } tour={ tour }
+        /* Та же кнопка стоит и в пустом состоянии, а якорь обхода достаётся
+           заголовочной: два элемента с одним `data-tour` — подсветка наугад. */
+        actions={ <span data-tour="directory-add">{ addButton }</span> }
+      />
 
       { error ? <Alert severity="error" className="mb-2">{ error }</Alert> : null }
 
-      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
+      <Card
+        padding="none"
+        style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }
+        data-tour="directory-table"
+      >
         <DataTable
           columns={ [...columns, actionsColumn] }
           rows={ rows }

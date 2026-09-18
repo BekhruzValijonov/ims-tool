@@ -75,9 +75,15 @@ export function ReportsPage() {
 
   return (
     <Page>
-      <PageHeader title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"/>
+      <PageHeader
+        title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"
+        tour="reports"
+      />
 
-      <Grid cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1.5 } style={ { marginBottom: 16 } }>
+      <Grid
+        cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1.5 } style={ { marginBottom: 16 } }
+        data-tour="reports-list"
+      >
         { REPORTS.map((item) => {
           const active = item.id === selected
           return (
@@ -102,7 +108,7 @@ export function ReportsPage() {
         }) }
       </Grid>
 
-      <Card padding="tight" className="mb-2">
+      <Card padding="tight" className="mb-2" data-tour="reports-params">
         <Stack row gap={ 2 } wrap align="end">
           <Text variant="subtitle2" style={ { minWidth: 200, paddingBottom: 8 } }>{ report.title }</Text>
 
@@ -146,6 +152,7 @@ export function ReportsPage() {
             variant="outlined" startIcon={ <IconDownload size={ 18 }/> }
             onClick={ exportCsv }
             disabled={ exporting || !state.data || state.data.rows.length === 0 }
+            data-tour="reports-export"
           >
             Выгрузить CSV
           </Button>
@@ -158,7 +165,7 @@ export function ReportsPage() {
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none">
+      <Card padding="none" data-tour="reports-table">
         <DataTable
           columns={ state.data?.columns ?? [] }
           rows={ state.data?.rows ?? [] }

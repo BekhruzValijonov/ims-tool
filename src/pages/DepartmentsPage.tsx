@@ -24,6 +24,7 @@ export function DepartmentsPage() {
     <DirectoryScreen<Department>
       title="Подразделения"
       addLabel="Добавить подразделение"
+      tour="departments"
       hint="Цеха, лаборатории и участки, за которыми числятся приборы"
       emptyText="Заведите цеха и лаборатории — за ними будут числиться приборы. Пока их нет, прибор некуда приписать."
       rows={ state.data ?? [] }

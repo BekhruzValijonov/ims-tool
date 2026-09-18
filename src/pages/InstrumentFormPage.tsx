@@ -30,6 +30,7 @@ export function InstrumentFormPage() {
       <PageHeader
         title="Редактирование прибора"
         hint="Правка паспорта. Состояние и держатель меняются операциями из карточки."
+        tour="instrumentForm"
       />
 
       <Card>
