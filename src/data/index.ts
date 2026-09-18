@@ -1,6 +1,7 @@
 import { isTauri } from "../platform/env"
 import type { AppRepo } from "./AppRepo"
 import { MemoryRepo } from "./MemoryRepo"
+import { forgetSnapshot, readSnapshot, withBrowserStorage } from "./browserStore"
 
 /**
  * Кэшируется промис, а не результат: иначе два параллельных первых вызова
@@ -44,15 +45,22 @@ async function initRepo(): Promise<AppRepo> {
 
   // Браузер: вёрстка на дев-сервере без сборки Rust.
   const repo = new MemoryRepo(clock)
-  if (import.meta.env.DEV) {
+
+  /* ?demo=empty оставляет приложение пустым — так проверяются первый запуск,
+     модалка «представьтесь» и экраны, на которых ещё ничего нет. Сохранённое
+     при этом забывается, иначе пустой запуск восстановил бы прошлую витрину. */
+  const empty = new URLSearchParams(location.search).get("demo") === "empty"
+  if (empty) forgetSnapshot()
+
+  const stored = empty ? null : readSnapshot()
+  if (stored) {
+    repo.restore(stored)
+  } else if (import.meta.env.DEV && !empty) {
     const { seedShowcase } = await import("./devSeed")
-    /* ?demo=empty оставляет приложение пустым — так проверяются первый запуск,
-       модалка «представьтесь» и экраны, на которых ещё ничего нет. */
-    if (new URLSearchParams(location.search).get("demo") !== "empty") {
-      await seedShowcase(repo, travel)
-    }
+    await seedShowcase(repo, travel)
   }
-  return repo
+
+  return withBrowserStorage(repo)
 }
 
 export async function getRepo(): Promise<AppRepo> {

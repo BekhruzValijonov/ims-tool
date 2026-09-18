@@ -53,6 +53,22 @@ import { OPERATOR_NAME_KEY, VERIFICATION_HORIZON_MS } from "./settingsKeys"
  * они одним набором (repoContract.ts) — иначе реализации разъедутся, и ошибка
  * вылезет только на устройстве, где её дороже всего ловить.
  */
+/* Версия снимка. Схема поменялась — старый снимок не читается, а витрина
+   засевается заново: чинить чужие данные в браузерной витрине незачем. */
+export const SNAPSHOT_VERSION = 1
+
+export interface MemorySnapshot {
+  readonly version: number
+  readonly instruments: readonly Instrument[]
+  readonly events: readonly InstrumentEvent[]
+  readonly verifications: readonly VerificationRecord[]
+  readonly departments: readonly Department[]
+  readonly locations: readonly StorageLocation[]
+  readonly employees: readonly Employee[]
+  readonly types: readonly InstrumentType[]
+  readonly settings: readonly (readonly [string, string])[]
+}
+
 export class MemoryRepo implements AppRepo {
   readonly backend: StorageBackend = "memory"
 
@@ -67,6 +83,39 @@ export class MemoryRepo implements AppRepo {
 
   /** Часы внедряются снаружи: тест не должен зависеть от текущего момента. */
   constructor(private readonly clock: () => number = Date.now) {}
+
+  /**
+   * Снимок всего содержимого.
+   *
+   * Нужен витрине в браузере: она обязана пережить перезагрузку страницы, иначе
+   * заведённый прибор и выбранное оформление пропадают на первом же F5. Сам
+   * репозиторий по-прежнему ничего не хранит — снимок забирает и возвращает
+   * тот, кто его собрал.
+   */
+  snapshot(): MemorySnapshot {
+    return {
+      version: SNAPSHOT_VERSION,
+      instruments: this.instrumentRows,
+      events: this.eventRows,
+      verifications: this.verificationRows,
+      departments: this.departmentRows,
+      locations: this.locationRows,
+      employees: this.employeeRows,
+      types: this.typeRows,
+      settings: [...this.settingsMap],
+    }
+  }
+
+  restore(snapshot: MemorySnapshot): void {
+    this.instrumentRows = [...snapshot.instruments]
+    this.eventRows = [...snapshot.events]
+    this.verificationRows = [...snapshot.verifications]
+    this.departmentRows = [...snapshot.departments]
+    this.locationRows = [...snapshot.locations]
+    this.employeeRows = [...snapshot.employees]
+    this.typeRows = [...snapshot.types]
+    this.settingsMap = new Map(snapshot.settings)
+  }
 
   readonly instruments: InstrumentRepo = {
     list: async (query = {}) => this.listInstruments(query),
