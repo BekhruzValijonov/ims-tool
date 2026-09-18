@@ -7,7 +7,7 @@
   width: var(--sidebar-width);
   height: 100vh;
   flex-shrink: 0;
-  border-right: 1px dashed var(--divider);
+  border-right: 1px solid var(--divider-soft);
   background-color: var(--bg-default);
   display: flex;
   flex-direction: column;

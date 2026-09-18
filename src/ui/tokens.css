@@ -65,6 +65,8 @@
   --text-secondary: var(--grey-600);
   --text-disabled: var(--grey-500);
   --divider: rgba(var(--grey-500-rgb), 0.2);
+  /* Граница боковой панели в дизайн-системе слабее общего разделителя. */
+  --divider-soft: rgba(var(--grey-500-rgb), 0.12);
   --action-hover: rgba(var(--grey-500-rgb), 0.08);
   --action-selected: rgba(var(--grey-500-rgb), 0.16);
 
