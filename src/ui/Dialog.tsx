@@ -1,5 +1,6 @@
 import { useEffect, useRef, type FormEvent, type ReactNode } from "react"
 import styles from "./Dialog.module.css"
+import { lockScroll } from "./scrollLock"
 import { Text } from "./Text"
 
 interface DialogProps {
@@ -23,6 +24,10 @@ interface DialogProps {
  */
 export function Dialog({ open, title, children, actions, onClose, onSubmit, wide }: DialogProps) {
   const ref = useRef<HTMLDialogElement>(null)
+
+  /* Запрет прокрутки ставится раньше показа окна: `showModal()` отматывает
+     документ в начало, и снимок положения нужно успеть сделать до него. */
+  useEffect(() => (open ? lockScroll() : undefined), [open])
 
   useEffect(() => {
     const dialog = ref.current

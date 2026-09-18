@@ -1,5 +1,6 @@
 import { useEffect, useRef, type ReactNode } from "react"
 import styles from "./Drawer.module.css"
+import { lockScroll } from "./scrollLock"
 import { IconButton } from "./Button"
 import { Text } from "./Text"
 import { IconClose } from "./icons"
@@ -21,6 +22,10 @@ interface DrawerProps {
  */
 export function Drawer({ open, title, children, footer, onClose }: DrawerProps) {
   const ref = useRef<HTMLDialogElement>(null)
+
+  /* Запрет прокрутки ставится раньше показа окна: `showModal()` отматывает
+     документ в начало, и снимок положения нужно успеть сделать до него. */
+  useEffect(() => (open ? lockScroll() : undefined), [open])
 
   useEffect(() => {
     const dialog = ref.current
