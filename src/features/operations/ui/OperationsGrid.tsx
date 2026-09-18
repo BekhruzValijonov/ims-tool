@@ -1,9 +1,11 @@
+import type { ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import Link from "@mui/material/Link"
 import type { OperationRow } from "./operationRows"
 import { formatDateTime } from "../../../shared/dates"
 import { MONO_CELL, monoSx } from "../../../shared/ui/dataText"
+import { emptyOverlay } from "../../../shared/ui/EmptyState"
 import { ROUTES } from "../../../app/routes"
 
 interface OperationsGridProps {
@@ -14,10 +16,11 @@ interface OperationsGridProps {
   readonly pageSize?: number
   onPageChange?(page: number): void
   readonly dense?: boolean
+  readonly empty?: ReactNode
 }
 
 export function OperationsGrid({
-  rows, loading, rowCount, page = 0, pageSize = 25, onPageChange, dense,
+  rows, loading, rowCount, page = 0, pageSize = 25, onPageChange, dense, empty,
 }: OperationsGridProps) {
   const navigate = useNavigate()
 
@@ -72,6 +75,7 @@ export function OperationsGrid({
       paginationModel={ serverSide ? { page, pageSize } : undefined }
       onPaginationModelChange={ serverSide ? (model) => onPageChange?.(model.page) : undefined }
       pageSizeOptions={ [pageSize] }
+      slots={ empty ? { noRowsOverlay: emptyOverlay(empty) } : undefined }
     />
   )
 }

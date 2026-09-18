@@ -21,6 +21,7 @@ import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS, formatDateTime } from "../shared/dates"
 import { DateField } from "../shared/ui/DateField"
 import { PageHeader } from "../shared/ui/PageHeader"
+import { EmptyState } from "../shared/ui/EmptyState"
 
 const PAGE_SIZE = 25
 
@@ -49,6 +50,7 @@ export function OperationsPage() {
   const [exporting, setExporting] = useState(false)
 
   const query = readQuery(params)
+  const filtered = [...params.keys()].length > 0
   const state = useAsync(async () => {
     const journal = await repo.operations.journal({ ...query, page, pageSize: PAGE_SIZE })
     const ids = [...new Set(journal.rows.map((event) => event.instrumentId))]
@@ -104,7 +106,7 @@ export function OperationsPage() {
         actions={
           <Button
             variant="outlined" size="small" startIcon={ <FileDownloadIcon/> }
-            onClick={ exportCsv } disabled={ exporting || !dirs }
+            onClick={ exportCsv } disabled={ exporting || !dirs || (state.data?.journal.total ?? 0) === 0 }
           >
             Экспорт
           </Button>
@@ -160,13 +162,33 @@ export function OperationsPage() {
 
       <Paper>
         { dirs && state.data ? (
-            <OperationsGrid
-              rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }
-              loading={ state.loading }
-              rowCount={ state.data.journal.total }
-              page={ page }
-              pageSize={ PAGE_SIZE }
+          <OperationsGrid
+            rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }
+            loading={ state.loading }
+            rowCount={ state.data.journal.total }
+            page={ page }
+            pageSize={ PAGE_SIZE }
             onPageChange={ setPage }
+            empty={ filtered ? (
+              <EmptyState
+                title="Операций не найдено"
+                action={
+                  <Button
+                    size="small" variant="outlined"
+                    onClick={ () => { setParams({}, { replace: true }); setPage(0) } }
+                  >
+                    Сбросить фильтры
+                  </Button>
+                }
+              >
+                За выбранный период и по выбранным условиям операций не было.
+              </EmptyState>
+            ) : (
+              <EmptyState title="Журнал пуст">
+                Он заполняется сам: каждая выдача, возврат, перемещение, ремонт и поверка
+                попадают сюда с именем того, кто их оформил.
+              </EmptyState>
+            ) }
           />
         ) : null }
       </Paper>

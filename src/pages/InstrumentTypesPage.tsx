@@ -40,6 +40,7 @@ export function InstrumentTypesPage() {
       title="Типы приборов"
       addLabel="Добавить тип"
       hint="Тип решает, нужна ли прибору поверка и на какой срок она выдаётся"
+      emptyText="Тип задаёт, нужна ли прибору поверка и на сколько месяцев она выдаётся. Без типов график поверок построить не из чего."
       rows={ state.data ?? [] }
       columns={ columns }
       loading={ state.loading }

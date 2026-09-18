@@ -1,3 +1,4 @@
+import type { ReactNode } from "react"
 import { useNavigate } from "react-router-dom"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import Link from "@mui/material/Link"
@@ -7,6 +8,7 @@ import { StatusMark } from "./StatusMark"
 import { formatDate } from "../../../shared/dates"
 import { MONO_CELL, monoSx } from "../../../shared/ui/dataText"
 import { useStateColors } from "../../../app/theme/useStateColors"
+import { emptyOverlay } from "../../../shared/ui/EmptyState"
 import { ROUTES } from "../../../app/routes"
 import type { Directories } from "../../directories/ui/useDirectories"
 
@@ -18,10 +20,12 @@ interface InstrumentsGridProps {
   readonly page: number
   readonly pageSize: number
   onPageChange(page: number): void
+  /** Что показать вместо таблицы, когда строк нет. */
+  readonly empty?: ReactNode
 }
 
 export function InstrumentsGrid({
-  rows, directories, loading, rowCount, page, pageSize, onPageChange,
+  rows, directories, loading, rowCount, page, pageSize, onPageChange, empty,
 }: InstrumentsGridProps) {
   const navigate = useNavigate()
   const { state } = useStateColors()
@@ -116,6 +120,7 @@ export function InstrumentsGrid({
       paginationModel={ { page, pageSize } }
       onPaginationModelChange={ (model) => onPageChange(model.page) }
       pageSizeOptions={ [pageSize] }
+      slots={ empty ? { noRowsOverlay: emptyOverlay(empty) } : undefined }
     />
   )
 }

@@ -21,6 +21,7 @@ import { saveTextFile } from "../platform/saveFile"
 import { DAY_MS } from "../shared/dates"
 import { DateField } from "../shared/ui/DateField"
 import { PageHeader } from "../shared/ui/PageHeader"
+import { EmptyState, emptyOverlay } from "../shared/ui/EmptyState"
 
 function toDateInput(timestamp: number): string {
   const date = new Date(timestamp)
@@ -173,6 +174,21 @@ export function ReportsPage() {
           initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
           pageSizeOptions={ [25, 50, 100] }
           sx={ { minHeight: 320 } }
+          slots={ {
+            noRowsOverlay: emptyOverlay(
+              report.params.includes("instrument") && !instrumentId ? (
+                <EmptyState title="Выберите прибор">
+                  Паспорт движения строится по одному прибору. Найдите его в поле выше —
+                  по инвентарному номеру или названию.
+                </EmptyState>
+              ) : (
+                <EmptyState title="Для отчёта нет данных">
+                  Отчёты строятся по журналу и реестру. Как только появятся приборы и первые
+                  операции, эта таблица заполнится.
+                </EmptyState>
+              ),
+            ),
+          } }
         />
       </Paper>
     </Box>

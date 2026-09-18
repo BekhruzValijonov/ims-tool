@@ -210,6 +210,7 @@ export const components: Components<Theme> = {
         border: "none",
         fontSize: SIZE.small,
         "--DataGrid-rowBorderColor": (theme.vars || theme).palette.divider,
+        "--DataGrid-overlayHeight": "232px",
         "& .MuiDataGrid-columnHeaders": {
           borderBottom: `1px solid ${ (theme.vars || theme).palette.text.primary }`,
         },

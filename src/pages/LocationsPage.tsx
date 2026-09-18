@@ -37,6 +37,7 @@ export function LocationsPage() {
       title="Места хранения"
       addLabel="Добавить место"
       hint="Шкафы, стеллажи и верстаки. Сюда прибор возвращается после выдачи"
+      emptyText="Заведите шкафы и стеллажи. В место хранения прибор вернётся сам, когда его сдадут: в форме возврата места нет."
       rows={ state.data ?? [] }
       columns={ columns }
       loading={ state.loading }

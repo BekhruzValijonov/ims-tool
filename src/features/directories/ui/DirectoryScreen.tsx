@@ -15,6 +15,7 @@ import TextField from "@mui/material/TextField"
 import AddIcon from "@mui/icons-material/Add"
 import { DataGrid, type GridColDef } from "@mui/x-data-grid"
 import { PageHeader } from "../../../shared/ui/PageHeader"
+import { EmptyState, emptyOverlay } from "../../../shared/ui/EmptyState"
 
 export type FieldSpec =
   | { kind: "text"; key: string; label: string; required?: boolean; helper?: string }
@@ -29,6 +30,8 @@ interface DirectoryScreenProps<T extends { id: string }> {
   readonly addLabel: string
   /** Одна строка о том, зачем справочник нужен. */
   readonly hint?: string
+  /** Что написать, когда справочник ещё пуст. */
+  readonly emptyText: string
   readonly rows: readonly T[]
   readonly columns: readonly GridColDef<T>[]
   readonly fields: readonly FieldSpec[]
@@ -54,7 +57,7 @@ interface DirectoryScreenProps<T extends { id: string }> {
  * запись перестаёт предлагаться в формах, но прошлое остаётся читаемым.
  */
 export function DirectoryScreen<T extends { id: string }>({
-  title, addLabel, hint, rows, columns, fields, loading, error,
+  title, addLabel, hint, emptyText, rows, columns, fields, loading, error,
   toForm, onSave, archiveLabel, isArchived, onArchive,
 }: DirectoryScreenProps<T>) {
   const [editing, setEditing] = useState<T | null>(null)
@@ -140,6 +143,20 @@ export function DirectoryScreen<T extends { id: string }>({
           disableRowSelectionOnClick
           initialState={ { pagination: { paginationModel: { pageSize: 25 } } } }
           pageSizeOptions={ [25, 50] }
+          slots={ {
+            noRowsOverlay: emptyOverlay(
+              <EmptyState
+                title={ `${ title }: пока пусто` }
+                action={
+                  <Button variant="contained" size="small" startIcon={ <AddIcon/> } onClick={ openCreate }>
+                    { addLabel }
+                  </Button>
+                }
+              >
+                { emptyText }
+              </EmptyState>,
+            ),
+          } }
         />
       </Paper>
 

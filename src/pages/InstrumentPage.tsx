@@ -152,7 +152,6 @@ export function InstrumentPage() {
         <Grid size={ { xs: 12, md: 5 } }>
           <Stack sx={ { gap: 2 } }>
             <Block title="Паспорт">
-              <Field label="Инвентарный номер" value={ instrument.inventoryNumber } mono/>
               <Field label="Серийный номер" value={ instrument.serialNumber ?? "—" } mono/>
               <Field label="Тип" value={ dirs?.typeName(instrument.typeId) ?? "—" }/>
               <Field label="Производитель" value={ instrument.manufacturer ?? "—" }/>

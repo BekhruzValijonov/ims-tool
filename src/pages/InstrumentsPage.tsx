@@ -22,6 +22,7 @@ import { DateField } from "../shared/ui/DateField"
 import { VERIFICATION_HORIZON_MS } from "../data/settingsKeys"
 import { ROUTES } from "../app/routes"
 import { PageHeader } from "../shared/ui/PageHeader"
+import { EmptyState } from "../shared/ui/EmptyState"
 
 const PAGE_SIZE = 25
 
@@ -53,6 +54,9 @@ export function InstrumentsPage() {
   const [exporting, setExporting] = useState(false)
 
   const query = readQuery(params)
+  /* Пустая таблица бывает двух разных бед: база ещё не заполнена или фильтры
+     ничего не нашли. Действия у них тоже разные. */
+  const filtered = [...params.keys()].length > 0
   const state = useAsync(
     () => repo.instruments.list({ ...query, page, pageSize: PAGE_SIZE }),
     [repo, params.toString(), page],
@@ -108,7 +112,7 @@ export function InstrumentsPage() {
             size="small"
             startIcon={ <FileDownloadIcon/> }
             onClick={ exportCsv }
-            disabled={ exporting || !filters }
+            disabled={ exporting || !filters || (state.data?.total ?? 0) === 0 }
           >
             Экспорт
           </Button>
@@ -215,14 +219,45 @@ export function InstrumentsPage() {
 
       <Paper>
         { filters ? (
-            <InstrumentsGrid
-              rows={ state.data?.rows ?? [] }
-              directories={ filters }
-              loading={ state.loading }
-              rowCount={ state.data?.total ?? 0 }
-              page={ page }
-              pageSize={ PAGE_SIZE }
+          <InstrumentsGrid
+            rows={ state.data?.rows ?? [] }
+            directories={ filters }
+            loading={ state.loading }
+            rowCount={ state.data?.total ?? 0 }
+            page={ page }
+            pageSize={ PAGE_SIZE }
             onPageChange={ setPage }
+            empty={ filtered ? (
+              <EmptyState
+                title="Ничего не нашлось"
+                action={
+                  <Button
+                    size="small" variant="outlined"
+                    onClick={ () => { setParams({}, { replace: true }); setPage(0) } }
+                  >
+                    Сбросить фильтры
+                  </Button>
+                }
+              >
+                Под выбранные условия не подходит ни один прибор. Снимите часть фильтров
+                или проверьте инвентарный номер.
+              </EmptyState>
+            ) : (
+              <EmptyState
+                title="Приборов пока нет"
+                action={
+                  <Button
+                    size="small" variant="contained" startIcon={ <AddIcon/> }
+                    onClick={ () => navigate(`${ ROUTES.instruments }/new`) }
+                  >
+                    Добавить прибор
+                  </Button>
+                }
+              >
+                Перед первым заведением заполните справочники: подразделения, места хранения
+                и типы приборов. Тогда у прибора будет где числиться и куда возвращаться.
+              </EmptyState>
+            ) }
           />
         ) : null }
       </Paper>

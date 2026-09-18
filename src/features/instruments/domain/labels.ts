@@ -22,9 +22,17 @@ export function statusLabel(status: InstrumentStatus): string {
   return STATUS_LABELS[status]
 }
 
+/** Названия валют по-русски: код UZS человеку ничего не говорит. */
+const CURRENCY_NAMES: Readonly<Record<string, string>> = {
+  UZS: "сум",
+  USD: "долл.",
+  RUB: "руб.",
+}
+
 /** Денежная сумма из тийинов в читаемый вид. */
 export function formatPrice(priceMinor: number | null, currency: string | null): string {
   if (priceMinor === null) return "—"
   const amount = priceMinor / 100
-  return `${ amount.toLocaleString("ru-RU", { maximumFractionDigits: 0 }) } ${ currency ?? "" }`.trim()
+  const name = currency ? CURRENCY_NAMES[currency] ?? currency : ""
+  return `${ amount.toLocaleString("ru-RU", { maximumFractionDigits: 0 }) } ${ name }`.trim()
 }

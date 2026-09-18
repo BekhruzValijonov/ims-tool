@@ -77,6 +77,7 @@ export function EmployeesPage() {
       title="Сотрудники"
       addLabel="Добавить сотрудника"
       hint="Кому можно выдавать приборы. Уволенный остаётся в списке — в журнале есть его выдачи"
+      emptyText="Добавьте тех, кому будете выдавать приборы: выдать прибор человеку, которого нет в списке, нельзя."
       rows={ state.data?.employees ?? [] }
       columns={ columns }
       loading={ state.loading }

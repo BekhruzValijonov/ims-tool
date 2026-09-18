@@ -11,6 +11,7 @@ import { useDirectories } from "../features/directories/ui/useDirectories"
 import { PageHeader } from "../shared/ui/PageHeader"
 import { GaugeCluster, type Gauge } from "../features/dashboard/ui/GaugeCluster"
 import { AttentionStrip } from "../features/dashboard/ui/AttentionStrip"
+import { FirstRun } from "../features/dashboard/ui/FirstRun"
 import { FlowChart } from "../features/dashboard/ui/FlowChart"
 import { DepartmentBarChart } from "../features/dashboard/ui/DepartmentBarChart"
 import { StatusDonut } from "../features/dashboard/ui/StatusDonut"
@@ -73,6 +74,18 @@ export function DashboardPage() {
   }
 
   const { counters, history, flow, recent, breakdown, departments, locations, instruments } = state.data
+
+  /* Пустая база — это не «дашборд с нулями», а другой экран: человеку нужен
+     порядок действий, а не четыре нуля и пустые графики. */
+  if (counters.total === 0 && counters.writtenOff === 0) {
+    return (
+      <Box>
+        <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
+        <FirstRun/>
+      </Box>
+    )
+  }
+
   const labels = history.map((day) => shortDate(day.date))
 
   const gauges: Gauge[] = [

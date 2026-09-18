@@ -7,6 +7,7 @@ import { STATUS_LABELS, formatPrice } from "../../instruments/domain/labels"
 import { EVENT_LABELS, CONDITION_LABELS } from "../../operations/domain/labels"
 import { DAY_MS, formatDate, formatDateTime } from "../../../shared/dates"
 import { toOperationRows } from "../../operations/ui/operationRows"
+import { MONO_CELL } from "../../../shared/ui/dataText"
 
 /** Что спрашивать у человека перед построением. */
 export type ReportParam = "period" | "horizon" | "instrument"
@@ -37,7 +38,7 @@ export interface ReportDefinition {
 
 /** Колонки таблицы и колонки выгрузки — одно и то же: расходиться им незачем. */
 function mirror(
-  spec: readonly { field: string; header: string; width?: number; flex?: number }[],
+  spec: readonly { field: string; header: string; width?: number; flex?: number; mono?: boolean }[],
 ): { columns: GridColDef[]; csv: CsvColumn<Record<string, unknown>>[] } {
   return {
     columns: spec.map((column) => ({
@@ -46,6 +47,7 @@ function mirror(
       width: column.width,
       flex: column.flex,
       minWidth: column.flex ? 140 : undefined,
+      cellClassName: column.mono ? MONO_CELL : undefined,
     })),
     csv: spec.map((column) => ({
       header: column.header,
@@ -66,15 +68,15 @@ const registry: ReportDefinition = {
   async run(repo, directories) {
     const page = await repo.instruments.list({ pageSize: 100000 })
     const spec = [
-      { field: "inventoryNumber", header: "Инвентарный номер", width: 160 },
+      { field: "inventoryNumber", header: "Инвентарный номер", width: 160, mono: true },
       { field: "name", header: "Наименование", flex: 1 },
       { field: "type", header: "Тип", width: 150 },
-      { field: "serialNumber", header: "Серийный номер", width: 150 },
+      { field: "serialNumber", header: "Серийный номер", width: 150, mono: true },
       { field: "status", header: "Статус", width: 130 },
       { field: "department", header: "Подразделение", width: 160 },
       { field: "location", header: "Место хранения", width: 170 },
       { field: "employee", header: "У кого", width: 180 },
-      { field: "price", header: "Стоимость", width: 140 },
+      { field: "price", header: "Стоимость", width: 140, mono: true },
     ]
     const rows = withId(page.rows.map((instrument) => ({
       inventoryNumber: instrument.inventoryNumber,
@@ -103,11 +105,11 @@ const onHands: ReportDefinition = {
     const spec = [
       { field: "employee", header: "Сотрудник", flex: 1 },
       { field: "department", header: "Подразделение", width: 170 },
-      { field: "inventoryNumber", header: "Инвентарный номер", width: 160 },
+      { field: "inventoryNumber", header: "Инвентарный номер", width: 160, mono: true },
       { field: "name", header: "Прибор", flex: 1 },
-      { field: "issuedAt", header: "Выдан", width: 120 },
-      { field: "dueAt", header: "Вернуть до", width: 130 },
-      { field: "overdueDays", header: "Просрочено, дней", width: 160 },
+      { field: "issuedAt", header: "Выдан", width: 120, mono: true },
+      { field: "dueAt", header: "Вернуть до", width: 130, mono: true },
+      { field: "overdueDays", header: "Просрочено, дней", width: 160, mono: true },
     ]
 
     const mapped = page.rows.map((instrument: Instrument) => {
@@ -148,8 +150,8 @@ const journal: ReportDefinition = {
     for (const instrument of loaded) if (instrument) instruments.set(instrument.id, instrument)
 
     const spec = [
-      { field: "occurredAt", header: "Когда", width: 150 },
-      { field: "inventoryNumber", header: "Инвентарный номер", width: 160 },
+      { field: "occurredAt", header: "Когда", width: 160, mono: true },
+      { field: "inventoryNumber", header: "Инвентарный номер", width: 160, mono: true },
       { field: "instrumentName", header: "Прибор", flex: 1 },
       { field: "kind", header: "Операция", width: 130 },
       { field: "employee", header: "Сотрудник", flex: 1 },
@@ -180,12 +182,12 @@ const verification: ReportDefinition = {
     const now = Date.now()
     const due = await repo.verification.dueBefore(now + input.horizonDays * DAY_MS)
     const spec = [
-      { field: "inventoryNumber", header: "Инвентарный номер", width: 160 },
+      { field: "inventoryNumber", header: "Инвентарный номер", width: 160, mono: true },
       { field: "name", header: "Прибор", flex: 1 },
       { field: "type", header: "Тип", width: 150 },
       { field: "department", header: "Подразделение", width: 170 },
-      { field: "validUntil", header: "Поверка до", width: 130 },
-      { field: "daysLeft", header: "Осталось дней", width: 140 },
+      { field: "validUntil", header: "Поверка до", width: 130, mono: true },
+      { field: "daysLeft", header: "Осталось дней", width: 140, mono: true },
       { field: "state", header: "Состояние", width: 140 },
     ]
 
@@ -222,11 +224,11 @@ const departments: ReportDefinition = {
     const summary = await repo.directories.departmentSummary()
     const spec = [
       { field: "name", header: "Подразделение", flex: 1 },
-      { field: "total", header: "Числится", width: 120 },
-      { field: "available", header: "В наличии", width: 130 },
-      { field: "checkedOut", header: "Выдано", width: 120 },
-      { field: "inRepair", header: "В ремонте", width: 130 },
-      { field: "inVerification", header: "На поверке", width: 140 },
+      { field: "total", header: "Числится", width: 120, mono: true },
+      { field: "available", header: "В наличии", width: 130, mono: true },
+      { field: "checkedOut", header: "Выдано", width: 120, mono: true },
+      { field: "inRepair", header: "В ремонте", width: 130, mono: true },
+      { field: "inVerification", header: "На поверке", width: 140, mono: true },
     ]
     const rows = withId(summary.map((row) => ({
       name: row.name,
@@ -249,7 +251,7 @@ const passport: ReportDefinition = {
   params: ["instrument"],
   async run(repo, directories, input) {
     const spec = [
-      { field: "occurredAt", header: "Когда", width: 150 },
+      { field: "occurredAt", header: "Когда", width: 160, mono: true },
       { field: "kind", header: "Операция", width: 140 },
       { field: "employee", header: "Сотрудник", flex: 1 },
       { field: "place", header: "Место", flex: 1 },

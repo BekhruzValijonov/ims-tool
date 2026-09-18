@@ -27,6 +27,7 @@ export function DepartmentsPage() {
       title="Подразделения"
       addLabel="Добавить подразделение"
       hint="Цеха, лаборатории и участки, за которыми числятся приборы"
+      emptyText="Заведите цеха и лаборатории — за ними будут числиться приборы. Пока их нет, прибор некуда приписать."
       rows={ state.data ?? [] }
       columns={ columns }
       loading={ state.loading }

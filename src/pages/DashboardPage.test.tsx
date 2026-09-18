@@ -97,13 +97,15 @@ describe("дашборд", () => {
     expect(park).toHaveTextContent("Списано за всё время: 1")
   })
 
-  it("переживает пустую базу и не показывает выдуманных чисел", async () => {
+  it("на пустой базе показывает порядок действий, а не нули и пустые графики", async () => {
     await withRepo()
 
-    await waitFor(() => expect(gauge("total")).not.toBeNull())
+    await waitFor(() =>
+      expect(screen.getByText("В базе пока нет ни одного прибора")).toBeInTheDocument())
 
-    expect(gauge("total")).toHaveTextContent("0")
-    expect(screen.getByText("Не вернули в срок")).toBeInTheDocument()
+    // Ни счётчиков, ни демо-чисел шаблона.
+    expect(gauge("total")).toBeNull()
     expect(screen.queryByText("13,277")).not.toBeInTheDocument()
+    expect(screen.getByRole("button", { name: "Добавить прибор" })).toBeInTheDocument()
   })
 })
