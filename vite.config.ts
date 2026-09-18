@@ -8,6 +8,32 @@ const host = process.env.TAURI_DEV_HOST;
 export default defineConfig(() => ({
   plugins: [react()],
 
+  /*
+   * Список зависимостей закреплён, а не собирается по мере обнаружения.
+   *
+   * Половина из них подключается лениво: графики — при первом заходе на
+   * дашборд, driver.js — при первом запуске обхода, плагины Tauri — при первой
+   * выгрузке. Каждое такое открытие заставляло Vite пересобрать зависимости и
+   * перезагрузить открытую вкладку, а вкладка, пережившая пересборку, иногда
+   * остаётся с двумя копиями React и падает на первом же useState.
+   */
+  optimizeDeps: {
+    include: [
+      "react",
+      "react-dom",
+      "react-dom/client",
+      "react/jsx-runtime",
+      "react/jsx-dev-runtime",
+      "react-router-dom",
+      "apexcharts",
+      "react-apexcharts",
+      "driver.js",
+      "@tauri-apps/plugin-dialog",
+      "@tauri-apps/plugin-fs",
+      "@tauri-apps/plugin-sql",
+    ],
+  },
+
   // Vite options tailored for Tauri development and only applied in `tauri dev` or `tauri build`
   //
   // 1. prevent Vite from obscuring rust errors
