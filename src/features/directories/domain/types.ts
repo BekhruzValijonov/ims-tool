@@ -72,6 +72,14 @@ export interface EmployeeQuery {
   readonly includeInactive?: boolean
 }
 
+/** Строка сводки по месту хранения — для дерева на дашборде. */
+export interface LocationSummary {
+  readonly locationId: string
+  readonly name: string
+  readonly departmentId: string | null
+  readonly total: number
+}
+
 /** Строка сводки по подразделению — для дашборда и отчёта о загрузке. */
 export interface DepartmentSummary {
   readonly departmentId: string
