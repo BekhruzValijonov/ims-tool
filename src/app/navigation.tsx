@@ -1,7 +1,7 @@
 import type { ReactNode } from "react"
 import {
   IconDashboard, IconInstrument, IconOperations, IconEmployees,
-  IconDepartments, IconLocations, IconTypes, IconReports, IconSettings,
+  IconDepartments, IconLocations, IconTypes, IconReports, IconSettings, IconBrand,
 } from "../ui/icons"
 import { ROUTES } from "./routes"
 
@@ -38,6 +38,7 @@ export const NAVIGATION: readonly NavSection[] = [
     title: "Прочее",
     items: [
       { path: ROUTES.reports, title: "Отчёты", icon: <IconReports size={ 22 }/> },
+      { path: ROUTES.branding, title: "Брендирование", icon: <IconBrand size={ 22 }/> },
       { path: ROUTES.settings, title: "Настройки", icon: <IconSettings size={ 22 }/> },
     ],
   },

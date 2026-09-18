@@ -1,4 +1,5 @@
 import type { TourStep } from "../startTour"
+import branding from "./branding"
 import dashboard from "./dashboard"
 import departments from "./departments"
 import employee from "./employee"
@@ -32,6 +33,7 @@ export const TOURS = {
   locations,
   instrumentTypes,
   reports,
+  branding,
   settings,
 } as const satisfies Record<string, readonly TourStep[]>
 

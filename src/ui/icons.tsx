@@ -162,3 +162,9 @@ export const IconHelp = svg(
     <path d="M12 16.6h.01"/>
   </>,
 )
+export const IconBrand = svg(
+  <>
+    <circle cx="12" cy="12" r="8.5"/>
+    <path d="M12 3.5v17M3.5 12h17"/>
+  </>,
+)

@@ -11,6 +11,7 @@ import { DepartmentsPage } from "../pages/DepartmentsPage"
 import { LocationsPage } from "../pages/LocationsPage"
 import { InstrumentTypesPage } from "../pages/InstrumentTypesPage"
 import { ReportsPage } from "../pages/ReportsPage"
+import { BrandingPage } from "../pages/BrandingPage"
 import { SettingsPage } from "../pages/SettingsPage"
 
 /**
@@ -37,6 +38,7 @@ export const router = createHashRouter([
       { path: "locations", element: <LocationsPage/> },
       { path: "instrument-types", element: <InstrumentTypesPage/> },
       { path: "reports", element: <ReportsPage/> },
+      { path: "branding", element: <BrandingPage/> },
       { path: "settings", element: <SettingsPage/> },
     ],
   },

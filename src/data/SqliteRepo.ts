@@ -341,11 +341,18 @@ export class SqliteRepo implements AppRepo {
       return rows[0] ? String(rows[0].value) : null
     },
     setOperatorName: async (name) => {
+      await this.settings.set(OPERATOR_NAME_KEY, name.trim())
+    },
+    get: async (key) => {
+      const rows = await this.db.select<Row[]>("SELECT value FROM settings WHERE key = ?;", [key])
+      return rows[0] ? String(rows[0].value) : null
+    },
+    set: async (key, value) => {
       await this.write(async () => {
         await this.db.execute(
           `INSERT INTO settings (key, value) VALUES (?, ?)
            ON CONFLICT (key) DO UPDATE SET value = excluded.value;`,
-          [OPERATOR_NAME_KEY, name.trim()])
+          [key, value])
       })
     },
   }

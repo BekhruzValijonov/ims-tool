@@ -1,5 +1,6 @@
 /** Ключи таблицы settings. Строковые литералы не разбредаются по коду. */
 export const OPERATOR_NAME_KEY = "operator_full_name"
+export const BRANDING_KEY = "branding"
 
 /**
  * За сколько до конца поверки прибор попадает в «истекает».

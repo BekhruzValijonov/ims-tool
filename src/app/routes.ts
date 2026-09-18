@@ -10,5 +10,6 @@ export const ROUTES = {
   locations: "/locations",
   instrumentTypes: "/instrument-types",
   reports: "/reports",
+  branding: "/branding",
   settings: "/settings",
 } as const

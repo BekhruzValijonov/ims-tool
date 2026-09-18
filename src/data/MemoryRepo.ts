@@ -187,6 +187,10 @@ export class MemoryRepo implements AppRepo {
     setOperatorName: async (name) => {
       this.settingsMap.set(OPERATOR_NAME_KEY, name.trim())
     },
+    get: async (key) => this.settingsMap.get(key) ?? null,
+    set: async (key, value) => {
+      this.settingsMap.set(key, value)
+    },
   }
 
   // ——— внутреннее ———

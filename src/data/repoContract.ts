@@ -439,6 +439,22 @@ export function describeRepoContract(name: string, createRepo: RepoFactory): voi
         await repo.settings.setOperatorName("  Сидоров Сидор Сидорович  ")
         expect(await repo.settings.operatorName()).toBe("Сидоров Сидор Сидорович")
       })
+
+      it("хранит произвольную настройку и перезаписывает её", async () => {
+        expect(await repo.settings.get("branding")).toBeNull()
+        await repo.settings.set("branding", '{"accent":"#1B222B"}')
+        expect(await repo.settings.get("branding")).toBe('{"accent":"#1B222B"}')
+
+        await repo.settings.set("branding", '{"accent":"#0E6F7A"}')
+        expect(await repo.settings.get("branding")).toBe('{"accent":"#0E6F7A"}')
+      })
+
+      it("не путает настройки между собой", async () => {
+        await repo.settings.set("branding", "оформление")
+        await repo.settings.setOperatorName("Сидоров Сидор Сидорович")
+        expect(await repo.settings.get("branding")).toBe("оформление")
+        expect(await repo.settings.operatorName()).toBe("Сидоров Сидор Сидорович")
+      })
     })
   })
 }

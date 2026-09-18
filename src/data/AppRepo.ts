@@ -118,6 +118,14 @@ export interface DashboardRepo {
 export interface SettingsRepo {
   operatorName(): Promise<string | null>
   setOperatorName(name: string): Promise<void>
+  /**
+   * Произвольная настройка строкой.
+   *
+   * Разбор значения остаётся тому, кто его записал: слой данных не должен
+   * знать, что внутри — оформление, срок или что-то, чего ещё нет.
+   */
+  get(key: string): Promise<string | null>
+  set(key: string, value: string): Promise<void>
 }
 
 export interface AppRepo {
