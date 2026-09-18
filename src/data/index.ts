@@ -1,4 +1,4 @@
-import { isDevelopment, isTauri } from "../platform/env"
+import { isTauri } from "../platform/env"
 import type { AppRepo } from "./AppRepo"
 import { MemoryRepo } from "./MemoryRepo"
 
@@ -31,7 +31,11 @@ async function initRepo(): Promise<AppRepo> {
     // даже попадать в граф — грузить его там нечем.
     const { SqliteRepo } = await import("./SqliteRepo")
     const repo = await SqliteRepo.load(clock)
-    if (isDevelopment()) {
+    /* Проверка написана как import.meta.env.DEV прямо здесь, а не через
+       функцию: только в таком виде сборщик видит константу и выбрасывает и
+       ветку, и сам модуль витрины из релизного бандла. Через вызов функции
+       он этого сделать не может, и демо-данные уезжают на завод. */
+    if (import.meta.env.DEV) {
       const { seedShowcaseIfEmpty } = await import("./devSeed")
       await seedShowcaseIfEmpty(repo, travel)
     }
@@ -40,7 +44,7 @@ async function initRepo(): Promise<AppRepo> {
 
   // Браузер: вёрстка на дев-сервере без сборки Rust.
   const repo = new MemoryRepo(clock)
-  if (isDevelopment()) {
+  if (import.meta.env.DEV) {
     const { seedShowcase } = await import("./devSeed")
     /* ?demo=empty оставляет приложение пустым — так проверяются первый запуск,
        модалка «представьтесь» и экраны, на которых ещё ничего нет. */
