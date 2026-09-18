@@ -15,6 +15,7 @@ import { ROUTES } from "../app/routes"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { Skeleton } from "../ui/Skeleton"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
@@ -83,7 +84,7 @@ export function InstrumentPage() {
     && instrument.expectedReturnAt < Date.now()
 
   return (
-    <div>
+    <Page>
       <Button
         startIcon={ <IconArrowLeft size={ 18 }/> }
         onClick={ () => navigate(ROUTES.instruments) }
@@ -242,6 +243,6 @@ export function InstrumentPage() {
           onDone={ state.reload }
         />
       ) : null }
-    </div>
+    </Page>
   )
 }

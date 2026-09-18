@@ -1,0 +1,17 @@
+/* Страница, которая прокручивается целиком: карточки, формы, дашборд. */
+.scroll {
+  flex: 1;
+  min-height: 0;
+  overflow-y: auto;
+  scrollbar-gutter: stable;
+  padding-right: 4px;
+}
+
+/* Страница, занимающая всю высоту: прокруткой заведует содержимое, обычно
+   таблица. Так шапка списка и фильтры остаются на виду. */
+.fill {
+  flex: 1;
+  min-height: 0;
+  display: flex;
+  flex-direction: column;
+}

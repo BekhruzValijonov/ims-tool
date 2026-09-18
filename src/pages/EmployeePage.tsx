@@ -11,6 +11,7 @@ import { ROUTES } from "../app/routes"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { Chip } from "../ui/Chip"
 import { Skeleton } from "../ui/Skeleton"
 import { Stack } from "../ui/layout"
@@ -56,7 +57,7 @@ export function EmployeePage() {
   const now = Date.now()
 
   return (
-    <div>
+    <Page>
       <Button
         startIcon={ <IconArrowLeft size={ 18 }/> }
         onClick={ () => navigate(ROUTES.employees) }
@@ -140,6 +141,6 @@ export function EmployeePage() {
           </Card>
         </div>
       </Stack>
-    </div>
+    </Page>
   )
 }

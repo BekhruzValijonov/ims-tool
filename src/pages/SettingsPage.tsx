@@ -5,6 +5,7 @@ import { PageHeader } from "../shared/ui/PageHeader"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { TextField } from "../ui/Field"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
@@ -25,7 +26,7 @@ export function SettingsPage() {
   }
 
   return (
-    <div style={ { maxWidth: 760 } }>
+    <Page maxWidth={ 760 }>
       <PageHeader title="Настройки"/>
 
       <Stack gap={ 2 }>
@@ -61,6 +62,6 @@ export function SettingsPage() {
           </Text>
         </Card>
       </Stack>
-    </div>
+    </Page>
   )
 }

@@ -59,8 +59,10 @@ export function DataTable<T>({
   }
 
   return (
-    <div>
-      <div style={ { height: 2 } }>{ loading ? <div className={ styles.loading }/> : null }</div>
+    <div className={ styles.root }>
+      <div style={ { height: 2, flexShrink: 0 } }>
+        { loading ? <div className={ styles.loading }/> : null }
+      </div>
 
       <div className={ styles.wrap }>
         <table className={ styles.table }>

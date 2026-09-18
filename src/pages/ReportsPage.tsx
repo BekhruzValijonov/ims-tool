@@ -11,6 +11,7 @@ import { EmptyState } from "../shared/ui/EmptyState"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { DataTable } from "../ui/DataTable"
 import { DateInput } from "../ui/DateInput"
 import { Select } from "../ui/Field"
@@ -73,7 +74,7 @@ export function ReportsPage() {
   }
 
   return (
-    <div>
+    <Page>
       <PageHeader title="Отчёты" hint="Выберите отчёт, задайте параметры и выгрузите его в CSV"/>
 
       <Grid cols={ { xs: 1, sm: 2, lg: 3 } } gap={ 1.5 } style={ { marginBottom: 16 } }>
@@ -176,6 +177,6 @@ export function ReportsPage() {
           ) }
         />
       </Card>
-    </div>
+    </Page>
   )
 }

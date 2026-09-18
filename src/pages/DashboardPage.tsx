@@ -17,6 +17,7 @@ import { COLORS } from "../app/theme/tokens"
 import { useStateColors } from "../app/theme/useStateColors"
 import { Alert } from "../ui/Alert"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { Skeleton } from "../ui/Skeleton"
 import { Stack } from "../ui/layout"
 import { Text } from "../ui/Text"
@@ -106,7 +107,7 @@ export function DashboardPage() {
   ]
 
   return (
-    <div>
+    <Page>
       <PageHeader title="Дашборд" hint="Что происходит с приборами прямо сейчас"/>
 
       <Stack gap={ 2 }>
@@ -134,6 +135,6 @@ export function DashboardPage() {
           </Card>
         </div>
       </Stack>
-    </div>
+    </Page>
   )
 }

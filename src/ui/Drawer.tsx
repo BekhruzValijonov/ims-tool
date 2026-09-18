@@ -32,14 +32,31 @@ export function Drawer({ open, title, children, footer, onClose }: DrawerProps) 
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
+    // Ссылка закреплена локально: обработчики ниже читают её после проверки.
+    const element = dialog
 
     function cancel(event: Event) {
       event.preventDefault()
       onClose()
     }
 
-    dialog.addEventListener("cancel", cancel)
-    return () => dialog.removeEventListener("cancel", cancel)
+    /* Щелчок мимо панели закрывает её — привычное поведение выдвижных
+       панелей. Нативный <dialog> отдаёт клик по затемнению на себя, поэтому
+       фон отличается от содержимого по координатам. */
+    function clickOutside(event: MouseEvent) {
+      if (event.target !== element) return
+      const box = element.getBoundingClientRect()
+      const inside = event.clientX >= box.left && event.clientX <= box.right
+        && event.clientY >= box.top && event.clientY <= box.bottom
+      if (!inside) onClose()
+    }
+
+    element.addEventListener("cancel", cancel)
+    element.addEventListener("click", clickOutside)
+    return () => {
+      element.removeEventListener("cancel", cancel)
+      element.removeEventListener("click", clickOutside)
+    }
   }, [onClose])
 
   return (

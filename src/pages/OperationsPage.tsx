@@ -16,6 +16,7 @@ import { EmptyState } from "../shared/ui/EmptyState"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { Chip } from "../ui/Chip"
 import { DateInput } from "../ui/DateInput"
 import { Drawer } from "../ui/Drawer"
@@ -109,7 +110,7 @@ export function OperationsPage() {
   const dirs = directories.data
 
   return (
-    <div>
+    <Page fill>
       <PageHeader
         title="Операции"
         count={ state.data?.journal.total }
@@ -134,7 +135,7 @@ export function OperationsPage() {
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none">
+      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
         { dirs && state.data ? (
           <OperationsTable
             rows={ toOperationRows(state.data.journal.rows, state.data.instruments, dirs) }
@@ -206,6 +207,6 @@ export function OperationsPage() {
           />
         </Stack>
       </Drawer>
-    </div>
+    </Page>
   )
 }

@@ -4,6 +4,7 @@ import { PageHeader } from "../shared/ui/PageHeader"
 import { FormPageActions, InstrumentForm } from "../features/instruments/ui/InstrumentForm"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { IconArrowLeft } from "../ui/icons"
 
 /**
@@ -18,7 +19,7 @@ export function InstrumentFormPage() {
   const navigate = useNavigate()
 
   return (
-    <div style={ { maxWidth: 900 } }>
+    <Page maxWidth={ 900 }>
       <Button
         startIcon={ <IconArrowLeft size={ 18 }/> }
         onClick={ () => navigate(-1) }
@@ -40,6 +41,6 @@ export function InstrumentFormPage() {
           ) }
         />
       </Card>
-    </div>
+    </Page>
   )
 }

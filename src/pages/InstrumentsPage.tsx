@@ -17,6 +17,7 @@ import { EmptyState } from "../shared/ui/EmptyState"
 import { Alert } from "../ui/Alert"
 import { Button } from "../ui/Button"
 import { Card } from "../ui/Card"
+import { Page } from "../ui/Page"
 import { Chip } from "../ui/Chip"
 import { DateInput } from "../ui/DateInput"
 import { Dialog } from "../ui/Dialog"
@@ -144,7 +145,7 @@ export function InstrumentsPage() {
     : params.get("verification") === "due" ? "verification" : ""
 
   return (
-    <div>
+    <Page fill>
       <PageHeader
         title="Приборы"
         count={ state.data?.total }
@@ -173,7 +174,7 @@ export function InstrumentsPage() {
 
       { state.error ? <Alert severity="error" className="mb-2">{ state.error }</Alert> : null }
 
-      <Card padding="none">
+      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
         { filters ? (
           <InstrumentsTable
             rows={ state.data?.rows ?? [] }
@@ -299,6 +300,6 @@ export function InstrumentsPage() {
           />
         ) : null }
       </Dialog>
-    </div>
+    </Page>
   )
 }

@@ -34,6 +34,8 @@ export function Dialog({ open, title, children, actions, onClose, onSubmit, wide
   useEffect(() => {
     const dialog = ref.current
     if (!dialog) return
+    // Ссылка закреплена локально: обработчики ниже читают её после проверки.
+    const element = dialog
 
     function cancel(event: Event) {
       // Esc закрывает окно только если его вообще разрешено закрывать.
@@ -41,8 +43,23 @@ export function Dialog({ open, title, children, actions, onClose, onSubmit, wide
       else onClose()
     }
 
-    dialog.addEventListener("cancel", cancel)
-    return () => dialog.removeEventListener("cancel", cancel)
+    /* Щелчок мимо окна закрывает его. Нативный <dialog> так не умеет:
+       событие приходит на сам элемент, и отличить фон от содержимого можно
+       только по координатам — они попадают в прямоугольник окна или нет. */
+    function clickOutside(event: MouseEvent) {
+      if (!onClose || event.target !== element) return
+      const box = element.getBoundingClientRect()
+      const inside = event.clientX >= box.left && event.clientX <= box.right
+        && event.clientY >= box.top && event.clientY <= box.bottom
+      if (!inside) onClose()
+    }
+
+    element.addEventListener("cancel", cancel)
+    element.addEventListener("click", clickOutside)
+    return () => {
+      element.removeEventListener("cancel", cancel)
+      element.removeEventListener("click", clickOutside)
+    }
   }, [onClose])
 
   const content = (

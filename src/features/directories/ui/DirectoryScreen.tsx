@@ -4,6 +4,7 @@ import { EmptyState } from "../../../shared/ui/EmptyState"
 import { Alert } from "../../../ui/Alert"
 import { Button } from "../../../ui/Button"
 import { Card } from "../../../ui/Card"
+import { Page } from "../../../ui/Page"
 import { DataTable, type Column } from "../../../ui/DataTable"
 import { Dialog } from "../../../ui/Dialog"
 import { Select, TextField, type Option } from "../../../ui/Field"
@@ -116,12 +117,12 @@ export function DirectoryScreen<T extends { id: string }>({
   )
 
   return (
-    <div>
+    <Page fill>
       <PageHeader title={ title } count={ rows.length } hint={ hint } actions={ addButton }/>
 
       { error ? <Alert severity="error" className="mb-2">{ error }</Alert> : null }
 
-      <Card padding="none">
+      <Card padding="none" style={ { flex: 1, minHeight: 0, display: "flex", flexDirection: "column" } }>
         <DataTable
           columns={ [...columns, actionsColumn] }
           rows={ rows }
@@ -191,6 +192,6 @@ export function DirectoryScreen<T extends { id: string }>({
           { failure ? <Alert severity="error">{ failure }</Alert> : null }
         </Stack>
       </Dialog>
-    </div>
+    </Page>
   )
 }
