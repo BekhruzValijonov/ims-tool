@@ -1,6 +1,7 @@
 import { useState, type ReactNode } from "react"
 import styles from "./DataTable.module.css"
 import { IconButton } from "./Button"
+import { Select } from "./Select"
 import { IconChevronLeft, IconChevronRight } from "./icons"
 
 export interface Column<T> {
@@ -113,6 +114,25 @@ export function DataTable<T>({
       { total > pageSize ? (
         <div className={ styles.foot }>
           <span>{ from }–{ to } из { total }</span>
+
+          {/* Список страниц, а не только стрелки: до сороковой страницы журнала
+              иначе добираться сорока нажатиями. */}
+          <div className={ styles.jump }>
+            <span>Страница</span>
+            <Select
+              compact
+              ariaLabel="Страница"
+              value={ String(currentPage) }
+              options={ Array.from({ length: lastPage + 1 }, (_, index) => ({
+                value: String(index),
+                label: String(index + 1),
+              })) }
+              onChange={ (next) => goTo(Number(next)) }
+              style={ { minWidth: 64 } }
+            />
+            <span>из { lastPage + 1 }</span>
+          </div>
+
           <div className={ styles.pager }>
             <IconButton
               label="Предыдущая страница"

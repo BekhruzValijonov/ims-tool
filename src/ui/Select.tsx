@@ -20,8 +20,12 @@ interface SelectProps {
   readonly required?: boolean
   readonly disabled?: boolean
   readonly fullWidth?: boolean
+  /** Пониже и мельче — для тесных мест вроде подвала таблицы. */
+  readonly compact?: boolean
   readonly className?: string
   readonly style?: CSSProperties
+  /** Чем список представляется, когда подписи рядом нет. */
+  readonly ariaLabel?: string
 }
 
 interface Position {
@@ -42,7 +46,8 @@ interface Position {
  * модальное окно: портал в body ушёл бы под затемнение нативного `<dialog>`.
  */
 export function Select({
-  value, onChange, options, emptyLabel, label, helper, required, disabled, fullWidth, className, style,
+  value, onChange, options, emptyLabel, label, helper, required, disabled, fullWidth, compact,
+  className, style, ariaLabel,
 }: SelectProps) {
   const id = useId()
   const triggerRef = useRef<HTMLButtonElement>(null)
@@ -173,10 +178,12 @@ export function Select({
         id={ id }
         ref={ triggerRef }
         type="button"
-        className={ [styles.trigger, open ? styles.open : null].filter(Boolean).join(" ") }
+        className={ [styles.trigger, compact ? styles.compact : null, open ? styles.open : null]
+          .filter(Boolean).join(" ") }
         disabled={ disabled }
         aria-haspopup="listbox"
         aria-expanded={ open }
+        aria-label={ label ? undefined : ariaLabel }
         onClick={ () => (open ? setOpen(false) : openList()) }
         onKeyDown={ onKeyDown }
       >

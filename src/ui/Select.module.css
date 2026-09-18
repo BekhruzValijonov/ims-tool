@@ -14,6 +14,13 @@
   transition: border-color 120ms ease;
 }
 
+.compact {
+  min-height: 30px;
+  padding: 0 8px;
+  gap: 4px;
+  font-size: 0.8125rem;
+}
+
 .trigger:hover { border-color: var(--text-secondary); }
 
 .trigger:focus-visible,
